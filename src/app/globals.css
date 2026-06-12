@@ -292,6 +292,17 @@ textarea {
   padding: 13px 14px;
 }
 
+.resource-row small {
+  color: var(--muted);
+}
+
+.admin-panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
 .stat-card {
   display: grid;
   gap: 8px;
@@ -451,6 +462,7 @@ textarea {
   .lesson-grid,
   .account-grid,
   .lesson-layout,
+  .admin-panels,
   .search-row {
     grid-template-columns: 1fr;
   }

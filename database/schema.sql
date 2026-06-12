@@ -107,3 +107,7 @@ insert into public.categories (name, slug, description, sort_order) values
 ('Drept Civil', 'drept-civil', 'Contracte, datorii, proprietate, raspundere si litigii civile.', 2),
 ('Imigratie', 'imigratie', 'Vize, cetatenie, statut, familie si aplicatii in UK.', 3),
 ('Drept Penal', 'drept-penal', 'Cazier, acuzatii, proceduri si efecte juridice.', 4);
+
+insert into storage.buckets (id, name, public)
+values ('lesson-resources', 'lesson-resources', false)
+on conflict (id) do nothing;

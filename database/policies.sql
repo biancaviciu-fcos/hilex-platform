@@ -81,3 +81,21 @@ create policy "Admins can manage video uploads"
 on public.video_uploads for all
 using (public.current_user_role() in ('admin', 'owner'))
 with check (public.current_user_role() in ('admin', 'owner'));
+
+create policy "Members can read lesson resource files"
+on storage.objects for select
+using (
+  bucket_id = 'lesson-resources'
+  and auth.uid() is not null
+);
+
+create policy "Admins can manage lesson resource files"
+on storage.objects for all
+using (
+  bucket_id = 'lesson-resources'
+  and public.current_user_role() in ('admin', 'owner')
+)
+with check (
+  bucket_id = 'lesson-resources'
+  and public.current_user_role() in ('admin', 'owner')
+);

@@ -24,6 +24,20 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   const body = Array.isArray(lesson.body) ? lesson.body : [];
   const keyPoints = Array.isArray(lesson.key_points) ? lesson.key_points : [];
   const resources = Array.isArray(lesson.lesson_resources) ? lesson.lesson_resources : [];
+  const resourcesWithUrls = await Promise.all(
+    resources.map(async (resource: { title: string; url: string; resource_type: string }) => {
+      if (resource.resource_type !== "pdf") return resource;
+
+      const { data } = await supabase.storage
+        .from("lesson-resources")
+        .createSignedUrl(resource.url, 60 * 15);
+
+      return {
+        ...resource,
+        url: data?.signedUrl || "#"
+      };
+    })
+  );
 
   return (
     <main className="page">
@@ -74,10 +88,10 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
             </section>
             <section id="resources">
               <h2>Resurse</h2>
-              {resources.length ? (
+              {resourcesWithUrls.length ? (
                 <div className="resource-list">
-                  {resources.map((resource: { title: string; url: string; resource_type: string }) => (
-                    <a className="resource-row" href={resource.url} key={resource.title}>
+                  {resourcesWithUrls.map((resource: { title: string; url: string; resource_type: string }) => (
+                    <a className="resource-row" href={resource.url} key={resource.title} rel="noreferrer" target="_blank">
                       <span>{resource.title}</span>
                       <strong>{resource.resource_type}</strong>
                     </a>

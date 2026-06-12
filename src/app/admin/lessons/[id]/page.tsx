@@ -77,11 +77,16 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
 
   if (!isAdminUser(profile?.role, user.email)) redirect("/library");
 
-  const { data: lesson } = await supabase.from("lessons").select("*").eq("id", id).single();
+  const { data: lesson } = await supabase
+    .from("lessons")
+    .select("*, lesson_resources(id,title,resource_type,url,access_level)")
+    .eq("id", id)
+    .single();
   if (!lesson) notFound();
 
   const body = Array.isArray(lesson.body) ? lesson.body.join("\n\n") : "";
   const keyPoints = Array.isArray(lesson.key_points) ? lesson.key_points.join("\n") : "";
+  const resources = Array.isArray(lesson.lesson_resources) ? lesson.lesson_resources : [];
 
   return (
     <main className="page">
@@ -152,6 +157,82 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
               Salveaza
             </button>
           </form>
+
+          <div className="admin-panels">
+            <section className="card form">
+              <h2>Adauga PDF</h2>
+              <form action="/api/admin/resources/upload" encType="multipart/form-data" method="POST" className="form">
+                <input type="hidden" name="lesson_id" value={lesson.id} />
+                <div className="field">
+                  <label>Titlu resursa</label>
+                  <input name="title" placeholder="Ex: Checklist documente" />
+                </div>
+                <div className="field">
+                  <label>Acces</label>
+                  <select name="access_level" defaultValue="basic">
+                    <option value="basic">Basic</option>
+                    <option value="premium">Premium</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label>Fisier PDF</label>
+                  <input accept="application/pdf" name="file" required type="file" />
+                </div>
+                <button className="btn primary" type="submit">
+                  Incarca PDF
+                </button>
+              </form>
+            </section>
+
+            <section className="card form">
+              <h2>Adauga link</h2>
+              <form action="/api/admin/resources/link" method="POST" className="form">
+                <input type="hidden" name="lesson_id" value={lesson.id} />
+                <div className="field">
+                  <label>Titlu link</label>
+                  <input name="title" required />
+                </div>
+                <div className="field">
+                  <label>URL</label>
+                  <input name="url" required type="url" />
+                </div>
+                <div className="field">
+                  <label>Acces</label>
+                  <select name="access_level" defaultValue="basic">
+                    <option value="basic">Basic</option>
+                    <option value="premium">Premium</option>
+                  </select>
+                </div>
+                <button className="btn primary" type="submit">
+                  Adauga link
+                </button>
+              </form>
+            </section>
+          </div>
+
+          <section className="card form">
+            <h2>Resurse atasate</h2>
+            {resources.length ? (
+              <div className="resource-list">
+                {resources.map((resource: { id: string; title: string; resource_type: string; url: string; access_level: string }) => (
+                  <div className="resource-row" key={resource.id}>
+                    <span>
+                      <strong>{resource.title}</strong>
+                      <br />
+                      <small>{resource.resource_type} · {resource.access_level}</small>
+                    </span>
+                    <form action={`/api/admin/resources/${resource.id}/delete`} method="POST">
+                      <button className="btn" type="submit">
+                        Sterge
+                      </button>
+                    </form>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="muted">Nu exista resurse atasate inca.</p>
+            )}
+          </section>
         </div>
       </section>
     </main>
