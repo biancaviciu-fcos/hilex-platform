@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { isAdminUser } from "@/lib/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { VideoUploadPanel } from "./VideoUploadPanel";
 
 async function updateLesson(formData: FormData) {
   "use server";
@@ -157,6 +158,8 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
               Salveaza
             </button>
           </form>
+
+          <VideoUploadPanel lessonId={lesson.id} />
 
           <div className="admin-panels">
             <section className="card form">

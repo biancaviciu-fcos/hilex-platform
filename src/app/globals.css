@@ -278,6 +278,14 @@ textarea {
   padding: 28px;
 }
 
+.video-embed {
+  aspect-ratio: 16 / 9;
+  background: #05071a;
+  border: 0;
+  display: block;
+  width: 100%;
+}
+
 .resource-list {
   display: grid;
   gap: 10px;

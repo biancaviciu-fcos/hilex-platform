@@ -24,21 +24,24 @@ export async function POST(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { data: resource } = await supabase
-    .from("lesson_resources")
-    .select("lesson_id,resource_type,url")
-    .eq("id", id)
-    .single();
+  const formData = await request.formData();
+  const videoAssetId = String(formData.get("video_asset_id") || "");
 
-  if (!resource) return NextResponse.json({ error: "Not found" }, { status: 404 });
-
-  await supabase.from("lesson_resources").delete().eq("id", id);
-
-  if (resource.resource_type === "pdf") {
-    await supabase.storage.from("lesson-resources").remove([resource.url]);
+  if (!videoAssetId) {
+    return NextResponse.json({ error: "Missing video asset id" }, { status: 400 });
   }
 
-  return NextResponse.redirect(new URL(`/admin/lessons/${resource.lesson_id}`, request.url), {
+  await supabase
+    .from("lessons")
+    .update({
+      video_provider: "cloudflare_stream",
+      video_asset_id: videoAssetId,
+      video_playback_id: videoAssetId,
+      updated_at: new Date().toISOString()
+    })
+    .eq("id", id);
+
+  return NextResponse.redirect(new URL(`/admin/lessons/${id}`, request.url), {
     status: 303
   });
 }

@@ -67,10 +67,20 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
           <article className="card article-card">
             <section id="video">
               <h2>Tutorial video</h2>
-              <div className="video-placeholder">
-                <span>▶</span>
-                <p>Player video securizat pentru membri</p>
-              </div>
+              {lesson.video_provider === "cloudflare_stream" && lesson.video_playback_id ? (
+                <iframe
+                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                  allowFullScreen
+                  className="video-embed"
+                  src={`https://iframe.videodelivery.net/${lesson.video_playback_id}`}
+                  title={lesson.title}
+                />
+              ) : (
+                <div className="video-placeholder">
+                  <span>▶</span>
+                  <p>Player video securizat pentru membri</p>
+                </div>
+              )}
             </section>
             <section id="details">
               <h2>Explicatii</h2>
