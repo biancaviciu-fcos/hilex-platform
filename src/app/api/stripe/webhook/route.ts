@@ -85,7 +85,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   });
 
   await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/login`
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/update-password`
   });
 }
 

@@ -13,7 +13,13 @@ async function signIn(formData: FormData) {
   redirect("/library");
 }
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const params = await searchParams;
+
   return (
     <main className="page">
       <section className="hero">
@@ -25,6 +31,11 @@ export default function LoginPage() {
       <section className="section">
         <div className="inner">
           <form className="card form" action={signIn}>
+            {params.error ? (
+              <p className="notice-text">
+                Datele de login nu sunt corecte sau parola nu a fost setata inca.
+              </p>
+            ) : null}
             <div className="field">
               <label>Email</label>
               <input name="email" type="email" required />
