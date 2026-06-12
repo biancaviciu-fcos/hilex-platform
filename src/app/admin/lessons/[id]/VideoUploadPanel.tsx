@@ -1,5 +1,6 @@
 "use client";
 
+import type { ChangeEvent } from "react";
 import { useState } from "react";
 
 export function VideoUploadPanel({ lessonId }: { lessonId: string }) {
@@ -7,6 +8,7 @@ export function VideoUploadPanel({ lessonId }: { lessonId: string }) {
   const [videoId, setVideoId] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   async function createUploadUrl() {
     setIsLoading(true);
@@ -26,7 +28,35 @@ export function VideoUploadPanel({ lessonId }: { lessonId: string }) {
 
     setUploadUrl(payload.uploadUrl);
     setVideoId(payload.videoId);
-    setMessage("Linkul de upload a fost creat. Deschide-l si incarca video-ul.");
+    setMessage("Linkul de upload a fost creat. Alege fisierul video si incarca-l.");
+  }
+
+  async function uploadVideo(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+
+    if (!file || !uploadUrl) {
+      return;
+    }
+
+    setIsUploading(true);
+    setMessage("");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch(uploadUrl, {
+      method: "POST",
+      body: formData
+    });
+
+    setIsUploading(false);
+
+    if (!response.ok) {
+      setMessage("Upload-ul video nu a reusit. Incearca din nou sau incarca manual in Cloudflare.");
+      return;
+    }
+
+    setMessage("Video-ul a fost incarcat. Apasa pe Salveaza video pe lectie.");
   }
 
   return (
@@ -42,16 +72,17 @@ export function VideoUploadPanel({ lessonId }: { lessonId: string }) {
       {message ? <p className="notice-text">{message}</p> : null}
       {uploadUrl ? (
         <div className="form">
-          <a className="btn" href={uploadUrl} rel="noreferrer" target="_blank">
-            Deschide upload Cloudflare
-          </a>
+          <div className="field">
+            <label>Alege fisierul video</label>
+            <input accept="video/*" disabled={isUploading} onChange={uploadVideo} type="file" />
+          </div>
           <form action={`/api/admin/lessons/${lessonId}/video`} method="POST" className="form">
             <div className="field">
               <label>Video ID</label>
               <input name="video_asset_id" readOnly value={videoId} />
             </div>
             <button className="btn primary" type="submit">
-              Salveaza video pe lectie
+              {isUploading ? "Se incarca..." : "Salveaza video pe lectie"}
             </button>
           </form>
         </div>
