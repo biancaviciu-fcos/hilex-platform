@@ -29,7 +29,8 @@ Add environment variables from `.env.example`.
 2. Go to SQL Editor.
 3. Run `database/schema.sql`.
 4. Run `database/policies.sql`.
-5. Copy project URL and keys into Vercel environment variables.
+5. Optional for starter content: run `database/seed_lessons.sql`.
+6. Copy project URL and keys into Vercel environment variables.
 
 ## 4. Stripe
 

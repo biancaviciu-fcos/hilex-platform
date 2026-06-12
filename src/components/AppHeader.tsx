@@ -8,6 +8,7 @@ export function AppHeader() {
       </Link>
       <nav className="nav">
         <Link href="/library">Biblioteca</Link>
+        <Link href="/pricing">Pachete</Link>
         <Link href="/admin">Admin</Link>
         <Link className="btn" href="/account">Cont</Link>
       </nav>

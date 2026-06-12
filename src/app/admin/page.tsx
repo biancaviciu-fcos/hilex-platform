@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
+import { isAdminUser } from "@/lib/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export default async function AdminPage() {
@@ -17,11 +18,11 @@ export default async function AdminPage() {
     .eq("id", user.id)
     .single();
 
-  if (!profile || !["admin", "owner"].includes(profile.role)) redirect("/library");
+  if (!isAdminUser(profile?.role, user.email)) redirect("/library");
 
   const { data: lessons } = await supabase
     .from("lessons")
-    .select("id,title,slug,status,access_level")
+    .select("id,title,slug,status,access_level,excerpt")
     .order("created_at", { ascending: false });
 
   return (
@@ -30,19 +31,26 @@ export default async function AdminPage() {
       <section className="hero">
         <div className="inner">
           <h1>Admin HILEX</h1>
-          <p>Gestioneaza continutul bibliotecii.</p>
+          <p>Gestioneaza continutul bibliotecii, drafturile si publicarea.</p>
           <Link className="btn primary" href="/admin/lessons/new">
             Lectie noua
           </Link>
         </div>
       </section>
       <section className="section">
-        <div className="inner grid">
+        <div className="inner lesson-grid">
           {(lessons || []).map((lesson) => (
-            <Link className="card" href={`/admin/lessons/${lesson.id}`} key={lesson.id}>
-              <span className="tag">{lesson.status}</span>
-              <h3>{lesson.title}</h3>
-              <p className="muted">{lesson.access_level}</p>
+            <Link className="lesson-card admin-lesson" href={`/admin/lessons/${lesson.id}`} key={lesson.id}>
+              <div className="lesson-content">
+                <div className="tag-row">
+                  <span className="tag">{lesson.status}</span>
+                  <span className={`tag ${lesson.access_level === "premium" ? "premium" : ""}`}>
+                    {lesson.access_level}
+                  </span>
+                </div>
+                <h3>{lesson.title}</h3>
+                <p className="muted">{lesson.excerpt || "Fara descriere inca."}</p>
+              </div>
             </Link>
           ))}
         </div>

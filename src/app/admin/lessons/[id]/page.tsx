@@ -1,11 +1,26 @@
 import { notFound, redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
+import { isAdminUser } from "@/lib/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 async function updateLesson(formData: FormData) {
   "use server";
 
   const supabase = await createSupabaseServerClient();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (!isAdminUser(profile?.role, user.email)) redirect("/library");
+
   const id = String(formData.get("id") || "");
   const title = String(formData.get("title") || "");
   const slug = String(formData.get("slug") || "");
@@ -60,7 +75,7 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
     .eq("id", user.id)
     .single();
 
-  if (!profile || !["admin", "owner"].includes(profile.role)) redirect("/library");
+  if (!isAdminUser(profile?.role, user.email)) redirect("/library");
 
   const { data: lesson } = await supabase.from("lessons").select("*").eq("id", id).single();
   if (!lesson) notFound();

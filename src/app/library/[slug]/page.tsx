@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -13,7 +14,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
 
   const { data: lesson } = await supabase
     .from("lessons")
-    .select("*, lesson_resources(title,resource_type,url,access_level,sort_order)")
+    .select("*, categories(name,slug), subcategories(name,slug), lesson_resources(title,resource_type,url,access_level,sort_order)")
     .eq("slug", slug)
     .eq("status", "published")
     .single();
@@ -22,12 +23,16 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
 
   const body = Array.isArray(lesson.body) ? lesson.body : [];
   const keyPoints = Array.isArray(lesson.key_points) ? lesson.key_points : [];
+  const resources = Array.isArray(lesson.lesson_resources) ? lesson.lesson_resources : [];
 
   return (
     <main className="page">
       <AppHeader />
-      <section className="hero">
+      <section className="hero compact">
         <div className="inner">
+          <p className="breadcrumbs">
+            <Link href="/library">Biblioteca</Link> / {lesson.categories?.name || "Lectie"}
+          </p>
           <span className={`tag ${lesson.access_level === "premium" ? "premium" : ""}`}>
             {lesson.access_level}
           </span>
@@ -36,20 +41,52 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
         </div>
       </section>
       <section className="section">
-        <div className="inner">
-          <article className="card">
-            <h3>Tutorial video</h3>
-            <p className="muted">Playerul securizat va fi conectat la providerul video ales.</p>
-            <h3>Explicatii</h3>
-            {body.map((paragraph: string) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-            <h3>Idei cheie</h3>
-            <ul>
-              {keyPoints.map((point: string) => (
-                <li key={point}>{point}</li>
+        <div className="inner lesson-layout">
+          <aside className="lesson-menu card">
+            <h3>In aceasta lectie</h3>
+            <a href="#video">Tutorial video</a>
+            <a href="#details">Explicatii</a>
+            <a href="#keys">Idei cheie</a>
+            <a href="#resources">Resurse</a>
+          </aside>
+
+          <article className="card article-card">
+            <section id="video">
+              <h2>Tutorial video</h2>
+              <div className="video-placeholder">
+                <span>▶</span>
+                <p>Player video securizat pentru membri</p>
+              </div>
+            </section>
+            <section id="details">
+              <h2>Explicatii</h2>
+              {body.map((paragraph: string) => (
+                <p key={paragraph}>{paragraph}</p>
               ))}
-            </ul>
+            </section>
+            <section id="keys">
+              <h2>Idei cheie</h2>
+              <ul className="feature-list">
+                {keyPoints.map((point: string) => (
+                  <li key={point}>{point}</li>
+                ))}
+              </ul>
+            </section>
+            <section id="resources">
+              <h2>Resurse</h2>
+              {resources.length ? (
+                <div className="resource-list">
+                  {resources.map((resource: { title: string; url: string; resource_type: string }) => (
+                    <a className="resource-row" href={resource.url} key={resource.title}>
+                      <span>{resource.title}</span>
+                      <strong>{resource.resource_type}</strong>
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <p className="muted">Nu exista resurse atasate inca.</p>
+              )}
+            </section>
           </article>
         </div>
       </section>

@@ -17,9 +17,38 @@ export function UpdatePasswordForm() {
   useEffect(() => {
     async function prepareSession() {
       const code = searchParams.get("code");
+      const tokenHash = searchParams.get("token_hash");
+      const type = searchParams.get("type");
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      const accessToken = hashParams.get("access_token");
+      const refreshToken = hashParams.get("refresh_token");
 
       if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (error) {
+          setMessage("Linkul de setare parola a expirat sau nu este valid. Cere un link nou.");
+          return;
+        }
+      }
+
+      if (accessToken && refreshToken) {
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        });
+
+        if (error) {
+          setMessage("Linkul de setare parola a expirat sau nu este valid. Cere un link nou.");
+          return;
+        }
+      }
+
+      if (tokenHash && type === "recovery") {
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: "recovery"
+        });
+
         if (error) {
           setMessage("Linkul de setare parola a expirat sau nu este valid. Cere un link nou.");
           return;
