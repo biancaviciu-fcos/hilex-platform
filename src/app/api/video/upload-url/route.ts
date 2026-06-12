@@ -53,7 +53,18 @@ export async function POST() {
   const payload = await response.json();
 
   if (!response.ok) {
-    return NextResponse.json({ error: "Could not create upload URL", details: payload }, { status: 500 });
+    const cloudflareMessage =
+      payload?.errors?.map((error: { message?: string }) => error.message).filter(Boolean).join(" ") ||
+      payload?.messages?.map((message: { message?: string }) => message.message).filter(Boolean).join(" ") ||
+      "Cloudflare rejected the upload URL request.";
+
+    return NextResponse.json(
+      {
+        error: cloudflareMessage,
+        details: payload
+      },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({

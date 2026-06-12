@@ -56,6 +56,15 @@ export function VideoUploadPanel({ lessonId }: { lessonId: string }) {
           </form>
         </div>
       ) : null}
+      <form action={`/api/admin/lessons/${lessonId}/video`} method="POST" className="form">
+        <div className="field">
+          <label>Ai incarcat deja video in Cloudflare? Pune Video ID aici</label>
+          <input name="video_asset_id" placeholder="Ex: 2f7c..." />
+        </div>
+        <button className="btn" type="submit">
+          Salveaza Video ID manual
+        </button>
+      </form>
     </section>
   );
 }
