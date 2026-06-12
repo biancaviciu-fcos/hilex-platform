@@ -1,0 +1,131 @@
+import { redirect } from "next/navigation";
+import { AppHeader } from "@/components/AppHeader";
+import { isAdminUser } from "@/lib/admin";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+async function createLesson(formData: FormData) {
+  "use server";
+
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (!isAdminUser(profile?.role, user.email)) redirect("/library");
+
+  const title = String(formData.get("title") || "");
+  const slug = String(formData.get("slug") || "");
+  const categoryId = String(formData.get("category_id") || "");
+  const accessLevel = String(formData.get("access_level") || "basic");
+  const excerpt = String(formData.get("excerpt") || "");
+  const body = String(formData.get("body") || "")
+    .split("\n")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  const keyPoints = String(formData.get("key_points") || "")
+    .split("\n")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  await supabase.from("lessons").insert({
+    title,
+    slug,
+    category_id: categoryId,
+    access_level: accessLevel,
+    excerpt,
+    body,
+    key_points: keyPoints,
+    status: "draft",
+    created_by: user.id
+  });
+
+  redirect("/admin");
+}
+
+export default async function NewLessonPage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (!isAdminUser(profile?.role, user.email)) redirect("/library");
+
+  const { data: categories } = await supabase
+    .from("categories")
+    .select("id,name")
+    .order("sort_order");
+
+  return (
+    <main className="page">
+      <AppHeader />
+      <section className="hero">
+        <div className="inner">
+          <h1>Lectie noua</h1>
+          <p>Adauga un clip/articol in biblioteca HILEX.</p>
+        </div>
+      </section>
+      <section className="section">
+        <div className="inner">
+          <form className="card form" action={createLesson}>
+            <div className="field">
+              <label>Titlu</label>
+              <input name="title" required />
+            </div>
+            <div className="field">
+              <label>Slug</label>
+              <input name="slug" placeholder="ex: calatoria-cu-copilul" required />
+            </div>
+            <div className="field">
+              <label>Categorie</label>
+              <select name="category_id" required>
+                {(categories || []).map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="field">
+              <label>Acces</label>
+              <select name="access_level">
+                <option value="basic">Basic</option>
+                <option value="premium">Premium</option>
+              </select>
+            </div>
+            <div className="field">
+              <label>Descriere scurta</label>
+              <textarea name="excerpt" rows={3} />
+            </div>
+            <div className="field">
+              <label>Text articol, cate un paragraf pe rand</label>
+              <textarea name="body" rows={8} />
+            </div>
+            <div className="field">
+              <label>Idei cheie, cate una pe rand</label>
+              <textarea name="key_points" rows={5} />
+            </div>
+            <button className="btn primary" type="submit">
+              Salveaza draft
+            </button>
+          </form>
+        </div>
+      </section>
+    </main>
+  );
+}
