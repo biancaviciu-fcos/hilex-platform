@@ -237,6 +237,22 @@ textarea {
   gap: 8px;
 }
 
+.subcategory-filter {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.filter-tag {
+  border: 1px solid transparent;
+}
+
+.filter-tag.active {
+  background: var(--pink);
+  border-color: var(--pink);
+  color: var(--white);
+}
+
 .breadcrumbs {
   color: rgba(255, 255, 255, 0.72);
   font-weight: 750;

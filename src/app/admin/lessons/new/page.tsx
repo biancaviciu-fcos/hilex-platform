@@ -25,6 +25,7 @@ async function createLesson(formData: FormData) {
   const title = String(formData.get("title") || "");
   const slug = String(formData.get("slug") || "");
   const categoryId = String(formData.get("category_id") || "");
+  const subcategoryId = String(formData.get("subcategory_id") || "");
   const accessLevel = String(formData.get("access_level") || "basic");
   const excerpt = String(formData.get("excerpt") || "");
   const thumbnail = formData.get("thumbnail");
@@ -43,6 +44,7 @@ async function createLesson(formData: FormData) {
       title,
       slug,
       category_id: categoryId,
+      subcategory_id: subcategoryId || null,
       access_level: accessLevel,
       excerpt,
       body,
@@ -90,6 +92,11 @@ export default async function NewLessonPage() {
     .select("id,name")
     .order("sort_order");
 
+  const { data: subcategories } = await supabase
+    .from("subcategories")
+    .select("id,name,category_id,categories(name)")
+    .order("sort_order");
+
   return (
     <main className="page">
       <AppHeader />
@@ -116,6 +123,18 @@ export default async function NewLessonPage() {
                 {(categories || []).map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="field">
+              <label>Subcategorie</label>
+              <select name="subcategory_id">
+                <option value="">Fara subcategorie</option>
+                {(subcategories || []).map((subcategory) => (
+                  <option key={subcategory.id} value={subcategory.id}>
+                    {subcategory.categories?.name ? `${subcategory.categories.name} - ` : ""}
+                    {subcategory.name}
                   </option>
                 ))}
               </select>

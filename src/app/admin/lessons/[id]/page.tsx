@@ -26,6 +26,8 @@ async function updateLesson(formData: FormData) {
   const id = String(formData.get("id") || "");
   const title = String(formData.get("title") || "");
   const slug = String(formData.get("slug") || "");
+  const categoryId = String(formData.get("category_id") || "");
+  const subcategoryId = String(formData.get("subcategory_id") || "");
   const accessLevel = String(formData.get("access_level") || "basic");
   const status = String(formData.get("status") || "draft");
   const excerpt = String(formData.get("excerpt") || "");
@@ -51,6 +53,8 @@ async function updateLesson(formData: FormData) {
   const updatePayload: Record<string, unknown> = {
     title,
     slug,
+    category_id: categoryId,
+    subcategory_id: subcategoryId || null,
     access_level: accessLevel,
     status,
     excerpt,
@@ -99,6 +103,16 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
     .single();
   if (!lesson) notFound();
 
+  const { data: categories } = await supabase
+    .from("categories")
+    .select("id,name")
+    .order("sort_order");
+
+  const { data: subcategories } = await supabase
+    .from("subcategories")
+    .select("id,name,category_id,categories(name)")
+    .order("sort_order");
+
   const body = Array.isArray(lesson.body) ? lesson.body.join("\n\n") : "";
   const keyPoints = Array.isArray(lesson.key_points) ? lesson.key_points.join("\n") : "";
   const resources = Array.isArray(lesson.lesson_resources) ? lesson.lesson_resources : [];
@@ -123,6 +137,28 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
             <div className="field">
               <label>Slug</label>
               <input name="slug" defaultValue={lesson.slug} required />
+            </div>
+            <div className="field">
+              <label>Categorie</label>
+              <select name="category_id" defaultValue={lesson.category_id} required>
+                {(categories || []).map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="field">
+              <label>Subcategorie</label>
+              <select name="subcategory_id" defaultValue={lesson.subcategory_id || ""}>
+                <option value="">Fara subcategorie</option>
+                {(subcategories || []).map((subcategory) => (
+                  <option key={subcategory.id} value={subcategory.id}>
+                    {subcategory.categories?.name ? `${subcategory.categories.name} - ` : ""}
+                    {subcategory.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="field">
               <label>Acces</label>

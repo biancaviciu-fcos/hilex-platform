@@ -46,6 +46,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
         <div className="inner">
           <p className="breadcrumbs">
             <Link href="/library">Biblioteca</Link> / {lesson.categories?.name || "Material"}
+            {lesson.subcategories?.name ? ` / ${lesson.subcategories.name}` : ""}
           </p>
           <span className={`tag ${lesson.access_level === "premium" ? "premium" : ""}`}>
             {lesson.access_level}
