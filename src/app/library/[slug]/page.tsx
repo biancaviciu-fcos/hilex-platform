@@ -3,6 +3,15 @@ import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+function relationName(value: unknown) {
+  if (Array.isArray(value)) {
+    const first = value[0] as { name?: string } | undefined;
+    return first?.name;
+  }
+
+  return (value as { name?: string } | null)?.name;
+}
+
 export default async function LessonPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const supabase = await createSupabaseServerClient();
@@ -24,6 +33,8 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   const body = Array.isArray(lesson.body) ? lesson.body : [];
   const keyPoints = Array.isArray(lesson.key_points) ? lesson.key_points : [];
   const resources = Array.isArray(lesson.lesson_resources) ? lesson.lesson_resources : [];
+  const categoryName = relationName(lesson.categories);
+  const subcategoryName = relationName(lesson.subcategories);
   const resourcesWithUrls = await Promise.all(
     resources.map(async (resource: { title: string; url: string; resource_type: string }) => {
       if (resource.resource_type !== "pdf") return resource;
@@ -45,8 +56,8 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
       <section className="hero compact">
         <div className="inner">
           <p className="breadcrumbs">
-            <Link href="/library">Biblioteca</Link> / {lesson.categories?.name || "Material"}
-            {lesson.subcategories?.name ? ` / ${lesson.subcategories.name}` : ""}
+            <Link href="/library">Biblioteca</Link> / {categoryName || "Material"}
+            {subcategoryName ? ` / ${subcategoryName}` : ""}
           </p>
           <span className={`tag ${lesson.access_level === "premium" ? "premium" : ""}`}>
             {lesson.access_level}

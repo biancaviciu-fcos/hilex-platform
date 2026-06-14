@@ -110,7 +110,7 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
 
   const { data: subcategories } = await supabase
     .from("subcategories")
-    .select("id,name,category_id,categories(name)")
+    .select("id,name,category_id")
     .order("sort_order");
 
   const body = Array.isArray(lesson.body) ? lesson.body.join("\n\n") : "";
@@ -152,12 +152,16 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
               <label>Subcategorie</label>
               <select name="subcategory_id" defaultValue={lesson.subcategory_id || ""}>
                 <option value="">Fara subcategorie</option>
-                {(subcategories || []).map((subcategory) => (
-                  <option key={subcategory.id} value={subcategory.id}>
-                    {subcategory.categories?.name ? `${subcategory.categories.name} - ` : ""}
-                    {subcategory.name}
-                  </option>
-                ))}
+                {(subcategories || []).map((subcategory) => {
+                  const categoryName = categories?.find((category) => category.id === subcategory.category_id)?.name;
+
+                  return (
+                    <option key={subcategory.id} value={subcategory.id}>
+                      {categoryName ? `${categoryName} - ` : ""}
+                      {subcategory.name}
+                    </option>
+                  );
+                })}
               </select>
             </div>
             <div className="field">

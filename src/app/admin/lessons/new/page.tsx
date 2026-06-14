@@ -94,7 +94,7 @@ export default async function NewLessonPage() {
 
   const { data: subcategories } = await supabase
     .from("subcategories")
-    .select("id,name,category_id,categories(name)")
+    .select("id,name,category_id")
     .order("sort_order");
 
   return (
@@ -131,12 +131,16 @@ export default async function NewLessonPage() {
               <label>Subcategorie</label>
               <select name="subcategory_id">
                 <option value="">Fara subcategorie</option>
-                {(subcategories || []).map((subcategory) => (
-                  <option key={subcategory.id} value={subcategory.id}>
-                    {subcategory.categories?.name ? `${subcategory.categories.name} - ` : ""}
-                    {subcategory.name}
-                  </option>
-                ))}
+                {(subcategories || []).map((subcategory) => {
+                  const categoryName = categories?.find((category) => category.id === subcategory.category_id)?.name;
+
+                  return (
+                    <option key={subcategory.id} value={subcategory.id}>
+                      {categoryName ? `${categoryName} - ` : ""}
+                      {subcategory.name}
+                    </option>
+                  );
+                })}
               </select>
             </div>
             <div className="field">

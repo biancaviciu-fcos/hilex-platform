@@ -3,6 +3,15 @@ import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+function relationName(value: unknown) {
+  if (Array.isArray(value)) {
+    const first = value[0] as { name?: string } | undefined;
+    return first?.name;
+  }
+
+  return (value as { name?: string } | null)?.name;
+}
+
 export default async function LibraryPage({
   searchParams
 }: {
@@ -26,8 +35,9 @@ export default async function LibraryPage({
 
   const { data: subcategories } = await supabase
     .from("subcategories")
-    .select("id,name,slug,category_id,sort_order,categories(slug)")
+    .select("id,name,slug,category_id,sort_order")
     .order("sort_order");
+  const selectedCategory = categories?.find((item) => item.slug === category);
 
   let lessonsQuery = supabase
     .from("lessons")
@@ -39,7 +49,6 @@ export default async function LibraryPage({
   }
 
   if (category) {
-    const selectedCategory = categories?.find((item) => item.slug === category);
     if (selectedCategory) lessonsQuery = lessonsQuery.eq("category_id", selectedCategory.id);
   }
 
@@ -50,7 +59,7 @@ export default async function LibraryPage({
 
   const { data: lessons } = await lessonsQuery.order("published_at", { ascending: false });
   const visibleSubcategories = category
-    ? (subcategories || []).filter((item) => item.categories?.slug === category)
+    ? (subcategories || []).filter((item) => item.category_id === selectedCategory?.id)
     : subcategories || [];
 
   return (
@@ -130,13 +139,19 @@ export default async function LibraryPage({
                   )}
                 </div>
                 <div className="lesson-content">
+                  {(() => {
+                    const subcategoryName = relationName(lesson.subcategories);
+
+                    return (
                   <div className="tag-row">
                     <span className={`tag ${lesson.access_level === "premium" ? "premium" : ""}`}>
                       {lesson.access_level}
                     </span>
                     {lesson.duration_minutes ? <span className="tag">{lesson.duration_minutes} min</span> : null}
-                    {lesson.subcategories?.name ? <span className="tag">{lesson.subcategories.name}</span> : null}
+                    {subcategoryName ? <span className="tag">{subcategoryName}</span> : null}
                   </div>
+                    );
+                  })()}
                   <h3>{lesson.title}</h3>
                   <p className="muted">{lesson.excerpt}</p>
                 </div>
