@@ -15,7 +15,7 @@ Platforma HILEX mare: biblioteca digitala cu abonamente, conturi, categorii, cli
 - Login si setare parola de catre utilizator
 - Roluri: membru Basic, membru Premium, admin
 - Categorii si subcategorii
-- Lectii cu video, text, idei cheie, PDF-uri si linkuri
+- Materiale cu video, text, idei cheie, PDF-uri, thumbnail-uri si linkuri
 - Acces diferentiat Basic/Premium
 - Stripe Checkout
 - Stripe webhook pentru activarea abonamentului

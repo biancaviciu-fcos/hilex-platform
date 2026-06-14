@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   const file = formData.get("file");
 
   if (!lessonId || !(file instanceof File)) {
-    return NextResponse.json({ error: "Missing file or lesson" }, { status: 400 });
+    return NextResponse.json({ error: "Missing file or material" }, { status: 400 });
   }
 
   const extension = file.name.split(".").pop() || "pdf";

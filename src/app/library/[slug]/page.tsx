@@ -45,7 +45,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
       <section className="hero compact">
         <div className="inner">
           <p className="breadcrumbs">
-            <Link href="/library">Biblioteca</Link> / {lesson.categories?.name || "Lectie"}
+            <Link href="/library">Biblioteca</Link> / {lesson.categories?.name || "Material"}
           </p>
           <span className={`tag ${lesson.access_level === "premium" ? "premium" : ""}`}>
             {lesson.access_level}
@@ -57,8 +57,8 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
       <section className="section">
         <div className="inner lesson-layout">
           <aside className="lesson-menu card">
-            <h3>In aceasta lectie</h3>
-            <a href="#video">Tutorial video</a>
+            <h3>In acest material</h3>
+            <a href="#video">Clip video</a>
             <a href="#details">Explicatii</a>
             <a href="#keys">Idei cheie</a>
             <a href="#resources">Resurse</a>
@@ -66,7 +66,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
 
           <article className="card article-card">
             <section id="video">
-              <h2>Tutorial video</h2>
+              <h2>Clip video</h2>
               {lesson.video_provider === "cloudflare_stream" && lesson.video_playback_id ? (
                 <iframe
                   allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"

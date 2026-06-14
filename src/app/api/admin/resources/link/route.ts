@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   const accessLevel = String(formData.get("access_level") || "basic");
 
   if (!lessonId || !title || !url) {
-    return NextResponse.json({ error: "Missing title, URL or lesson" }, { status: 400 });
+    return NextResponse.json({ error: "Missing title, URL or material" }, { status: 400 });
   }
 
   await supabase.from("lesson_resources").insert({

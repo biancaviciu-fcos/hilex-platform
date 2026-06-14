@@ -28,6 +28,7 @@ async function updateLesson(formData: FormData) {
   const accessLevel = String(formData.get("access_level") || "basic");
   const status = String(formData.get("status") || "draft");
   const excerpt = String(formData.get("excerpt") || "");
+  const thumbnailUrl = String(formData.get("thumbnail_url") || "");
   const videoProvider = String(formData.get("video_provider") || "") || null;
   const videoAssetId = String(formData.get("video_asset_id") || "") || null;
   const videoPlaybackId = String(formData.get("video_playback_id") || "") || null;
@@ -48,6 +49,7 @@ async function updateLesson(formData: FormData) {
       access_level: accessLevel,
       status,
       excerpt,
+      thumbnail_url: thumbnailUrl || null,
       video_provider: videoProvider,
       video_asset_id: videoAssetId,
       video_playback_id: videoPlaybackId,
@@ -94,7 +96,7 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
       <AppHeader />
       <section className="hero">
         <div className="inner">
-          <h1>Editeaza lectia</h1>
+          <h1>Editeaza materialul</h1>
           <p>{lesson.title}</p>
         </div>
       </section>
@@ -128,6 +130,15 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
             <div className="field">
               <label>Descriere scurta</label>
               <textarea name="excerpt" rows={3} defaultValue={lesson.excerpt || ""} />
+            </div>
+            <div className="field">
+              <label>Thumbnail / imagine de coperta</label>
+              <input
+                name="thumbnail_url"
+                defaultValue={lesson.thumbnail_url || ""}
+                placeholder="https://.../imagine.jpg"
+                type="url"
+              />
             </div>
             <div className="field">
               <label>Video provider</label>

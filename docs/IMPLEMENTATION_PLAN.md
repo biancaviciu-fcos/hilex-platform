@@ -13,7 +13,7 @@
 
 - Admin categorii
 - Admin subcategorii
-- Admin lectii
+- Admin materiale
 - Editor text
 - PDF resources
 - Linkuri recomandate
@@ -24,7 +24,7 @@
 - Alegere Cloudflare Stream sau Mux
 - Upload video din admin
 - Salvare `video_provider_asset_id`
-- Player securizat in lectii
+- Player securizat in materiale
 - Restrictionare acces Basic/Premium
 
 ## Faza 4: Stripe

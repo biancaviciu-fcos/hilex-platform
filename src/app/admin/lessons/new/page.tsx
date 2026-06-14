@@ -26,6 +26,7 @@ async function createLesson(formData: FormData) {
   const categoryId = String(formData.get("category_id") || "");
   const accessLevel = String(formData.get("access_level") || "basic");
   const excerpt = String(formData.get("excerpt") || "");
+  const thumbnailUrl = String(formData.get("thumbnail_url") || "");
   const body = String(formData.get("body") || "")
     .split("\n")
     .map((item) => item.trim())
@@ -41,6 +42,7 @@ async function createLesson(formData: FormData) {
     category_id: categoryId,
     access_level: accessLevel,
     excerpt,
+    thumbnail_url: thumbnailUrl || null,
     body,
     key_points: keyPoints,
     status: "draft",
@@ -76,8 +78,8 @@ export default async function NewLessonPage() {
       <AppHeader />
       <section className="hero">
         <div className="inner">
-          <h1>Lectie noua</h1>
-          <p>Adauga un clip/articol in biblioteca HILEX.</p>
+          <h1>Material nou</h1>
+          <p>Adauga un clip, articol sau ghid in biblioteca HILEX.</p>
         </div>
       </section>
       <section className="section">
@@ -111,6 +113,10 @@ export default async function NewLessonPage() {
             <div className="field">
               <label>Descriere scurta</label>
               <textarea name="excerpt" rows={3} />
+            </div>
+            <div className="field">
+              <label>Thumbnail / imagine de coperta</label>
+              <input name="thumbnail_url" placeholder="https://.../imagine.jpg" type="url" />
             </div>
             <div className="field">
               <label>Text articol, cate un paragraf pe rand</label>

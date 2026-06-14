@@ -56,7 +56,7 @@ export function VideoUploadPanel({ lessonId }: { lessonId: string }) {
       return;
     }
 
-    setMessage("Video-ul a fost incarcat. Apasa pe Salveaza video pe lectie.");
+    setMessage("Video-ul a fost incarcat. Apasa pe Salveaza video pe material.");
   }
 
   return (
@@ -64,7 +64,7 @@ export function VideoUploadPanel({ lessonId }: { lessonId: string }) {
       <h2>Video Cloudflare Stream</h2>
       <p className="muted">
         Creeaza un link privat de upload, incarca video-ul in Cloudflare, apoi
-        salveaza ID-ul video pe lectie.
+        salveaza ID-ul video pe material.
       </p>
       <button className="btn primary" disabled={isLoading} onClick={createUploadUrl} type="button">
         {isLoading ? "Se creeaza..." : "Creeaza link upload video"}
@@ -82,7 +82,7 @@ export function VideoUploadPanel({ lessonId }: { lessonId: string }) {
               <input name="video_asset_id" readOnly value={videoId} />
             </div>
             <button className="btn primary" type="submit">
-              {isUploading ? "Se incarca..." : "Salveaza video pe lectie"}
+              {isUploading ? "Se incarca..." : "Salveaza video pe material"}
             </button>
           </form>
         </div>

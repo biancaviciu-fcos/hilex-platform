@@ -22,7 +22,7 @@ export default async function AdminPage() {
 
   const { data: lessons } = await supabase
     .from("lessons")
-    .select("id,title,slug,status,access_level,excerpt")
+    .select("id,title,slug,status,access_level,excerpt,thumbnail_url")
     .order("created_at", { ascending: false });
 
   return (
@@ -33,7 +33,7 @@ export default async function AdminPage() {
           <h1>Admin HILEX</h1>
           <p>Gestioneaza continutul bibliotecii, drafturile si publicarea.</p>
           <Link className="btn primary" href="/admin/lessons/new">
-            Lectie noua
+            Material nou
           </Link>
         </div>
       </section>
@@ -41,6 +41,13 @@ export default async function AdminPage() {
         <div className="inner lesson-grid">
           {(lessons || []).map((lesson) => (
             <Link className="lesson-card admin-lesson" href={`/admin/lessons/${lesson.id}`} key={lesson.id}>
+              <div className="lesson-thumb">
+                {lesson.thumbnail_url ? (
+                  <img alt="" src={lesson.thumbnail_url} />
+                ) : (
+                  <span>▶</span>
+                )}
+              </div>
               <div className="lesson-content">
                 <div className="tag-row">
                   <span className="tag">{lesson.status}</span>

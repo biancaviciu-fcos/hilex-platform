@@ -27,7 +27,7 @@ HILEX este o biblioteca digitala privata pentru continut legal in romana. Utiliz
 
 ## Continut
 
-O lectie poate contine:
+Un material poate contine:
 
 - titlu
 - slug
@@ -91,7 +91,7 @@ Emailuri automate:
 Adminul trebuie sa permita:
 
 - adaugare/editare categorii
-- adaugare/editare lectii
+- adaugare/editare materiale
 - upload video
 - upload PDF
 - setare Basic/Premium

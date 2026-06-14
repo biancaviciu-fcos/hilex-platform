@@ -201,6 +201,14 @@ textarea {
   color: var(--white);
   display: flex;
   justify-content: center;
+  overflow: hidden;
+}
+
+.lesson-thumb img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 .lesson-thumb span,

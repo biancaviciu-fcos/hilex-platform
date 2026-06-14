@@ -25,7 +25,7 @@ export default async function LibraryPage({
 
   let lessonsQuery = supabase
     .from("lessons")
-    .select("id,title,slug,excerpt,access_level,duration_minutes,status,categories(name,slug)")
+    .select("id,title,slug,excerpt,access_level,duration_minutes,status,thumbnail_url,categories(name,slug)")
     .eq("status", "published");
 
   if (query) {
@@ -76,7 +76,7 @@ export default async function LibraryPage({
 
           <div className="section-title">
             <div>
-              <h2>Lectii disponibile</h2>
+              <h2>Materiale disponibile</h2>
               <p className="muted">{lessons?.length || 0} rezultate</p>
             </div>
             {(query || category) ? (
@@ -90,7 +90,11 @@ export default async function LibraryPage({
             {(lessons || []).map((lesson) => (
               <Link className="lesson-card" href={`/library/${lesson.slug}`} key={lesson.id}>
                 <div className="lesson-thumb">
-                  <span>▶</span>
+                  {lesson.thumbnail_url ? (
+                    <img alt="" src={lesson.thumbnail_url} />
+                  ) : (
+                    <span>▶</span>
+                  )}
                 </div>
                 <div className="lesson-content">
                   <div className="tag-row">
