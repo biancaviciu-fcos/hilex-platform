@@ -12,6 +12,10 @@ function relationName(value: unknown) {
   return (value as { name?: string } | null)?.name;
 }
 
+function accessLabel(accessLevel: string) {
+  return accessLevel === "premium" ? "Premium" : "Basic";
+}
+
 export default async function LessonPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const supabase = await createSupabaseServerClient();
@@ -36,7 +40,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   const categoryName = relationName(lesson.categories);
   const subcategoryName = relationName(lesson.subcategories);
   const resourcesWithUrls = await Promise.all(
-    resources.map(async (resource: { title: string; url: string; resource_type: string }) => {
+    resources.map(async (resource: { title: string; url: string; resource_type: string; access_level: string }) => {
       if (resource.resource_type !== "pdf") return resource;
 
       const { data } = await supabase.storage
@@ -54,53 +58,51 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
     <main className="page">
       <AppHeader />
       <section className="hero compact">
-        <div className="inner">
+        <div className="inner material-hero-inner">
           <p className="breadcrumbs">
             <Link href="/library">Biblioteca</Link> / {categoryName || "Material"}
             {subcategoryName ? ` / ${subcategoryName}` : ""}
           </p>
-          <span className={`tag ${lesson.access_level === "premium" ? "premium" : ""}`}>
-            {lesson.access_level}
-          </span>
+          <div className="material-meta">
+            <span className={`tag ${lesson.access_level === "premium" ? "premium" : ""}`}>
+              {accessLabel(lesson.access_level)}
+            </span>
+            {categoryName ? <span className="tag light">{categoryName}</span> : null}
+            {subcategoryName ? <span className="tag light">{subcategoryName}</span> : null}
+            {lesson.duration_minutes ? <span className="tag light">{lesson.duration_minutes} min</span> : null}
+          </div>
           <h1>{lesson.title}</h1>
           <p>{lesson.excerpt}</p>
         </div>
       </section>
       <section className="section">
-        <div className="inner lesson-layout">
-          <aside className="lesson-menu card">
-            <h3>In acest material</h3>
-            <a href="#video">Clip video</a>
-            <a href="#details">Explicatii</a>
-            <a href="#keys">Idei cheie</a>
-            <a href="#resources">Resurse</a>
-          </aside>
+        <div className="inner material-page">
+          <section className="material-video-shell" id="video">
+            {lesson.video_provider === "cloudflare_stream" && lesson.video_playback_id ? (
+              <iframe
+                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                allowFullScreen
+                className="video-embed"
+                src={`https://iframe.videodelivery.net/${lesson.video_playback_id}`}
+                title={lesson.title}
+              />
+            ) : (
+              <div className="video-placeholder">
+                <span>▶</span>
+                <p>Player video securizat pentru membri</p>
+              </div>
+            )}
+          </section>
 
-          <article className="card article-card">
-            <section id="video">
-              <h2>Clip video</h2>
-              {lesson.video_provider === "cloudflare_stream" && lesson.video_playback_id ? (
-                <iframe
-                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-                  allowFullScreen
-                  className="video-embed"
-                  src={`https://iframe.videodelivery.net/${lesson.video_playback_id}`}
-                  title={lesson.title}
-                />
-              ) : (
-                <div className="video-placeholder">
-                  <span>▶</span>
-                  <p>Player video securizat pentru membri</p>
-                </div>
-              )}
-            </section>
-            <section id="details">
+          <div className="material-content-layout">
+            <article className="card article-card material-article">
+              <section id="details">
               <h2>Explicatii</h2>
               {body.map((paragraph: string) => (
                 <p key={paragraph}>{paragraph}</p>
               ))}
             </section>
-            <section id="keys">
+              <section id="keys">
               <h2>Idei cheie</h2>
               <ul className="feature-list">
                 {keyPoints.map((point: string) => (
@@ -108,22 +110,37 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
                 ))}
               </ul>
             </section>
-            <section id="resources">
-              <h2>Resurse</h2>
-              {resourcesWithUrls.length ? (
+            </article>
+
+            <aside className="material-sidebar">
+              <section className="card material-side-card">
+                <h3>In acest material</h3>
+                <a href="#video">Clip video</a>
+                <a href="#details">Explicatii</a>
+                <a href="#keys">Idei cheie</a>
+                <a href="#resources">Resurse</a>
+              </section>
+
+              <section className="card material-side-card" id="resources">
+                <h3>Resurse</h3>
+                {resourcesWithUrls.length ? (
                 <div className="resource-list">
-                  {resourcesWithUrls.map((resource: { title: string; url: string; resource_type: string }) => (
+                    {resourcesWithUrls.map((resource: { title: string; url: string; resource_type: string; access_level: string }) => (
                     <a className="resource-row" href={resource.url} key={resource.title} rel="noreferrer" target="_blank">
-                      <span>{resource.title}</span>
-                      <strong>{resource.resource_type}</strong>
+                      <span>
+                        <strong>{resource.title}</strong>
+                        <small>{accessLabel(resource.access_level)}</small>
+                      </span>
+                      <strong>{resource.resource_type.toUpperCase()}</strong>
                     </a>
                   ))}
                 </div>
               ) : (
                 <p className="muted">Nu exista resurse atasate inca.</p>
               )}
-            </section>
-          </article>
+              </section>
+            </aside>
+          </div>
         </div>
       </section>
     </main>

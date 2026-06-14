@@ -258,6 +258,61 @@ textarea {
   font-weight: 750;
 }
 
+.material-hero-inner {
+  display: grid;
+  gap: 14px;
+}
+
+.material-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.material-page {
+  display: grid;
+  gap: 20px;
+}
+
+.material-video-shell {
+  background: #05071a;
+  border-radius: 8px;
+  box-shadow: 0 18px 50px rgba(2, 8, 63, 0.18);
+  overflow: hidden;
+}
+
+.material-content-layout {
+  align-items: start;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+
+.material-article {
+  padding: clamp(22px, 4vw, 38px);
+}
+
+.material-sidebar {
+  display: grid;
+  gap: 16px;
+  position: sticky;
+  top: 88px;
+}
+
+.material-side-card {
+  display: grid;
+  gap: 12px;
+}
+
+.material-side-card h3 {
+  margin-bottom: 2px;
+}
+
+.material-side-card a {
+  color: var(--blue);
+  font-weight: 800;
+}
+
 .lesson-layout {
   align-items: start;
   display: grid;
@@ -322,6 +377,11 @@ textarea {
   display: flex;
   justify-content: space-between;
   padding: 13px 14px;
+}
+
+.resource-row span {
+  display: grid;
+  gap: 3px;
 }
 
 .resource-row small {
@@ -489,6 +549,11 @@ textarea {
   color: #9b005a;
 }
 
+.tag.light {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--white);
+}
+
 .form {
   display: grid;
   gap: 14px;
@@ -528,9 +593,14 @@ textarea {
   .lesson-grid,
   .account-grid,
   .lesson-layout,
+  .material-content-layout,
   .admin-panels,
   .search-row {
     grid-template-columns: 1fr;
+  }
+
+  .material-sidebar {
+    position: static;
   }
 
   .section-title {
