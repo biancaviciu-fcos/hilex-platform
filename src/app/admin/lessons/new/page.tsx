@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { isAdminUser } from "@/lib/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { uploadMaterialThumbnail } from "@/lib/thumbnails";
 
 async function createLesson(formData: FormData) {
   "use server";
@@ -26,7 +27,7 @@ async function createLesson(formData: FormData) {
   const categoryId = String(formData.get("category_id") || "");
   const accessLevel = String(formData.get("access_level") || "basic");
   const excerpt = String(formData.get("excerpt") || "");
-  const thumbnailUrl = String(formData.get("thumbnail_url") || "");
+  const thumbnail = formData.get("thumbnail");
   const body = String(formData.get("body") || "")
     .split("\n")
     .map((item) => item.trim())
@@ -36,18 +37,34 @@ async function createLesson(formData: FormData) {
     .map((item) => item.trim())
     .filter(Boolean);
 
-  await supabase.from("lessons").insert({
-    title,
-    slug,
-    category_id: categoryId,
-    access_level: accessLevel,
-    excerpt,
-    thumbnail_url: thumbnailUrl || null,
-    body,
-    key_points: keyPoints,
-    status: "draft",
-    created_by: user.id
-  });
+  const { data: material, error } = await supabase
+    .from("lessons")
+    .insert({
+      title,
+      slug,
+      category_id: categoryId,
+      access_level: accessLevel,
+      excerpt,
+      body,
+      key_points: keyPoints,
+      status: "draft",
+      created_by: user.id
+    })
+    .select("id")
+    .single();
+
+  if (error || !material) redirect("/admin");
+
+  if (thumbnail instanceof File && thumbnail.size > 0) {
+    const thumbnailUrl = await uploadMaterialThumbnail(thumbnail, material.id);
+
+    if (thumbnailUrl) {
+      await supabase
+        .from("lessons")
+        .update({ thumbnail_url: thumbnailUrl, updated_at: new Date().toISOString() })
+        .eq("id", material.id);
+    }
+  }
 
   redirect("/admin");
 }
@@ -84,7 +101,7 @@ export default async function NewLessonPage() {
       </section>
       <section className="section">
         <div className="inner">
-          <form className="card form" action={createLesson}>
+          <form className="card form" action={createLesson} encType="multipart/form-data">
             <div className="field">
               <label>Titlu</label>
               <input name="title" required />
@@ -116,7 +133,7 @@ export default async function NewLessonPage() {
             </div>
             <div className="field">
               <label>Thumbnail / imagine de coperta</label>
-              <input name="thumbnail_url" placeholder="https://.../imagine.jpg" type="url" />
+              <input accept="image/*" name="thumbnail" type="file" />
             </div>
             <div className="field">
               <label>Text articol, cate un paragraf pe rand</label>

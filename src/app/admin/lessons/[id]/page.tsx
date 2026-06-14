@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { isAdminUser } from "@/lib/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { uploadMaterialThumbnail } from "@/lib/thumbnails";
 import { VideoUploadPanel } from "./VideoUploadPanel";
 
 async function updateLesson(formData: FormData) {
@@ -28,7 +29,7 @@ async function updateLesson(formData: FormData) {
   const accessLevel = String(formData.get("access_level") || "basic");
   const status = String(formData.get("status") || "draft");
   const excerpt = String(formData.get("excerpt") || "");
-  const thumbnailUrl = String(formData.get("thumbnail_url") || "");
+  const thumbnail = formData.get("thumbnail");
   const videoProvider = String(formData.get("video_provider") || "") || null;
   const videoAssetId = String(formData.get("video_asset_id") || "") || null;
   const videoPlaybackId = String(formData.get("video_playback_id") || "") || null;
@@ -41,23 +42,34 @@ async function updateLesson(formData: FormData) {
     .map((item) => item.trim())
     .filter(Boolean);
 
+  let thumbnailUrl: string | null = null;
+
+  if (thumbnail instanceof File && thumbnail.size > 0) {
+    thumbnailUrl = await uploadMaterialThumbnail(thumbnail, id);
+  }
+
+  const updatePayload: Record<string, unknown> = {
+    title,
+    slug,
+    access_level: accessLevel,
+    status,
+    excerpt,
+    video_provider: videoProvider,
+    video_asset_id: videoAssetId,
+    video_playback_id: videoPlaybackId,
+    body,
+    key_points: keyPoints,
+    published_at: status === "published" ? new Date().toISOString() : null,
+    updated_at: new Date().toISOString()
+  };
+
+  if (thumbnailUrl) {
+    updatePayload.thumbnail_url = thumbnailUrl;
+  }
+
   await supabase
     .from("lessons")
-    .update({
-      title,
-      slug,
-      access_level: accessLevel,
-      status,
-      excerpt,
-      thumbnail_url: thumbnailUrl || null,
-      video_provider: videoProvider,
-      video_asset_id: videoAssetId,
-      video_playback_id: videoPlaybackId,
-      body,
-      key_points: keyPoints,
-      published_at: status === "published" ? new Date().toISOString() : null,
-      updated_at: new Date().toISOString()
-    })
+    .update(updatePayload)
     .eq("id", id);
 
   redirect("/admin");
@@ -102,7 +114,7 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
       </section>
       <section className="section">
         <div className="inner">
-          <form className="card form" action={updateLesson}>
+          <form className="card form" action={updateLesson} encType="multipart/form-data">
             <input type="hidden" name="id" value={lesson.id} />
             <div className="field">
               <label>Titlu</label>
@@ -133,12 +145,10 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
             </div>
             <div className="field">
               <label>Thumbnail / imagine de coperta</label>
-              <input
-                name="thumbnail_url"
-                defaultValue={lesson.thumbnail_url || ""}
-                placeholder="https://.../imagine.jpg"
-                type="url"
-              />
+              {lesson.thumbnail_url ? (
+                <img alt="" className="thumbnail-preview" src={lesson.thumbnail_url} />
+              ) : null}
+              <input accept="image/*" name="thumbnail" type="file" />
             </div>
             <div className="field">
               <label>Video provider</label>

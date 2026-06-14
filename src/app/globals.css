@@ -496,6 +496,16 @@ textarea {
   width: 100%;
 }
 
+.thumbnail-preview {
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: block;
+  max-width: 420px;
+  object-fit: cover;
+  width: 100%;
+}
+
 @media (max-width: 760px) {
   .grid,
   .topic-grid,
