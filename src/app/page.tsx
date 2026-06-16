@@ -1,25 +1,11 @@
-import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export default function HomePage() {
-  return (
-    <main className="page">
-      <section className="hero">
-        <div className="inner">
-          <h1>HILEX</h1>
-          <p>
-            Biblioteca digitala cu informatii legale in romana, disponibila
-            pentru membri Basic si Premium.
-          </p>
-          <div className="nav">
-            <Link className="btn primary" href="/pricing">
-              Alege abonamentul
-            </Link>
-            <Link className="btn" href="/login">
-              Login
-            </Link>
-          </div>
-        </div>
-      </section>
-    </main>
-  );
+export default async function HomePage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  redirect(user ? "/library" : "/login");
 }

@@ -8,6 +8,7 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const plan = String(formData.get("plan") || "basic") === "premium" ? "premium" : "basic";
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+    const marketingSiteUrl = process.env.NEXT_PUBLIC_MARKETING_SITE_URL || siteUrl;
     const priceId = priceIdForPlan(plan);
 
     if (!siteUrl || !priceId) {
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
       },
       metadata: { plan },
       success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${siteUrl}/pricing`
+      cancel_url: `${marketingSiteUrl}/#pachete`
     });
 
     return NextResponse.redirect(session.url!, { status: 303 });
