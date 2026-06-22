@@ -26,7 +26,7 @@ export async function AppHeader() {
         Hi<span>Lex</span>
       </Link>
       <nav className="nav">
-        <Link href="/library">Biblioteca</Link>
+        <Link href="/library">Resurse</Link>
         <Link href="/contact">Contact</Link>
         {showAdmin ? <Link href="/admin">Admin</Link> : null}
         <Link className="btn" href="/account">Cont</Link>

@@ -2,7 +2,7 @@
 
 ## Scop
 
-HILEX este o biblioteca digitala privata pentru continut legal in romana. Utilizatorii primesc acces dupa plata unui abonament anual Basic sau Premium.
+HILEX este o zona privata de resurse digitale pentru continut legal in romana. Utilizatorii primesc acces dupa plata unui abonament anual Basic sau Premium.
 
 ## Flux utilizator
 

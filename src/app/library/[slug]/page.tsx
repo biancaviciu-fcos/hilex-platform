@@ -63,7 +63,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
         <section className="hero compact">
           <div className="inner material-hero-inner">
             <p className="breadcrumbs">
-              <Link href="/library">Biblioteca</Link> / {categoryName || "Material"}
+              <Link href="/library">Resurse</Link> / {categoryName || "Material"}
               {subcategoryName ? ` / ${subcategoryName}` : ""}
             </p>
             <div className="material-meta">
@@ -91,7 +91,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
                     Cere upgrade la Premium
                   </Link>
                   <Link className="btn" href="/library">
-                    Inapoi la biblioteca
+                    Inapoi la resurse
                   </Link>
                 </div>
               </div>
@@ -123,7 +123,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
       <section className="hero compact">
         <div className="inner material-hero-inner">
           <p className="breadcrumbs">
-            <Link href="/library">Biblioteca</Link> / {categoryName || "Material"}
+            <Link href="/library">Resurse</Link> / {categoryName || "Material"}
             {subcategoryName ? ` / ${subcategoryName}` : ""}
           </p>
           <div className="material-meta">

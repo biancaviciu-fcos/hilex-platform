@@ -81,7 +81,7 @@ export default async function LibraryPage({
       <AppHeader />
       <section className="hero library-hero">
         <div className="inner">
-          <h1>Biblioteca HILEX</h1>
+          <h1>Resurse HILEX</h1>
           <p>Clipuri, articole si resurse juridice pentru membri.</p>
           <form className="search-row" action="/library">
             <input

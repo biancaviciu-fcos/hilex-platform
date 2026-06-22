@@ -103,7 +103,7 @@ export default async function NewLessonPage() {
       <section className="hero">
         <div className="inner">
           <h1>Material nou</h1>
-          <p>Adauga un clip, articol sau ghid in biblioteca HILEX.</p>
+          <p>Adauga un clip, articol sau ghid in resursele HILEX.</p>
         </div>
       </section>
       <section className="section">

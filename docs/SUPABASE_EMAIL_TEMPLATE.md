@@ -26,7 +26,7 @@ Bun venit in HILEX - seteaza parola contului tau
 </p>
 
 <p>
-  Dupa setarea parolei, vei putea accesa biblioteca HILEX si materialele incluse in abonamentul tau.
+  Dupa setarea parolei, vei putea accesa resursele HILEX si materialele incluse in abonamentul tau.
 </p>
 
 <p>

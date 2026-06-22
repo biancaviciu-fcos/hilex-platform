@@ -9,7 +9,7 @@ export default function UpdatePasswordPage() {
           <h1>Seteaza parola HILEX</h1>
           <p>
             Alege o parola pentru contul tau. Dupa salvare, vei intra direct in
-            biblioteca membrilor.
+            resursele membrilor.
           </p>
         </div>
       </section>

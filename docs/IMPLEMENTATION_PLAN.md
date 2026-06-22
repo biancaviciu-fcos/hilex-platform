@@ -6,7 +6,7 @@
 - Setup Supabase
 - Schema baza de date
 - Login/register prin link de setare parola
-- Layout biblioteca
+- Layout resurse
 - Migrare design din demo
 
 ## Faza 2: Continut

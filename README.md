@@ -1,6 +1,6 @@
 # HILEX Full Platform
 
-Platforma HILEX mare: biblioteca digitala cu abonamente, conturi, categorii, clipuri video securizate, PDF-uri si panou admin.
+Platforma HILEX mare: resurse digitale cu abonamente, conturi, categorii, clipuri video securizate, PDF-uri si panou admin.
 
 ## Stack recomandat
 

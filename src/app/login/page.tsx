@@ -25,7 +25,7 @@ export default async function LoginPage({
       <section className="hero">
         <div className="inner">
           <h1>Login HILEX</h1>
-          <p>Intra in contul tau pentru a accesa biblioteca.</p>
+          <p>Intra in contul tau pentru a accesa resursele.</p>
         </div>
       </section>
       <section className="section">

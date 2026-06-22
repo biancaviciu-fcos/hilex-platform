@@ -3,7 +3,12 @@ import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export default async function ContactPage() {
+export default async function ContactPage({
+  searchParams
+}: {
+  searchParams: Promise<{ sent?: string; error?: string }>;
+}) {
+  const params = await searchParams;
   const supabase = await createSupabaseServerClient();
   const {
     data: { user }
@@ -30,9 +35,51 @@ export default async function ContactPage() {
               Pentru intrebari despre cont, acces la materiale, resurse sau upgrade la Premium, contacteaza echipa
               HILEX si revenim cat mai curand.
             </p>
+            {params.sent ? (
+              <p className="success-text">Mesajul tau a fost trimis. Revenim cat mai curand.</p>
+            ) : null}
+            {params.error ? (
+              <p className="notice-text">Mesajul nu a putut fi trimis. Te rugam sa incerci din nou.</p>
+            ) : null}
+            <form action="/api/contact" className="contact-form" method="POST">
+              <div className="field">
+                <label htmlFor="contact-name">Nume</label>
+                <input id="contact-name" name="name" placeholder="Numele tau" required type="text" />
+              </div>
+              <div className="field">
+                <label htmlFor="contact-email">Email</label>
+                <input id="contact-email" name="email" placeholder="email@exemplu.com" required type="email" />
+              </div>
+              <div className="field">
+                <label htmlFor="contact-topic">Cu ce te putem ajuta?</label>
+                <select id="contact-topic" name="topic" defaultValue="Problema cu platforma">
+                  <option>Problema cu platforma</option>
+                  <option>Nu vad materialele corecte</option>
+                  <option>Upgrade la Premium</option>
+                  <option>Intrebare despre cont</option>
+                  <option>Alta intrebare</option>
+                </select>
+              </div>
+              <div className="field">
+                <label htmlFor="contact-message">Mesaj</label>
+                <textarea
+                  id="contact-message"
+                  name="message"
+                  placeholder="Scrie aici exact ce problema ai..."
+                  required
+                  rows={7}
+                />
+              </div>
+              <button className="btn primary" type="submit">
+                Trimite mesajul
+              </button>
+            </form>
             <div className="contact-actions">
-              <a className="btn primary" href="mailto:members@hilex.co.uk">
-                members@hilex.co.uk
+              <a className="btn primary" href="mailto:membership@hilex.co.uk">
+                membership@hilex.co.uk
+              </a>
+              <a className="btn primary consultation-btn" href="https://booking.fcos.co.uk" rel="noreferrer" target="_blank">
+                Programeaza consultanta
               </a>
               <a className="btn" href="https://hilex.co.uk" rel="noreferrer" target="_blank">
                 Website HILEX
@@ -48,6 +95,9 @@ export default async function ContactPage() {
                 Scrie-ne si te ajutam cu trecerea de la Basic la Premium, inclusiv diferenta de acces si pasii de
                 activare.
               </p>
+              <a className="btn" href="mailto:membership@hilex.co.uk?subject=Upgrade%20la%20Premium">
+                Cere upgrade
+              </a>
             </article>
 
             <article className="card contact-card">
@@ -56,6 +106,15 @@ export default async function ContactPage() {
               <p className="muted">
                 Daca nu poti intra in cont sau nu vezi materialele corecte, trimite-ne emailul folosit la plata.
               </p>
+            </article>
+
+            <article className="card contact-card">
+              <span className="eyebrow">Consultanta</span>
+              <h3>Vrei sa vorbesti cu cineva?</h3>
+              <p className="muted">Poti programa o consultanta direct prin pagina de booking Forest & Co.</p>
+              <a className="btn primary" href="https://booking.fcos.co.uk" rel="noreferrer" target="_blank">
+                Programeaza consultanta
+              </a>
             </article>
 
             <article className="card contact-card notice-contact">
@@ -70,11 +129,11 @@ export default async function ContactPage() {
 
         <div className="inner contact-footer-card card">
           <div>
-            <span className="eyebrow">Biblioteca</span>
+            <span className="eyebrow">Resurse</span>
             <h3>Continua sa explorezi materialele HILEX</h3>
           </div>
           <Link className="btn" href="/library">
-            Inapoi la biblioteca
+            Inapoi la resurse
           </Link>
         </div>
       </section>

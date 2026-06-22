@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "HILEX",
-  description: "Biblioteca digitala HILEX"
+  description: "Resurse digitale HILEX"
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
