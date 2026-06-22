@@ -1,7 +1,9 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
+import { canAccessLesson } from "@/lib/access";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { AccessLevel } from "@/lib/types";
 
 function relationName(value: unknown) {
   if (Array.isArray(value)) {
@@ -25,6 +27,18 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
 
   if (!user) redirect("/login");
 
+  const { data: subscription } = await supabase
+    .from("subscriptions")
+    .select("access_level,status,current_period_end")
+    .eq("user_id", user.id)
+    .in("status", ["active", "trialing"])
+    .or(`current_period_end.is.null,current_period_end.gt.${new Date().toISOString()}`)
+    .order("access_level", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const userAccess = (subscription?.access_level || null) as AccessLevel | null;
+
   const { data: lesson } = await supabase
     .from("lessons")
     .select("*, categories(name,slug), subcategories(name,slug), lesson_resources(title,resource_type,url,access_level,sort_order)")
@@ -39,6 +53,55 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   const resources = Array.isArray(lesson.lesson_resources) ? lesson.lesson_resources : [];
   const categoryName = relationName(lesson.categories);
   const subcategoryName = relationName(lesson.subcategories);
+  const lessonAccess = lesson.access_level as AccessLevel;
+  const locked = !canAccessLesson(userAccess, lessonAccess);
+
+  if (locked) {
+    return (
+      <main className="page">
+        <AppHeader />
+        <section className="hero compact">
+          <div className="inner material-hero-inner">
+            <p className="breadcrumbs">
+              <Link href="/library">Biblioteca</Link> / {categoryName || "Material"}
+              {subcategoryName ? ` / ${subcategoryName}` : ""}
+            </p>
+            <div className="material-meta">
+              <span className="tag premium">Premium</span>
+              {categoryName ? <span className="tag light">{categoryName}</span> : null}
+              {subcategoryName ? <span className="tag light">{subcategoryName}</span> : null}
+            </div>
+            <h1>{lesson.title}</h1>
+            <p>{lesson.excerpt}</p>
+          </div>
+        </section>
+        <section className="section">
+          <div className="inner">
+            <div className="locked-material card">
+              <span className="lock-icon">P</span>
+              <div>
+                <span className="eyebrow">Material Premium</span>
+                <h2>Fa upgrade la Premium pentru a avea acces</h2>
+                <p className="muted">
+                  Acest material este disponibil pentru membrii Premium. Dupa upgrade, vei putea vedea clipul,
+                  explicatiile si resursele atasate.
+                </p>
+                <div className="locked-actions">
+                  <Link className="btn primary" href="/contact">
+                    Cere upgrade la Premium
+                  </Link>
+                  <Link className="btn" href="/library">
+                    Inapoi la biblioteca
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
   const resourcesWithUrls = await Promise.all(
     resources.map(async (resource: { title: string; url: string; resource_type: string; access_level: string }) => {
       if (resource.resource_type !== "pdf") return resource;

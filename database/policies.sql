@@ -51,10 +51,6 @@ on public.lessons for select
 using (
   status = 'published'
   and auth.uid() is not null
-  and (
-    access_level = 'basic'
-    or public.current_access_level() = 'premium'
-  )
 );
 
 create policy "Admins can manage lessons"

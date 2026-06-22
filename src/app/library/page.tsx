@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
+import { canAccessLesson } from "@/lib/access";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { AccessLevel } from "@/lib/types";
 
 function relationName(value: unknown) {
   if (Array.isArray(value)) {
@@ -27,6 +29,18 @@ export default async function LibraryPage({
   } = await supabase.auth.getUser();
 
   if (!user) redirect("/login");
+
+  const { data: subscription } = await supabase
+    .from("subscriptions")
+    .select("access_level,status,current_period_end")
+    .eq("user_id", user.id)
+    .in("status", ["active", "trialing"])
+    .or(`current_period_end.is.null,current_period_end.gt.${new Date().toISOString()}`)
+    .order("access_level", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const userAccess = (subscription?.access_level || null) as AccessLevel | null;
 
   const { data: categories } = await supabase
     .from("categories")
@@ -129,14 +143,24 @@ export default async function LibraryPage({
           </div>
 
           <div className="lesson-grid">
-            {(lessons || []).map((lesson) => (
-              <Link className="lesson-card" href={`/library/${lesson.slug}`} key={lesson.id}>
+            {(lessons || []).map((lesson) => {
+              const lessonAccess = lesson.access_level as AccessLevel;
+              const locked = !canAccessLesson(userAccess, lessonAccess);
+
+              return (
+              <Link className={`lesson-card ${locked ? "locked" : ""}`} href={`/library/${lesson.slug}`} key={lesson.id}>
                 <div className="lesson-thumb">
                   {lesson.thumbnail_url ? (
                     <img alt="" src={lesson.thumbnail_url} />
                   ) : (
                     <span>▶</span>
                   )}
+                  {locked ? (
+                    <div className="locked-overlay">
+                      <strong>Premium</strong>
+                      <small>Fa upgrade la Premium pentru a avea acces</small>
+                    </div>
+                  ) : null}
                 </div>
                 <div className="lesson-content">
                   {(() => {
@@ -154,9 +178,13 @@ export default async function LibraryPage({
                   })()}
                   <h3>{lesson.title}</h3>
                   <p className="muted">{lesson.excerpt}</p>
+                  {locked ? (
+                    <p className="upgrade-note">Fa upgrade la Premium pentru a avea acces la acest material.</p>
+                  ) : null}
                 </div>
               </Link>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

@@ -155,6 +155,16 @@ textarea {
   overflow: hidden;
 }
 
+.lesson-card.locked {
+  border-color: #f3c8df;
+}
+
+.lesson-card.locked .lesson-thumb img,
+.lesson-card.locked .lesson-thumb > span {
+  filter: saturate(0.5);
+  opacity: 0.38;
+}
+
 .topic-card {
   padding: 18px;
   min-height: 160px;
@@ -202,6 +212,7 @@ textarea {
   display: flex;
   justify-content: center;
   overflow: hidden;
+  position: relative;
 }
 
 .lesson-thumb img {
@@ -229,6 +240,42 @@ textarea {
   display: grid;
   gap: 12px;
   padding: 16px;
+}
+
+.locked-overlay {
+  align-items: center;
+  background: rgba(2, 8, 63, 0.78);
+  color: var(--white);
+  display: grid;
+  gap: 6px;
+  inset: 0;
+  justify-items: center;
+  padding: 18px;
+  position: absolute;
+  text-align: center;
+}
+
+.locked-overlay strong {
+  background: var(--pink);
+  border-radius: 999px;
+  font-size: 12px;
+  padding: 6px 10px;
+  text-transform: uppercase;
+}
+
+.locked-overlay small {
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.upgrade-note {
+  background: #fff4fb;
+  border: 1px solid #f3c8df;
+  border-radius: 8px;
+  color: #7b124c;
+  font-weight: 850;
+  margin: 0;
+  padding: 11px 12px;
 }
 
 .tag-row {
@@ -388,6 +435,43 @@ textarea {
   color: var(--muted);
 }
 
+.locked-material {
+  align-items: center;
+  display: grid;
+  gap: 22px;
+  grid-template-columns: 82px minmax(0, 1fr);
+  padding: clamp(24px, 5vw, 44px);
+}
+
+.locked-material h2 {
+  color: var(--navy);
+  font-size: clamp(34px, 5vw, 58px);
+  line-height: 1.02;
+  margin: 8px 0;
+}
+
+.lock-icon {
+  align-items: center;
+  background: #fff4fb;
+  border: 1px solid #f3c8df;
+  border-radius: 999px;
+  color: var(--pink);
+  display: flex;
+  font-size: 32px;
+  font-weight: 950;
+  height: 82px;
+  justify-content: center;
+  width: 82px;
+}
+
+.locked-actions,
+.contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
 .admin-panels {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -417,6 +501,57 @@ textarea {
 
 .account-notice {
   margin-top: 16px;
+}
+
+.contact-layout {
+  align-items: start;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) 380px;
+}
+
+.contact-card h2 {
+  color: var(--navy);
+  font-size: clamp(36px, 5vw, 60px);
+  line-height: 1.04;
+  margin: 10px 0;
+}
+
+.contact-card h3 {
+  font-size: 24px;
+}
+
+.primary-contact {
+  padding: clamp(24px, 5vw, 44px);
+}
+
+.contact-side {
+  display: grid;
+  gap: 16px;
+}
+
+.notice-contact {
+  background: #fff4fb;
+  border-color: #f3c8df;
+}
+
+.notice-contact p {
+  color: #7b124c;
+  font-weight: 850;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.contact-footer-card {
+  align-items: center;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.contact-footer-card h3 {
+  font-size: 28px;
 }
 
 .stat-card {
@@ -929,7 +1064,12 @@ textarea {
   .lesson-layout,
   .material-content-layout,
   .admin-panels,
+  .contact-layout,
   .search-row {
+    grid-template-columns: 1fr;
+  }
+
+  .locked-material {
     grid-template-columns: 1fr;
   }
 
@@ -943,6 +1083,11 @@ textarea {
   }
 
   .account-summary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .contact-footer-card {
     align-items: stretch;
     flex-direction: column;
   }
