@@ -22,7 +22,7 @@ export default async function ContactPage({
       <section className="hero compact">
         <div className="inner">
           <h1>Contact HILEX</h1>
-          <p>Ai nevoie de ajutor cu platforma, accesul tau sau un posibil upgrade la Premium?</p>
+          <p>Ai nevoie de ajutor cu platforma, abonamentul tau sau o situatie juridica?</p>
         </div>
       </section>
 
@@ -32,8 +32,8 @@ export default async function ContactPage({
             <span className="eyebrow">Suport membri</span>
             <h2>Trimite-ne un mesaj</h2>
             <p className="muted">
-              Pentru intrebari despre cont, acces la materiale, resurse sau upgrade la Premium, contacteaza echipa
-              HILEX si revenim cat mai curand.
+              Pentru intrebari despre cont, acces la materiale, upgrade la Premium sau o situatie juridica in care ai
+              nevoie de asistenta, contacteaza echipa HILEX si revenim cat mai curand.
             </p>
             {params.sent ? (
               <p className="success-text">Mesajul tau a fost trimis. Revenim cat mai curand.</p>
@@ -52,10 +52,16 @@ export default async function ContactPage({
               </div>
               <div className="field">
                 <label htmlFor="contact-topic">Cu ce te putem ajuta?</label>
-                <select id="contact-topic" name="topic" defaultValue="Problema cu platforma">
+                <select id="contact-topic" name="topic" defaultValue="Situatie juridica - Dreptul Familiei">
+                  <option>Situatie juridica - Dreptul Familiei</option>
+                  <option>Situatie juridica - Imigratie</option>
+                  <option>Situatie juridica - Drept Civil</option>
+                  <option>Situatie juridica - Drept Penal</option>
+                  <option>Am nevoie de asistenta juridica</option>
+                  <option>Vreau sa programez o consultanta</option>
+                  <option>Upgrade la Premium</option>
                   <option>Problema cu platforma</option>
                   <option>Nu vad materialele corecte</option>
-                  <option>Upgrade la Premium</option>
                   <option>Intrebare despre cont</option>
                   <option>Alta intrebare</option>
                 </select>
@@ -95,14 +101,6 @@ export default async function ContactPage({
               <a className="btn" href="#contact-form">
                 Cere upgrade
               </a>
-            </article>
-
-            <article className="card contact-card">
-              <span className="eyebrow">Acces</span>
-              <h3>Probleme cu login-ul?</h3>
-              <p className="muted">
-                Daca nu poti intra in cont sau nu vezi materialele corecte, trimite-ne emailul folosit la plata.
-              </p>
             </article>
 
             <article className="card contact-card">

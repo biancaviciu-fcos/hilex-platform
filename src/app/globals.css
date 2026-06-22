@@ -552,6 +552,12 @@ textarea {
   border-color: var(--navy);
 }
 
+.consultation-nav-btn {
+  background: var(--pink);
+  border-color: var(--pink);
+  color: var(--white);
+}
+
 .notice-contact {
   background: #fff4fb;
   border-color: #f3c8df;
