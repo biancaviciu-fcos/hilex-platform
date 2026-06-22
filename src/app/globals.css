@@ -36,14 +36,23 @@ textarea {
   min-height: 100vh;
 }
 
+.page:has(> .topbar) {
+  padding-left: 238px;
+}
+
 .topbar {
   background: var(--white);
-  border-bottom: 1px solid var(--line);
-  padding: 12px 28px;
+  border-right: 1px solid var(--line);
+  bottom: 0;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
+  flex-direction: column;
+  gap: 24px;
+  left: 0;
+  padding: 24px 18px;
+  position: fixed;
+  top: 0;
+  width: 238px;
+  z-index: 30;
 }
 
 .brand {
@@ -58,9 +67,20 @@ textarea {
 
 .nav {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  align-items: stretch;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav > a:not(.btn) {
+  border-radius: 8px;
+  color: var(--navy);
+  font-weight: 850;
+  padding: 10px 12px;
+}
+
+.nav > a:not(.btn):hover {
+  background: #f6f3ff;
 }
 
 .btn {
@@ -74,6 +94,7 @@ textarea {
   align-items: center;
   justify-content: center;
   min-height: 40px;
+  text-align: center;
 }
 
 .btn.primary {
@@ -126,15 +147,15 @@ textarea {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 10px;
-  max-width: 760px;
-  margin-top: 24px;
+  max-width: 646px;
+  margin-top: 18px;
 }
 
 .search-row input {
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
-  padding: 14px 16px;
-  min-height: 48px;
+  padding: 11px 14px;
+  min-height: 41px;
 }
 
 .topic-grid,
@@ -143,6 +164,90 @@ textarea {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
+}
+
+.member-home-hero {
+  background:
+    radial-gradient(circle at 92% 0%, rgba(217, 4, 124, 0.3), transparent 26%),
+    var(--navy);
+}
+
+.hero-eyebrow {
+  color: rgba(255, 255, 255, 0.72);
+  display: inline-flex;
+  margin-bottom: 8px;
+}
+
+.compact-search {
+  max-width: 550px;
+}
+
+.home-intro-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  margin-bottom: 24px;
+}
+
+.home-intro-card h2 {
+  color: var(--navy);
+  font-size: clamp(25px, 3vw, 34px);
+  line-height: 1.12;
+  margin: 8px 0;
+}
+
+.home-intro-card.accent {
+  border-color: #f3c8df;
+}
+
+.home-section-title {
+  margin-top: 18px;
+}
+
+.large-topic-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.large-topic-card {
+  display: grid;
+  gap: 12px;
+  min-height: 210px;
+  padding: 22px;
+}
+
+.topic-icon {
+  align-items: center;
+  background: var(--navy);
+  border-radius: 999px;
+  color: var(--white);
+  display: flex;
+  font-size: 24px;
+  font-weight: 950;
+  height: 54px;
+  justify-content: center;
+  width: 54px;
+}
+
+.filter-panel {
+  align-items: end;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(2, 8, 63, 0.05);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto auto auto;
+  margin: 28px 0 10px;
+  padding: 16px;
+}
+
+.checkbox-filter {
+  align-items: center;
+  color: var(--navy);
+  display: flex;
+  font-weight: 850;
+  gap: 8px;
+  min-height: 40px;
 }
 
 .topic-card,
@@ -157,6 +262,10 @@ textarea {
 
 .lesson-card.locked {
   border-color: #f3c8df;
+}
+
+.lesson-card-main {
+  display: block;
 }
 
 .lesson-card.locked .lesson-thumb img,
@@ -242,6 +351,32 @@ textarea {
   display: grid;
   gap: 10px;
   padding: 15px;
+}
+
+.favorite-btn {
+  background: #fff4fb;
+  border: 0;
+  border-top: 1px solid #f3c8df;
+  color: #7b124c;
+  cursor: pointer;
+  font-weight: 900;
+  padding: 12px 14px;
+  width: 100%;
+}
+
+.favorite-btn.active {
+  background: var(--navy);
+  color: var(--white);
+}
+
+.hero-favorite-btn {
+  margin-top: 10px;
+}
+
+.hero-favorite-btn.active {
+  background: var(--pink);
+  border-color: var(--pink);
+  color: var(--white);
 }
 
 .locked-overlay {
@@ -1096,6 +1231,25 @@ textarea {
 }
 
 @media (max-width: 760px) {
+  .page {
+    padding-left: 0;
+  }
+
+  .topbar {
+    border-bottom: 1px solid var(--line);
+    border-right: 0;
+    bottom: auto;
+    gap: 12px;
+    padding: 14px 16px;
+    position: static;
+    width: auto;
+  }
+
+  .nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
   .grid,
   .topic-grid,
   .lesson-grid,
@@ -1104,6 +1258,9 @@ textarea {
   .material-content-layout,
   .admin-panels,
   .contact-layout,
+  .home-intro-grid,
+  .large-topic-grid,
+  .filter-panel,
   .search-row {
     grid-template-columns: 1fr;
   }

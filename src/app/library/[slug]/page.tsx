@@ -55,6 +55,12 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   const subcategoryName = relationName(lesson.subcategories);
   const lessonAccess = lesson.access_level as AccessLevel;
   const locked = !canAccessLesson(userAccess, lessonAccess);
+  const { data: favorite } = await supabase
+    .from("favorite_lessons")
+    .select("lesson_id")
+    .eq("user_id", user.id)
+    .eq("lesson_id", lesson.id)
+    .maybeSingle();
 
   if (locked) {
     return (
@@ -136,6 +142,12 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
           </div>
           <h1>{lesson.title}</h1>
           <p>{lesson.excerpt}</p>
+          <form action={`/api/favorites/${lesson.id}`} method="POST">
+            <input name="next" type="hidden" value={`/library/${lesson.slug}`} />
+            <button className={`btn hero-favorite-btn ${favorite ? "active" : ""}`} type="submit">
+              {favorite ? "Salvat pentru mai tarziu" : "Salveaza pentru mai tarziu"}
+            </button>
+          </form>
         </div>
       </section>
       <section className="section">

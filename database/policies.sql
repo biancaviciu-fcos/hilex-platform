@@ -5,6 +5,7 @@ alter table public.subcategories enable row level security;
 alter table public.lessons enable row level security;
 alter table public.lesson_resources enable row level security;
 alter table public.video_uploads enable row level security;
+alter table public.favorite_lessons enable row level security;
 
 create or replace function public.current_user_role()
 returns public.user_role
@@ -67,6 +68,11 @@ using (
     or public.current_access_level() = 'premium'
   )
 );
+
+create policy "Users can manage own favorite lessons"
+on public.favorite_lessons for all
+using (user_id = auth.uid())
+with check (user_id = auth.uid());
 
 create policy "Admins can manage resources"
 on public.lesson_resources for all

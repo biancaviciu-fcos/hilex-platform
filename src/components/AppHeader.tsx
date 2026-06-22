@@ -21,12 +21,13 @@ export async function AppHeader() {
   }
 
   return (
-    <header className="topbar">
+    <aside className="topbar">
       <Link className="brand" href="/library">
         Hi<span>Lex</span>
       </Link>
       <nav className="nav">
         <Link href="/library">Resurse</Link>
+        <Link href="/library?favorites=1">Favorite</Link>
         <Link href="/contact">Contact</Link>
         {showAdmin ? <Link href="/admin">Admin</Link> : null}
         <a className="btn consultation-nav-btn" href="https://booking.fcos.co.uk" rel="noreferrer" target="_blank">
@@ -34,6 +35,6 @@ export async function AppHeader() {
         </a>
         <Link className="btn" href="/account">Cont</Link>
       </nav>
-    </header>
+    </aside>
   );
 }
