@@ -41,7 +41,7 @@ export default async function ContactPage({
             {params.error ? (
               <p className="notice-text">Mesajul nu a putut fi trimis. Te rugam sa incerci din nou.</p>
             ) : null}
-            <form action="/api/contact" className="contact-form" method="POST">
+            <form action="/api/contact" className="contact-form" id="contact-form" method="POST">
               <div className="field">
                 <label htmlFor="contact-name">Nume</label>
                 <input id="contact-name" name="name" placeholder="Numele tau" required type="text" />
@@ -75,9 +75,6 @@ export default async function ContactPage({
               </button>
             </form>
             <div className="contact-actions">
-              <a className="btn primary" href="mailto:membership@hilex.co.uk">
-                membership@hilex.co.uk
-              </a>
               <a className="btn primary consultation-btn" href="https://booking.fcos.co.uk" rel="noreferrer" target="_blank">
                 Programeaza consultanta
               </a>
@@ -95,7 +92,7 @@ export default async function ContactPage({
                 Scrie-ne si te ajutam cu trecerea de la Basic la Premium, inclusiv diferenta de acces si pasii de
                 activare.
               </p>
-              <a className="btn" href="mailto:membership@hilex.co.uk?subject=Upgrade%20la%20Premium">
+              <a className="btn" href="#contact-form">
                 Cere upgrade
               </a>
             </article>
