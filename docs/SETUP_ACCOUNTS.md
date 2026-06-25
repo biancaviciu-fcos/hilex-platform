@@ -48,7 +48,7 @@ Recomandare: Resend.
 Avem nevoie de:
 
 - API key
-- domeniu/email verificat, de exemplu `no-reply@hilex.co.uk`
+- domeniu/email verificat, de exemplu `membership@hilex.co.uk`
 
 ## Hosting
 

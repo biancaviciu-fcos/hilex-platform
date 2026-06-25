@@ -27,7 +27,7 @@ export async function POST(request: Request) {
 
   const resendApiKey = process.env.RESEND_API_KEY;
   const to = process.env.CONTACT_EMAIL || "membership@hilex.co.uk";
-  const from = process.env.EMAIL_FROM || "HILEX <no-reply@hilex.co.uk>";
+  const from = process.env.EMAIL_FROM || "HILEX <membership@hilex.co.uk>";
 
   if (!resendApiKey) {
     console.error("Missing RESEND_API_KEY for contact form");

@@ -13,6 +13,7 @@ async function requestPasswordReset(formData: FormData) {
     await sendForgotPasswordEmail(email);
   } catch (error) {
     console.error("Forgot password email failed", error);
+    redirect("/forgot-password?error=send");
   }
 
   redirect("/forgot-password?sent=1");
@@ -41,7 +42,13 @@ export default async function ForgotPasswordPage({
                 Daca emailul exista in sistem, vei primi in cateva minute linkul pentru resetarea parolei.
               </p>
             ) : null}
-            {params.error ? (
+            {params.error === "send" ? (
+              <p className="notice-text">
+                Nu am putut trimite emailul acum. Te rugam sa verifici ca emailul este cel folosit pentru contul HILEX
+                sau sa ne contactezi la membership@hilex.co.uk.
+              </p>
+            ) : null}
+            {params.error === "1" ? (
               <p className="notice-text">Te rugam sa introduci adresa de email folosita pentru contul HILEX.</p>
             ) : null}
             <div className="field">
