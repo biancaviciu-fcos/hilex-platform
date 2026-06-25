@@ -839,6 +839,17 @@ textarea {
   padding: 12px 14px;
 }
 
+.login-help-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -4px;
+}
+
+.login-help-row a {
+  color: var(--blue);
+  font-weight: 850;
+}
+
 .muted {
   color: var(--muted);
 }

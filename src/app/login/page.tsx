@@ -45,13 +45,12 @@ export default async function LoginPage({
               <label>Parola</label>
               <input name="password" type="password" required />
             </div>
+            <div className="login-help-row">
+              <Link href="/forgot-password">Am uitat parola</Link>
+            </div>
             <button className="btn primary" type="submit">
               Login
             </button>
-            <p className="notice-text">
-              Ai uitat parola?{" "}
-              <Link href="/forgot-password">Trimite link de resetare</Link>
-            </p>
           </form>
         </div>
       </section>
