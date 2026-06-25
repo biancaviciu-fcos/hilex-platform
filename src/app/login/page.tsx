@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 async function signIn(formData: FormData) {
@@ -47,6 +48,10 @@ export default async function LoginPage({
             <button className="btn primary" type="submit">
               Login
             </button>
+            <p className="notice-text">
+              Ai uitat parola?{" "}
+              <Link href="/forgot-password">Trimite link de resetare</Link>
+            </p>
           </form>
         </div>
       </section>
