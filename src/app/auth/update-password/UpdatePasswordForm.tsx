@@ -43,10 +43,10 @@ export function UpdatePasswordForm() {
         }
       }
 
-      if (tokenHash && type === "recovery") {
+      if (tokenHash && (type === "recovery" || type === "invite")) {
         const { error } = await supabase.auth.verifyOtp({
           token_hash: tokenHash,
-          type: "recovery"
+          type
         });
 
         if (error) {

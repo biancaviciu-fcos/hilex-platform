@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { sendWelcomePasswordEmail } from "@/lib/auth-email";
 
 export async function POST(request: Request) {
   const body = await request.text();
@@ -49,17 +48,21 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   if (!email || !subscriptionId) return;
 
-  const { data: createdUser, error: createUserError } = await supabase.auth.admin.createUser({
-    email,
-    email_confirm: true,
-    user_metadata: { full_name: name || "" }
-  });
+  const { data: existingUsers } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
+  let userId = existingUsers.users.find((item) => item.email === email)?.id;
 
-  let userId = createdUser.user?.id;
+  if (!userId) {
+    const { data: invitedUser, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
+      data: { full_name: name || "" },
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/update-password`
+    });
 
-  if (!userId && createUserError) {
-    const { data: existingUsers } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
-    userId = existingUsers.users.find((item) => item.email === email)?.id;
+    if (inviteError) {
+      console.error("HILEX invite user failed", inviteError);
+      return;
+    }
+
+    userId = invitedUser.user?.id;
   }
 
   if (!userId) return;
@@ -84,8 +87,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     current_period_end: toIso(subscription.current_period_end),
     cancel_at_period_end: subscription.cancel_at_period_end
   });
-
-  await sendWelcomePasswordEmail(email, name);
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
