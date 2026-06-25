@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { sendForgotPasswordEmail } from "@/lib/auth-email";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 async function requestPasswordReset(formData: FormData) {
   "use server";
@@ -9,24 +9,13 @@ async function requestPasswordReset(formData: FormData) {
 
   if (!email) redirect("/forgot-password?error=1");
 
-  try {
-    await sendForgotPasswordEmail(email);
-  } catch (error) {
-    console.error("Forgot password email failed", error);
-    const message = error instanceof Error ? error.message.toLowerCase() : "";
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/update-password`
+  });
 
-    if (message.includes("user not found") || message.includes("not found")) {
-      redirect("/forgot-password?sent=1");
-    }
-
-    if (message.includes("missing resend_api_key")) {
-      redirect("/forgot-password?error=config");
-    }
-
-    if (message.includes("domain") || message.includes("sender") || message.includes("from")) {
-      redirect("/forgot-password?error=sender");
-    }
-
+  if (error) {
+    console.error("Forgot password reset failed", error);
     redirect("/forgot-password?error=send");
   }
 
@@ -54,18 +43,6 @@ export default async function ForgotPasswordPage({
             {params.sent ? (
               <p className="success-text">
                 Daca emailul exista in sistem, vei primi in cateva minute linkul pentru resetarea parolei.
-              </p>
-            ) : null}
-            {params.error === "config" ? (
-              <p className="notice-text">
-                Emailul nu poate fi trimis deoarece lipseste cheia Resend in Vercel. Verifica variabila
-                RESEND_API_KEY.
-              </p>
-            ) : null}
-            {params.error === "sender" ? (
-              <p className="notice-text">
-                Emailul nu poate fi trimis deoarece adresa de expeditor nu este acceptata in Resend. Verifica
-                EMAIL_FROM si domeniul/adresa membership@hilex.co.uk.
               </p>
             ) : null}
             {params.error === "send" ? (
