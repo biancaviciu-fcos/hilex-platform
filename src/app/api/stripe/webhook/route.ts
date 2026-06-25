@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { sendWelcomePasswordEmail } from "@/lib/auth-email";
 
 export async function POST(request: Request) {
   const body = await request.text();
@@ -84,9 +85,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     cancel_at_period_end: subscription.cancel_at_period_end
   });
 
-  await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/update-password`
-  });
+  await sendWelcomePasswordEmail(email, name);
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {

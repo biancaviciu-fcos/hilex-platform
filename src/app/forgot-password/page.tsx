@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { sendForgotPasswordEmail } from "@/lib/auth-email";
 
 async function requestPasswordReset(formData: FormData) {
   "use server";
@@ -9,10 +9,11 @@ async function requestPasswordReset(formData: FormData) {
 
   if (!email) redirect("/forgot-password?error=1");
 
-  const supabase = await createSupabaseServerClient();
-  await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/update-password`
-  });
+  try {
+    await sendForgotPasswordEmail(email);
+  } catch (error) {
+    console.error("Forgot password email failed", error);
+  }
 
   redirect("/forgot-password?sent=1");
 }
