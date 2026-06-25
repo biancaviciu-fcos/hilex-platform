@@ -25,7 +25,7 @@ async function createPasswordLink(email: string) {
   });
 
   if (error) {
-    throw error;
+    throw new Error(`Supabase password link failed: ${error.message}`);
   }
 
   const actionLink = data.properties?.action_link;

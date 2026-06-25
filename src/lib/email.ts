@@ -23,15 +23,15 @@ export async function sendEmail({ to, subject, text, html, replyTo }: SendEmailI
     body: JSON.stringify({
       from,
       to,
-      reply_to: replyTo,
       subject,
       text,
-      html
+      html,
+      ...(replyTo ? { reply_to: replyTo } : {})
     })
   });
 
   if (!response.ok) {
-    throw new Error(await response.text());
+    throw new Error(`Resend email failed (${response.status}): ${await response.text()}`);
   }
 }
 

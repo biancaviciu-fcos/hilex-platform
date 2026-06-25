@@ -13,6 +13,20 @@ async function requestPasswordReset(formData: FormData) {
     await sendForgotPasswordEmail(email);
   } catch (error) {
     console.error("Forgot password email failed", error);
+    const message = error instanceof Error ? error.message.toLowerCase() : "";
+
+    if (message.includes("user not found") || message.includes("not found")) {
+      redirect("/forgot-password?sent=1");
+    }
+
+    if (message.includes("missing resend_api_key")) {
+      redirect("/forgot-password?error=config");
+    }
+
+    if (message.includes("domain") || message.includes("sender") || message.includes("from")) {
+      redirect("/forgot-password?error=sender");
+    }
+
     redirect("/forgot-password?error=send");
   }
 
@@ -40,6 +54,18 @@ export default async function ForgotPasswordPage({
             {params.sent ? (
               <p className="success-text">
                 Daca emailul exista in sistem, vei primi in cateva minute linkul pentru resetarea parolei.
+              </p>
+            ) : null}
+            {params.error === "config" ? (
+              <p className="notice-text">
+                Emailul nu poate fi trimis deoarece lipseste cheia Resend in Vercel. Verifica variabila
+                RESEND_API_KEY.
+              </p>
+            ) : null}
+            {params.error === "sender" ? (
+              <p className="notice-text">
+                Emailul nu poate fi trimis deoarece adresa de expeditor nu este acceptata in Resend. Verifica
+                EMAIL_FROM si domeniul/adresa membership@hilex.co.uk.
               </p>
             ) : null}
             {params.error === "send" ? (
