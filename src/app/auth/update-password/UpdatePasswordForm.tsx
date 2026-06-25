@@ -16,6 +16,19 @@ export function UpdatePasswordForm() {
 
   useEffect(() => {
     async function prepareSession() {
+      async function markReadyIfSessionExists() {
+        const {
+          data: { session }
+        } = await supabase.auth.getSession();
+
+        if (session) {
+          setIsReady(true);
+          return true;
+        }
+
+        return false;
+      }
+
       const code = searchParams.get("code");
       const tokenHash = searchParams.get("token_hash");
       const type = searchParams.get("type");
@@ -26,6 +39,7 @@ export function UpdatePasswordForm() {
       if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(code);
         if (error) {
+          if (await markReadyIfSessionExists()) return;
           setMessage("Linkul de setare parola a expirat sau nu este valid. Cere un link nou.");
           return;
         }
@@ -38,6 +52,7 @@ export function UpdatePasswordForm() {
         });
 
         if (error) {
+          if (await markReadyIfSessionExists()) return;
           setMessage("Linkul de setare parola a expirat sau nu este valid. Cere un link nou.");
           return;
         }
@@ -50,21 +65,15 @@ export function UpdatePasswordForm() {
         });
 
         if (error) {
+          if (await markReadyIfSessionExists()) return;
           setMessage("Linkul de setare parola a expirat sau nu este valid. Cere un link nou.");
           return;
         }
       }
 
-      const {
-        data: { session }
-      } = await supabase.auth.getSession();
-
-      if (!session) {
+      if (!(await markReadyIfSessionExists())) {
         setMessage("Nu am putut valida sesiunea. Deschide linkul primit pe email in acelasi browser.");
-        return;
       }
-
-      setIsReady(true);
     }
 
     prepareSession();
