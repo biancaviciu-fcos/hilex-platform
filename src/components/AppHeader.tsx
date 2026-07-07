@@ -22,11 +22,12 @@ export async function AppHeader() {
 
   return (
     <aside className="topbar">
-      <Link className="brand" href="/library">
+      <Link className="brand" href="/">
         Hi<span>Lex</span>
       </Link>
       <nav className="nav">
-        <Link href="/library">Resurse</Link>
+        <Link href="/">Acasa</Link>
+        <Link href="/library">Biblioteca</Link>
         <Link href="/library?favorites=1">Favorite</Link>
         <Link href="/contact">Contact</Link>
         {showAdmin ? <Link href="/admin">Admin</Link> : null}

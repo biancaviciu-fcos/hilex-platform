@@ -1299,3 +1299,269 @@ textarea {
     flex-direction: column;
   }
 }
+
+/* Member platform restored layout */
+.page:has(> .topbar) {
+  padding-left: 0;
+}
+
+.topbar {
+  align-items: center;
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
+  border-right: 0;
+  bottom: auto;
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  justify-content: space-between;
+  left: auto;
+  min-height: 80px;
+  padding: 18px 32px;
+  position: sticky;
+  top: 0;
+  width: 100%;
+}
+
+.topbar .brand {
+  font-size: 28px;
+}
+
+.topbar .nav {
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.topbar .nav > a:not(.btn) {
+  border-radius: 0;
+  font-size: 16px;
+  padding: 0;
+}
+
+.topbar .nav > a:not(.btn):hover {
+  background: transparent;
+  color: var(--pink);
+}
+
+.topbar .consultation-nav-btn {
+  display: none;
+}
+
+.member-shell .hero {
+  padding: 68px 0 74px;
+}
+
+.member-shell .hero.compact {
+  padding: 56px 0 70px;
+}
+
+.member-shell .hero h1 {
+  font-size: clamp(48px, 7vw, 88px);
+  letter-spacing: 0;
+  line-height: 0.98;
+  max-width: 980px;
+}
+
+.member-shell .hero p {
+  font-size: 18px;
+  margin-top: 22px;
+}
+
+.library-hero .search-row {
+  margin-top: 28px;
+  max-width: 760px;
+}
+
+.library-hero .search-row input {
+  border-color: transparent;
+  border-radius: 8px;
+  font-size: 16px;
+  min-height: 58px;
+  padding: 0 20px;
+}
+
+.library-hero .search-row .btn {
+  min-height: 58px;
+  padding-inline: 28px;
+}
+
+.library-topic-grid {
+  margin-top: 10px;
+}
+
+.library-topic-card {
+  min-height: 156px;
+  padding: 22px;
+}
+
+.library-topic-card h3 {
+  font-size: 22px;
+}
+
+.subcategory-filter {
+  margin: 22px 0 18px;
+}
+
+.subcategory-filter .tag-row {
+  margin-top: 10px;
+}
+
+.filter-tag {
+  background: #eef4ff;
+  color: var(--navy);
+  font-size: 13px;
+  padding: 8px 13px;
+}
+
+.filter-tag.active {
+  background: var(--pink);
+  color: var(--white);
+}
+
+.library-filter-panel {
+  align-items: end;
+  grid-template-columns: 220px auto auto auto;
+  margin: 16px 0 26px;
+  max-width: 780px;
+}
+
+.lesson-grid {
+  gap: 20px;
+}
+
+.lesson-card {
+  box-shadow: 0 12px 30px rgba(2, 8, 63, 0.08);
+}
+
+.lesson-content {
+  gap: 14px;
+  padding: 18px;
+}
+
+.lesson-card h3 {
+  font-size: 20px;
+  line-height: 1.14;
+}
+
+.lesson-card p {
+  font-size: 16px;
+}
+
+.member-landing-hero {
+  background:
+    linear-gradient(90deg, rgba(2, 8, 63, 0.98), rgba(2, 8, 63, 0.9)),
+    var(--navy);
+}
+
+.member-landing-grid {
+  align-items: center;
+  display: grid;
+  gap: 34px;
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+
+.member-home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.ghost-on-navy {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.32);
+  color: var(--white);
+}
+
+.member-status-card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  color: var(--white);
+  display: grid;
+  gap: 10px;
+  padding: 24px;
+}
+
+.member-status-card .eyebrow,
+.member-status-card p {
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.member-status-card strong {
+  font-size: 42px;
+  line-height: 1;
+}
+
+.member-home-topics {
+  margin-top: 6px;
+}
+
+.home-topic-card {
+  display: grid;
+  gap: 12px;
+  min-height: 220px;
+  padding: 24px;
+}
+
+.home-support-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 28px;
+}
+
+.home-support-grid .card {
+  display: grid;
+  gap: 12px;
+}
+
+.home-support-grid .card h3 {
+  font-size: 24px;
+  line-height: 1.12;
+}
+
+.material-video-shell {
+  border-radius: 8px;
+}
+
+.material-content-layout {
+  grid-template-columns: minmax(0, 1fr) 300px;
+}
+
+@media (max-width: 900px) {
+  .member-landing-grid,
+  .home-support-grid,
+  .material-content-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .library-filter-panel {
+    grid-template-columns: 1fr;
+    max-width: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 16px;
+    position: static;
+  }
+
+  .member-shell .hero,
+  .member-shell .hero.compact {
+    padding: 42px 0 48px;
+  }
+
+  .member-shell .hero h1 {
+    font-size: clamp(40px, 12vw, 58px);
+  }
+
+  .library-hero .search-row {
+    grid-template-columns: 1fr;
+  }
+}
