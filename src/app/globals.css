@@ -931,6 +931,13 @@ textarea {
   font-weight: 800;
 }
 
+.field-hint {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+  margin: -4px 0 0;
+}
+
 .field input,
 .field textarea,
 .field select {
@@ -1465,9 +1472,9 @@ textarea {
 
 .library-filter-panel {
   align-items: end;
-  grid-template-columns: 220px auto auto auto;
+  grid-template-columns: minmax(220px, 1fr) 220px auto auto auto;
   margin: 16px 0 26px;
-  max-width: 780px;
+  max-width: 980px;
 }
 
 .lesson-grid {

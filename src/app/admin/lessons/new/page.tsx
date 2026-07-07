@@ -118,7 +118,7 @@ export default async function NewLessonPage() {
               <input name="slug" placeholder="ex: calatoria-cu-copilul" required />
             </div>
             <div className="field">
-              <label>Categorie</label>
+              <label>Aria de drept / filtru principal</label>
               <select name="category_id" required>
                 {(categories || []).map((category) => (
                   <option key={category.id} value={category.id}>
@@ -126,9 +126,10 @@ export default async function NewLessonPage() {
                   </option>
                 ))}
               </select>
+              <p className="field-hint">Asta este categoria principala dupa care membrii pot filtra materialele.</p>
             </div>
             <div className="field">
-              <label>Subcategorie</label>
+              <label>Subcategorie interna (optional)</label>
               <select name="subcategory_id">
                 <option value="">Fara subcategorie</option>
                 {(subcategories || []).map((subcategory) => {
@@ -142,12 +143,13 @@ export default async function NewLessonPage() {
                   );
                 })}
               </select>
+              <p className="field-hint">Momentan nu afisam subcategoriile ca filtru public in biblioteca.</p>
             </div>
             <div className="field">
-              <label>Acces</label>
+              <label>Pachet material</label>
               <select name="access_level">
-                <option value="basic">Basic</option>
-                <option value="premium">Premium</option>
+                <option value="basic">Basic - inclus pentru toti membrii</option>
+                <option value="premium">Premium - blocat pentru membrii Basic</option>
               </select>
             </div>
             <div className="field">

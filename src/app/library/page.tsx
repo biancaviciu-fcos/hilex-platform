@@ -14,7 +14,6 @@ type LessonCardData = {
   duration_minutes: number | null;
   thumbnail_url: string | null;
   categories?: unknown;
-  subcategories?: unknown;
 };
 
 function relationName(value: unknown) {
@@ -35,9 +34,9 @@ const quickFilters = [
   { label: "Imigrare", href: "/library?category=imigratie" },
   { label: "Penal", href: "/library?category=drept-penal" },
   { label: "Munca", href: "/library?q=munca" },
-  { label: "Locuinte", href: "/library?subcategory=proprietate-si-locuire" },
+  { label: "Locuinte", href: "/library?q=locuinte" },
   { label: "HMRC", href: "/library?q=HMRC" },
-  { label: "Politie", href: "/library?subcategory=politie-si-investigatii" },
+  { label: "Politie", href: "/library?q=politie" },
   { label: "Business", href: "/library?q=business" },
   { label: "Soferi", href: "/library?q=soferi" }
 ];
@@ -108,12 +107,11 @@ function LessonCard({
 export default async function LibraryPage({
   searchParams
 }: {
-  searchParams: Promise<{ q?: string; category?: string; subcategory?: string; access?: string; favorites?: string }>;
+  searchParams: Promise<{ q?: string; category?: string; access?: string; favorites?: string }>;
 }) {
   const params = await searchParams;
   const query = params.q?.trim() || "";
   const category = params.category?.trim() || "";
-  const subcategory = params.subcategory?.trim() || "";
   const access = params.access === "basic" || params.access === "premium" ? params.access : "";
   const onlyFavorites = params.favorites === "1";
   const supabase = await createSupabaseServerClient();
@@ -140,13 +138,7 @@ export default async function LibraryPage({
     .select("id,name,slug,description,sort_order")
     .order("sort_order");
 
-  const { data: subcategories } = await supabase
-    .from("subcategories")
-    .select("id,name,slug,category_id,sort_order")
-    .order("sort_order");
-
   const selectedCategory = categories?.find((item) => item.slug === category);
-  const selectedSubcategory = subcategories?.find((item) => item.slug === subcategory);
 
   const { data: favorites } = await supabase
     .from("favorite_lessons")
@@ -164,7 +156,7 @@ export default async function LibraryPage({
 
   let lessonsQuery = supabase
     .from("lessons")
-    .select("id,title,slug,excerpt,access_level,duration_minutes,status,thumbnail_url,categories(name,slug),subcategories(name,slug)")
+    .select("id,title,slug,excerpt,access_level,duration_minutes,status,thumbnail_url,categories(name,slug)")
     .eq("status", "published");
 
   if (query) {
@@ -173,10 +165,6 @@ export default async function LibraryPage({
 
   if (category && selectedCategory) {
     lessonsQuery = lessonsQuery.eq("category_id", selectedCategory.id);
-  }
-
-  if (subcategory && selectedSubcategory) {
-    lessonsQuery = lessonsQuery.eq("subcategory_id", selectedSubcategory.id);
   }
 
   if (access) {
@@ -191,7 +179,6 @@ export default async function LibraryPage({
   const next = `/library?${new URLSearchParams({
     ...(query ? { q: query } : {}),
     ...(category ? { category } : {}),
-    ...(subcategory ? { subcategory } : {}),
     ...(access ? { access } : {}),
     ...(onlyFavorites ? { favorites: "1" } : {})
   }).toString()}`;
@@ -243,25 +230,19 @@ export default async function LibraryPage({
             </div>
           </div>
 
-          <div className="subcategory-filter secondary-filter-row">
-            <span className="eyebrow">Subcategorii</span>
-            <div className="tag-row">
-              {(subcategories || []).map((item) => (
-                <Link
-                  className={`tag filter-tag ${subcategory === item.slug ? "active" : ""}`}
-                  href={`/library?subcategory=${item.slug}`}
-                  key={item.id}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-
           <form className="filter-panel library-filter-panel" action="/library">
             <input name="q" type="hidden" value={query} />
-            <input name="category" type="hidden" value={category} />
-            <input name="subcategory" type="hidden" value={subcategory} />
+            <div className="field">
+              <label htmlFor="category">Aria de drept</label>
+              <select defaultValue={category} id="category" name="category">
+                <option value="">Toate ariile de drept</option>
+                {(categories || []).map((item) => (
+                  <option key={item.id} value={item.slug}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="field">
               <label htmlFor="access">Pachet</label>
               <select defaultValue={access} id="access" name="access">
