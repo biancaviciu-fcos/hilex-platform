@@ -62,6 +62,13 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
     .eq("lesson_id", lesson.id)
     .maybeSingle();
 
+  const { data: progress } = await supabase
+    .from("lesson_progress")
+    .select("lesson_id")
+    .eq("user_id", user.id)
+    .eq("lesson_id", lesson.id)
+    .maybeSingle();
+
   if (locked) {
     return (
       <main className="page">
@@ -146,6 +153,12 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
             <input name="next" type="hidden" value={`/library/${lesson.slug}`} />
             <button className={`btn hero-favorite-btn ${favorite ? "active" : ""}`} type="submit">
               {favorite ? "Salvat pentru mai tarziu" : "Salveaza pentru mai tarziu"}
+            </button>
+          </form>
+          <form action={`/api/progress/${lesson.id}`} method="POST">
+            <input name="next" type="hidden" value={`/library/${lesson.slug}`} />
+            <button className={`btn hero-progress-btn ${progress ? "active" : ""}`} type="submit">
+              {progress ? "Material parcurs" : "Marcheaza ca parcurs"}
             </button>
           </form>
         </div>

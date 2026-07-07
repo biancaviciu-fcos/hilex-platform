@@ -30,6 +30,18 @@ function favoriteIds(rows: { lesson_id: string }[] | null) {
   return new Set((rows || []).map((item) => item.lesson_id));
 }
 
+const quickFilters = [
+  { label: "Familie", href: "/library?category=dreptul-familiei" },
+  { label: "Imigrare", href: "/library?category=imigratie" },
+  { label: "Penal", href: "/library?category=drept-penal" },
+  { label: "Munca", href: "/library?q=munca" },
+  { label: "Locuinte", href: "/library?subcategory=proprietate-si-locuire" },
+  { label: "HMRC", href: "/library?q=HMRC" },
+  { label: "Politie", href: "/library?subcategory=politie-si-investigatii" },
+  { label: "Business", href: "/library?q=business" },
+  { label: "Soferi", href: "/library?q=soferi" }
+];
+
 function sortForAccess(lessons: LessonCardData[], userAccess: AccessLevel | null) {
   if (userAccess === "premium") return lessons;
 
@@ -46,11 +58,13 @@ function LessonCard({
   lesson,
   userAccess,
   isFavorite,
+  isCompleted,
   next
 }: {
   lesson: LessonCardData;
   userAccess: AccessLevel | null;
   isFavorite: boolean;
+  isCompleted: boolean;
   next: string;
 }) {
   const lessonAccess = lesson.access_level as AccessLevel;
@@ -74,6 +88,7 @@ function LessonCard({
             <span className={`tag ${lesson.access_level === "premium" ? "premium" : ""}`}>{lesson.access_level}</span>
             {lesson.duration_minutes ? <span className="tag">{lesson.duration_minutes} min</span> : null}
             {categoryName ? <span className="tag">{categoryName}</span> : null}
+            {isCompleted ? <span className="tag completed">Parcurs</span> : null}
           </div>
           <h3>{lesson.title}</h3>
           <p className="muted">{lesson.excerpt}</p>
@@ -139,6 +154,13 @@ export default async function LibraryPage({
     .eq("user_id", user.id);
 
   const savedIds = favoriteIds(favorites);
+
+  const { data: progressRows } = await supabase
+    .from("lesson_progress")
+    .select("lesson_id")
+    .eq("user_id", user.id);
+
+  const completedIds = favoriteIds(progressRows);
 
   let lessonsQuery = supabase
     .from("lessons")
@@ -211,6 +233,17 @@ export default async function LibraryPage({
           </div>
 
           <div className="subcategory-filter">
+            <span className="eyebrow">Filtre rapide</span>
+            <div className="tag-row">
+              {quickFilters.map((item) => (
+                <Link className="tag filter-tag" href={item.href} key={item.label}>
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="subcategory-filter secondary-filter-row">
             <span className="eyebrow">Subcategorii</span>
             <div className="tag-row">
               {(subcategories || []).map((item) => (
@@ -260,6 +293,7 @@ export default async function LibraryPage({
             {lessons.map((lesson) => (
               <LessonCard
                 isFavorite={savedIds.has(lesson.id)}
+                isCompleted={completedIds.has(lesson.id)}
                 key={lesson.id}
                 lesson={lesson}
                 next={next}

@@ -104,11 +104,20 @@ create table public.favorite_lessons (
   primary key (user_id, lesson_id)
 );
 
+create table public.lesson_progress (
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  lesson_id uuid not null references public.lessons(id) on delete cascade,
+  completed_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  primary key (user_id, lesson_id)
+);
+
 create index lessons_category_idx on public.lessons(category_id);
 create index lessons_subcategory_idx on public.lessons(subcategory_id);
 create index lessons_access_status_idx on public.lessons(access_level, status);
 create index subscriptions_user_status_idx on public.subscriptions(user_id, status);
 create index favorite_lessons_lesson_idx on public.favorite_lessons(lesson_id);
+create index lesson_progress_lesson_idx on public.lesson_progress(lesson_id);
 
 insert into public.categories (name, slug, description, sort_order) values
 ('Dreptul Familiei', 'dreptul-familiei', 'Divort, copii, acord parental si aranjamente familiale.', 1),

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { AccessLevel } from "@/lib/types";
 
 function planLabel(accessLevel?: string | null) {
   if (accessLevel === "premium") return "Pachet Premium";
@@ -64,6 +65,36 @@ export default async function AccountPage() {
     .limit(1)
     .maybeSingle();
 
+  const userAccess = (subscription?.access_level || null) as AccessLevel | null;
+
+  let accessibleLessons: { id: string; access_level: string; status: string }[] | null = [];
+
+  if (userAccess) {
+    let lessonsQuery = supabase
+      .from("lessons")
+      .select("id,access_level,status")
+      .eq("status", "published");
+
+    if (userAccess === "basic") {
+      lessonsQuery = lessonsQuery.eq("access_level", "basic");
+    }
+
+    const { data } = await lessonsQuery;
+    accessibleLessons = data;
+  }
+  const accessibleLessonIds = new Set((accessibleLessons || []).map((lesson) => lesson.id));
+
+  const { data: progressRows } = await supabase
+    .from("lesson_progress")
+    .select("lesson_id")
+    .eq("user_id", user.id);
+
+  const completedCount = (progressRows || []).filter((row) => accessibleLessonIds.has(row.lesson_id)).length;
+  const totalCount = accessibleLessons?.length || 0;
+  const progressPercent = totalCount ? Math.round((completedCount / totalCount) * 100) : 0;
+  const progressBlocks = Math.round(progressPercent / 10);
+  const progressBar = `${"█".repeat(progressBlocks)}${"░".repeat(10 - progressBlocks)}`;
+
   return (
     <main className="page">
       <AppHeader />
@@ -90,6 +121,19 @@ export default async function AccountPage() {
                 Iesi din cont
               </button>
             </form>
+          </div>
+          <div className="card progress-card">
+            <div>
+              <span className="eyebrow">Progresul tau</span>
+              <h2>Ai parcurs</h2>
+              <p className="progress-bar" aria-label={`${progressPercent}% parcurs`}>
+                {progressBar}
+              </p>
+              <strong>{progressPercent}%</strong>
+              <p className="muted">
+                {completedCount} din {totalCount} materiale disponibile pentru pachetul tau.
+              </p>
+            </div>
           </div>
           <div className="account-grid">
             <article className="card stat-card">

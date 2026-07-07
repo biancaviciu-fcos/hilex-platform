@@ -379,6 +379,16 @@ textarea {
   color: var(--white);
 }
 
+.hero-progress-btn {
+  margin-top: 10px;
+}
+
+.hero-progress-btn.active {
+  background: #eefbf3;
+  border-color: #bfe8ce;
+  color: #155f33;
+}
+
 .locked-overlay {
   align-items: center;
   background: rgba(2, 8, 63, 0.78);
@@ -636,6 +646,34 @@ textarea {
   max-width: 680px;
 }
 
+.progress-card {
+  margin-bottom: 16px;
+}
+
+.progress-card h2 {
+  color: var(--navy);
+  font-size: clamp(26px, 3vw, 34px);
+  line-height: 1.1;
+  margin: 8px 0 4px;
+}
+
+.progress-card strong {
+  color: var(--pink);
+  display: block;
+  font-size: clamp(32px, 4vw, 46px);
+  line-height: 1;
+  margin: 4px 0 8px;
+}
+
+.progress-bar {
+  color: var(--navy);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: clamp(24px, 4vw, 40px);
+  letter-spacing: 1px;
+  line-height: 1.2;
+  margin: 12px 0 4px;
+}
+
 .account-notice {
   margin-top: 16px;
 }
@@ -867,6 +905,11 @@ textarea {
 .tag.premium {
   background: #ffeaf6;
   color: #9b005a;
+}
+
+.tag.completed {
+  background: #eefbf3;
+  color: #155f33;
 }
 
 .tag.light {
