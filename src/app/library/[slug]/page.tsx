@@ -94,17 +94,17 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
               <span className="lock-icon">P</span>
               <div>
                 <span className="eyebrow">Material Premium</span>
-                <h2>Fa upgrade la Premium pentru a avea acces</h2>
+                <h2>Fă upgrade la Premium pentru a avea acces</h2>
                 <p className="muted">
-                  Acest material este disponibil pentru membrii Premium. Dupa upgrade, vei putea vedea clipul,
-                  explicatiile si resursele atasate.
+                  Acest material este disponibil pentru membrii Premium. După upgrade, vei putea vedea clipul,
+                  explicațiile și resursele atașate.
                 </p>
                 <div className="locked-actions">
                   <Link className="btn primary" href="/contact">
                     Cere upgrade la Premium
                   </Link>
                   <Link className="btn" href="/library">
-                    Inapoi la resurse
+                    Înapoi la resurse
                   </Link>
                 </div>
               </div>
@@ -163,13 +163,13 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
           <form action={`/api/favorites/${lesson.id}`} method="POST">
             <input name="next" type="hidden" value={`/library/${lesson.slug}`} />
             <button className={`btn hero-favorite-btn ${favorite ? "active" : ""}`} type="submit">
-              {favorite ? "Salvat pentru mai tarziu" : "Salveaza pentru mai tarziu"}
+              {favorite ? "Salvat pentru mai târziu" : "Salvează pentru mai târziu"}
             </button>
           </form>
           <form action={`/api/progress/${lesson.id}`} method="POST">
             <input name="next" type="hidden" value={`/library/${lesson.slug}`} />
             <button className={`btn hero-progress-btn ${progress ? "active" : ""}`} type="submit">
-              {progress ? "Material parcurs" : "Marcheaza ca parcurs"}
+              {progress ? "Material parcurs" : "Marchează ca parcurs"}
             </button>
           </form>
         </div>
@@ -196,7 +196,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
           <div className="material-content-layout">
             <article className="card article-card material-article">
               <section id="details">
-              <h2>Explicatii</h2>
+              <h2>Explicații</h2>
               {body.map((paragraph: string) => (
                 <p key={paragraph}>{paragraph}</p>
               ))}
@@ -213,9 +213,9 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
 
             <aside className="material-sidebar">
               <section className="card material-side-card">
-                <h3>In acest material</h3>
+                <h3>În acest material</h3>
                 <a href="#video">Clip video</a>
-                <a href="#details">Explicatii</a>
+                <a href="#details">Explicații</a>
                 <a href="#keys">Idei cheie</a>
                 <a href="#resources">Resurse</a>
               </section>
@@ -235,7 +235,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
                   ))}
                 </div>
               ) : (
-                <p className="muted">Nu exista resurse atasate inca.</p>
+                <p className="muted">Nu există resurse atașate încă.</p>
               )}
               </section>
             </aside>

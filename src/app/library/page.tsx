@@ -78,7 +78,7 @@ function LessonCard({
           {locked ? (
             <div className="locked-overlay">
               <strong>Premium</strong>
-              <small>Fa upgrade la Premium pentru a avea acces</small>
+              <small>Fă upgrade la Premium pentru a avea acces</small>
             </div>
           ) : null}
         </div>
@@ -91,13 +91,13 @@ function LessonCard({
           </div>
           <h3>{lesson.title}</h3>
           <p className="muted">{lesson.excerpt}</p>
-          {locked ? <p className="upgrade-note">Fa upgrade la Premium pentru a avea acces la acest material.</p> : null}
+          {locked ? <p className="upgrade-note">Fă upgrade la Premium pentru a avea acces la acest material.</p> : null}
         </div>
       </Link>
       <form action={`/api/favorites/${lesson.id}`} method="POST">
         <input name="next" type="hidden" value={next} />
         <button className={`favorite-btn ${isFavorite ? "active" : ""}`} type="submit">
-          {isFavorite ? "Salvat" : "Salveaza pentru mai tarziu"}
+          {isFavorite ? "Salvat" : "Salvează pentru mai târziu"}
         </button>
       </form>
     </article>
@@ -204,13 +204,13 @@ export default async function LibraryPage({
           <p>Un centru de soluții juridice practice pentru membri.</p>
           <form className="search-row" action="/library">
             <input
-              aria-label="Cauta"
+              aria-label="Caută"
               defaultValue={query}
               name="q"
-              placeholder="Cauta dupa tema, categorie sau cuvant cheie"
+              placeholder="Caută după temă, categorie sau cuvânt cheie"
             />
             <button className="btn primary" type="submit">
-              Cauta
+              Caută
             </button>
           </form>
         </div>
@@ -260,7 +260,7 @@ export default async function LibraryPage({
             <div className="field">
               <label htmlFor="access">Pachet</label>
               <select defaultValue={access} id="access" name="access">
-                <option value="">Basic si Premium</option>
+                <option value="">Basic și Premium</option>
                 <option value="basic">Basic</option>
                 <option value="premium">Premium</option>
               </select>
@@ -270,10 +270,10 @@ export default async function LibraryPage({
               Doar favorite
             </label>
             <button className="btn primary" type="submit">
-              Aplica
+              Aplică
             </button>
             <Link className="btn" href="/library">
-              Reseteaza
+              Resetează
             </Link>
           </form>
 

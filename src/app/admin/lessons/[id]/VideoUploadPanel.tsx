@@ -28,7 +28,7 @@ export function VideoUploadPanel({ lessonId }: { lessonId: string }) {
 
     setUploadUrl(payload.uploadUrl);
     setVideoId(payload.videoId);
-    setMessage("Linkul de upload a fost creat. Alege fisierul video si incarca-l.");
+    setMessage("Linkul de upload a fost creat. Alege fișierul video și încarcă-l.");
   }
 
   async function uploadVideo(event: ChangeEvent<HTMLInputElement>) {
@@ -52,28 +52,28 @@ export function VideoUploadPanel({ lessonId }: { lessonId: string }) {
     setIsUploading(false);
 
     if (!response.ok) {
-      setMessage("Upload-ul video nu a reusit. Incearca din nou sau incarca manual in Cloudflare.");
+      setMessage("Upload-ul video nu a reușit. Încearcă din nou sau încarcă manual în Cloudflare.");
       return;
     }
 
-    setMessage("Video-ul a fost incarcat. Apasa pe Salveaza video pe material.");
+    setMessage("Video-ul a fost încărcat. Apasă pe Salvează video pe material.");
   }
 
   return (
     <section className="card form">
       <h2>Video Cloudflare Stream</h2>
       <p className="muted">
-        Creeaza un link privat de upload, incarca video-ul in Cloudflare, apoi
-        salveaza ID-ul video pe material.
+        Creează un link privat de upload, încarcă video-ul în Cloudflare, apoi
+        salvează ID-ul video pe material.
       </p>
       <button className="btn primary" disabled={isLoading} onClick={createUploadUrl} type="button">
-        {isLoading ? "Se creeaza..." : "Creeaza link upload video"}
+        {isLoading ? "Se creează..." : "Creează link upload video"}
       </button>
       {message ? <p className="notice-text">{message}</p> : null}
       {uploadUrl ? (
         <div className="form">
           <div className="field">
-            <label>Alege fisierul video</label>
+            <label>Alege fișierul video</label>
             <input accept="video/*" disabled={isUploading} onChange={uploadVideo} type="file" />
           </div>
           <form action={`/api/admin/lessons/${lessonId}/video`} method="POST" className="form">
@@ -82,18 +82,18 @@ export function VideoUploadPanel({ lessonId }: { lessonId: string }) {
               <input name="video_asset_id" readOnly value={videoId} />
             </div>
             <button className="btn primary" type="submit">
-              {isUploading ? "Se incarca..." : "Salveaza video pe material"}
+              {isUploading ? "Se încarcă..." : "Salvează video pe material"}
             </button>
           </form>
         </div>
       ) : null}
       <form action={`/api/admin/lessons/${lessonId}/video`} method="POST" className="form">
         <div className="field">
-          <label>Ai incarcat deja video in Cloudflare? Pune Video ID aici</label>
+          <label>Ai încărcat deja video în Cloudflare? Pune Video ID aici</label>
           <input name="video_asset_id" placeholder="Ex: 2f7c..." />
         </div>
         <button className="btn" type="submit">
-          Salveaza Video ID manual
+          Salvează Video ID manual
         </button>
       </form>
     </section>

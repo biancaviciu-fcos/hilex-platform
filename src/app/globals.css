@@ -626,6 +626,28 @@ textarea {
   margin-top: 20px;
 }
 
+.danger-zone {
+  align-items: center;
+  border-color: #f3c8df;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.danger-zone h2 {
+  color: #7b124c;
+  font-size: 26px;
+  line-height: 1.12;
+  margin: 8px 0;
+}
+
+.danger-btn {
+  background: #7b124c;
+  border-color: #7b124c;
+  color: var(--white);
+}
+
 .account-summary {
   align-items: center;
   display: flex;

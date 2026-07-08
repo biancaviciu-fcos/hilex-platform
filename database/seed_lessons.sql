@@ -21,18 +21,18 @@ insert into public.lessons (
 ) values
 (
   (select id from family),
-  'Calatoria cu copilul in afara UK: este necesar acordul celuilalt parinte?',
+  'Călătoria cu copilul în afara UK: este necesar acordul celuilalt părinte?',
   'calatoria-cu-copilul-in-afara-uk',
-  'Cand ai nevoie de acordul celuilalt parinte si ce rol are hotararea judecatoreasca.',
+  'Când ai nevoie de acordul celuilalt părinte și ce rol are hotărârea judecătorească.',
   '[
-    "Aceasta este una dintre cele mai frecvente intrebari in practica si trebuie analizata pornind de la un element cheie: exista sau nu o hotarare judecatoreasca ce stabileste rezidenta copilului.",
-    "In situatia in care exista o astfel de hotarare, este important sa verifici daca aceasta a fost emisa de o instanta din UK.",
-    "Daca ai un Child Arrangements Order emis in UK, care confirma ca minorul locuieste cu tine, in mod obisnuit ai dreptul sa calatoresti cu copilul in afara UK pentru o perioada de pana la 28 de zile."
+    "Aceasta este una dintre cele mai frecvente întrebări în practică și trebuie analizată pornind de la un element cheie: există sau nu o hotărâre judecătorească ce stabilește rezidența copilului.",
+    "În situația în care există o astfel de hotărâre, este important să verifici dacă aceasta a fost emisă de o instanță din UK.",
+    "Dacă ai un Child Arrangements Order emis în UK, care confirmă că minorul locuiește cu tine, în mod obișnuit ai dreptul să călătorești cu copilul în afara UK pentru o perioadă de până la 28 de zile."
   ]'::jsonb,
   '[
-    "Verifica daca exista o hotarare judecatoreasca emisa in UK.",
-    "Hotararile din alte tari nu produc automat efecte in UK.",
-    "Nu incalca programul de contact fara acordul celuilalt parinte."
+    "Verifică dacă există o hotărâre judecătorească emisă în UK.",
+    "Hotărârile din alte țări nu produc automat efecte în UK.",
+    "Nu încălca programul de contact fără acordul celuilalt părinte."
   ]'::jsonb,
   'basic',
   'published',
@@ -41,17 +41,17 @@ insert into public.lessons (
 ),
 (
   (select id from family),
-  'Divortul in UK: pasii principali si documentele necesare',
+  'Divorțul în UK: pașii principali și documentele necesare',
   'divortul-in-uk',
-  'Ce trebuie sa stii inainte sa incepi procedura de divort.',
+  'Ce trebuie să știi înainte să începi procedura de divorț.',
   '[
-    "Procedura de divort trebuie pregatita corect de la inceput, mai ales cand exista copii, bunuri comune sau aspecte internationale.",
-    "Inainte de depunerea cererii, este util sa verifici actele de stare civila, datele partenerului si eventualele documente legate de copii sau bunuri."
+    "Procedura de divorț trebuie pregătită corect de la început, mai ales când există copii, bunuri comune sau aspecte internaționale.",
+    "Înainte de depunerea cererii, este util să verifici actele de stare civilă, datele partenerului și eventualele documente legate de copii sau bunuri."
   ]'::jsonb,
   '[
-    "Verifica documentele de identitate.",
-    "Pregateste certificatul de casatorie.",
-    "Separarea financiara este o discutie distincta."
+    "Verifică documentele de identitate.",
+    "Pregătește certificatul de căsătorie.",
+    "Separarea financiară este o discuție distinctă."
   ]'::jsonb,
   'basic',
   'published',
@@ -60,16 +60,16 @@ insert into public.lessons (
 ),
 (
   (select id from immigration),
-  'Spouse Visa: conditii esentiale pentru aplicatie',
+  'Spouse Visa: condiții esențiale pentru aplicație',
   'spouse-visa-conditii-esentiale',
-  'Elementele care trebuie probate intr-o aplicatie de tip spouse visa.',
+  'Elementele care trebuie probate într-o aplicație de tip spouse visa.',
   '[
-    "Aplicatia de spouse visa este analizata pe mai multe criterii: relatia, venitul, cazarea, limba engleza si documentele justificative.",
-    "O aplicatie puternica trebuie sa fie coerenta, completa si sustinuta cu documente clare."
+    "Aplicația de spouse visa este analizată pe mai multe criterii: relația, venitul, cazarea, limba engleză și documentele justificative.",
+    "O aplicație puternică trebuie să fie coerentă, completă și susținută cu documente clare."
   ]'::jsonb,
   '[
-    "Dovedeste relatia reala si continua.",
-    "Verifica pragul financiar.",
+    "Dovedește relația reală și continuă.",
+    "Verifică pragul financiar.",
     "Include documente de cazare."
   ]'::jsonb,
   'premium',
@@ -79,17 +79,17 @@ insert into public.lessons (
 ),
 (
   (select id from civil),
-  'Contracte civile: clauze pe care trebuie sa le intelegi',
+  'Contracte civile: clauze pe care trebuie să le înțelegi',
   'contracte-civile-clauze',
-  'Cum citesti un contract si ce clauze merita atentie speciala.',
+  'Cum citești un contract și ce clauze merită atenție specială.',
   '[
-    "Un contract trebuie citit ca un set de obligatii, termene, riscuri si remedii.",
-    "Este important sa urmaresti clauzele privind plata, incetarea, penalitatile si raspunderea."
+    "Un contract trebuie citit ca un set de obligații, termene, riscuri și remedii.",
+    "Este important să urmărești clauzele privind plata, încetarea, penalitățile și răspunderea."
   ]'::jsonb,
   '[
-    "Identifica partile corect.",
-    "Verifica termenii de plata.",
-    "Citeste clauzele de incetare."
+    "Identifică părțile corect.",
+    "Verifică termenii de plată.",
+    "Citește clauzele de încetare."
   ]'::jsonb,
   'basic',
   'published',
@@ -98,17 +98,17 @@ insert into public.lessons (
 ),
 (
   (select id from penal),
-  'Cazierul si impactul asupra vietii profesionale',
+  'Cazierul și impactul asupra vieții profesionale',
   'cazierul-si-impactul-profesional',
-  'Cand poate conta cazierul si cum poate afecta anumite proceduri.',
+  'Când poate conta cazierul și cum poate afecta anumite proceduri.',
   '[
-    "Cazierul poate avea efecte in mai multe contexte: angajare, imigratie, calatorii sau proceduri administrative.",
-    "Impactul depinde de natura faptei, vechimea condamnarii si tipul verificarii solicitate."
+    "Cazierul poate avea efecte în mai multe contexte: angajare, imigrație, călătorii sau proceduri administrative.",
+    "Impactul depinde de natura faptei, vechimea condamnării și tipul verificării solicitate."
   ]'::jsonb,
   '[
-    "Verifica tipul verificarii cerute.",
-    "Diferentiaza condamnarile spent si unspent.",
-    "Analizeaza efectul asupra aplicatiilor de imigratie."
+    "Verifică tipul verificării cerute.",
+    "Diferențiază condamnările spent și unspent.",
+    "Analizează efectul asupra aplicațiilor de imigrație."
   ]'::jsonb,
   'premium',
   'published',

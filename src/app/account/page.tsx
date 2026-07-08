@@ -6,27 +6,27 @@ import type { AccessLevel } from "@/lib/types";
 function planLabel(accessLevel?: string | null) {
   if (accessLevel === "premium") return "Premium";
   if (accessLevel === "basic") return "Basic";
-  return "In verificare";
+  return "În verificare";
 }
 
 function statusLabel(status?: string | null) {
   const labels: Record<string, string> = {
     active: "Activ",
     trialing: "Activ",
-    past_due: "Plata intarziata",
+    past_due: "Plată întârziată",
     canceled: "Anulat",
     expired: "Expirat",
-    incomplete: "In curs de activare",
+    incomplete: "În curs de activare",
     incomplete_expired: "Expirat",
     unpaid: "Neachitat",
     paused: "Pauzat"
   };
 
-  return status ? labels[status] || status : "In verificare";
+  return status ? labels[status] || status : "În verificare";
 }
 
 function formatDate(value?: string | null) {
-  if (!value) return "In verificare";
+  if (!value) return "În verificare";
 
   return new Intl.DateTimeFormat("ro-RO", {
     day: "2-digit",
@@ -101,7 +101,7 @@ export default async function AccountPage() {
       <section className="hero compact">
         <div className="inner">
           <h1>Contul meu</h1>
-          <p>Detaliile contului tau HILEX, accesul activ si perioada abonamentului.</p>
+          <p>Detaliile contului tău HILEX, accesul activ și perioada abonamentului.</p>
         </div>
       </section>
       <section className="section">
@@ -112,26 +112,26 @@ export default async function AccountPage() {
               <h2>{planLabel(subscription?.access_level)}</h2>
               <p className="muted">
                 {subscription?.status === "active" || subscription?.status === "trialing"
-                  ? "Abonamentul tau este activ si poti accesa continutul inclus in pachet."
-                  : "Daca tocmai ai finalizat plata, activarea poate dura cateva momente."}
+                  ? "Abonamentul tău este activ și poți accesa conținutul inclus în pachet."
+                  : "Dacă tocmai ai finalizat plata, activarea poate dura câteva momente."}
               </p>
             </div>
             <form action={signOut}>
               <button className="btn" type="submit">
-                Iesi din cont
+                Ieși din cont
               </button>
             </form>
           </div>
           <div className="card progress-card">
             <div>
-              <span className="eyebrow">Progresul tau</span>
+              <span className="eyebrow">Progresul tău</span>
               <h2>Ai parcurs</h2>
               <p className="progress-bar" aria-label={`${progressPercent}% parcurs`}>
                 {progressBar}
               </p>
               <strong>{progressPercent}%</strong>
               <p className="muted">
-                {completedCount} din {totalCount} materiale disponibile pentru pachetul tau.
+                {completedCount} din {totalCount} materiale disponibile pentru pachetul tău.
               </p>
             </div>
           </div>
@@ -149,13 +149,13 @@ export default async function AccountPage() {
               <strong>{statusLabel(subscription?.status)}</strong>
             </article>
             <article className="card stat-card">
-              <span className="eyebrow">Acces pana la</span>
+              <span className="eyebrow">Acces până la</span>
               <strong>{formatDate(subscription?.current_period_end)}</strong>
             </article>
           </div>
           {subscription?.cancel_at_period_end ? (
             <p className="notice-text account-notice">
-              Abonamentul este activ pana la data afisata, dar nu se va reinnoi automat.
+              Abonamentul este activ până la data afișată, dar nu se va reînnoi automat.
             </p>
           ) : null}
         </div>

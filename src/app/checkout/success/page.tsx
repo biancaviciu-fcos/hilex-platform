@@ -7,8 +7,8 @@ export default function CheckoutSuccessPage() {
         <div className="inner">
           <h1>Abonamentul este activ</h1>
           <p>
-            Contul tau HILEX a fost creat. Vei primi emailul pentru setarea
-            parolei si accesul la platforma.
+            Contul tău HILEX a fost creat. Vei primi emailul pentru setarea
+            parolei și accesul la platformă.
           </p>
           <Link className="btn primary" href="/login">
             Mergi la login

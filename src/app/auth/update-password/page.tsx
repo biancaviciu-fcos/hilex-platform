@@ -6,16 +6,16 @@ export default function UpdatePasswordPage() {
     <main className="page">
       <section className="hero">
         <div className="inner">
-          <h1>Seteaza parola HILEX</h1>
+          <h1>Setează parola HILEX</h1>
           <p>
-            Alege o parola pentru contul tau. Dupa salvare, vei intra direct in
+            Alege o parolă pentru contul tău. După salvare, vei intra direct în
             resursele membrilor.
           </p>
         </div>
       </section>
       <section className="section">
         <div className="inner">
-          <Suspense fallback={<div className="card">Se incarca...</div>}>
+          <Suspense fallback={<div className="card">Se încarcă...</div>}>
             <UpdatePasswordForm />
           </Suspense>
         </div>

@@ -110,14 +110,14 @@ export default async function HomePage() {
         <div className="inner member-landing-grid">
           <div>
             <span className="eyebrow hero-eyebrow">HILEX pentru membri</span>
-            <h1>Bine ai venit in platforma HILEX</h1>
+            <h1>Bine ai venit în platforma HILEX</h1>
             <p>
               Găsești soluții practice, materiale video și resurse juridice create pentru situații reale din viața de zi
               cu zi.
             </p>
             <div className="member-home-actions">
               <Link className="btn primary" href="/library">
-                Intra in resurse
+                Intră în resurse
               </Link>
               <Link className="btn ghost-on-navy" href="/contact">
                 Contacteaza-ne
@@ -127,7 +127,7 @@ export default async function HomePage() {
           <aside className="member-status-card">
             <span className="eyebrow">Planul tău</span>
             <strong>{accessLabel}</strong>
-            <p>{allLessons.length} materiale disponibile in resurse.</p>
+            <p>{allLessons.length} materiale disponibile în resurse.</p>
             <Link className="status-link" href="/library?favorites=1">
               Ai salvat {savedMaterials.length} materiale
             </Link>
@@ -140,7 +140,7 @@ export default async function HomePage() {
           <div className="section-title">
             <div>
               <span className="eyebrow">Arii de drept</span>
-              <h2>Alege domeniul care te intereseaza</h2>
+              <h2>Alege domeniul care te interesează</h2>
             </div>
             <Link className="btn" href="/library">
               Vezi toate materialele
@@ -187,7 +187,7 @@ export default async function HomePage() {
                 {savedMaterials.slice(0, 3).map((material) => (
                   <MaterialMiniCard key={material.id} material={material} />
                 ))}
-                {!savedMaterials.length ? <p className="muted">Nu ai salvat materiale inca.</p> : null}
+                {!savedMaterials.length ? <p className="muted">Nu ai salvat materiale încă.</p> : null}
               </div>
             </section>
 
@@ -202,7 +202,7 @@ export default async function HomePage() {
                 {recentlyViewed.map((material) => (
                   <MaterialMiniCard key={material.id} material={material} />
                 ))}
-                {!recentlyViewed.length ? <p className="muted">Materialele parcurse vor aparea aici.</p> : null}
+                {!recentlyViewed.length ? <p className="muted">Materialele parcurse vor apărea aici.</p> : null}
               </div>
             </section>
 
@@ -238,10 +238,10 @@ export default async function HomePage() {
           <div className="home-support-grid">
             <article className="card">
               <span className="eyebrow">Cum funcționează HiLex</span>
-              <h3>Cauta, salveaza si revino la materiale.</h3>
+              <h3>Caută, salvează și revino la materiale.</h3>
               <p className="muted">
-                In resurse poti cauta dupa tema, domeniu sau cuvant cheie. Materialele importante pot fi salvate la
-                favorite pentru a le parcurge mai tarziu.
+                În resurse poți căuta după temă, domeniu sau cuvânt cheie. Materialele importante pot fi salvate la
+                favorite pentru a le parcurge mai târziu.
               </p>
               <Link className="btn" href="/library?favorites=1">
                 Vezi favoritele
@@ -249,9 +249,9 @@ export default async function HomePage() {
             </article>
             <article className="card">
               <span className="eyebrow">Ai nevoie de ajutor?</span>
-              <h3>Scrie-ne direct din platforma.</h3>
+              <h3>Scrie-ne direct din platformă.</h3>
               <p className="muted">
-                Daca ai o intrebare despre membership, acces sau ai nevoie de asistenta juridica, foloseste formularul
+                Dacă ai o întrebare despre membership, acces sau ai nevoie de asistență juridică, folosește formularul
                 de contact.
               </p>
               <Link className="btn primary" href="/contact">

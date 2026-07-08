@@ -22,7 +22,7 @@ export default async function ContactPage({
       <section className="hero compact">
         <div className="inner">
           <h1>Contact HILEX</h1>
-          <p>Ai nevoie de ajutor cu platforma, abonamentul tau sau o situatie juridica?</p>
+          <p>Ai nevoie de ajutor cu platforma, abonamentul tău sau o situație juridică?</p>
         </div>
       </section>
 
@@ -32,19 +32,19 @@ export default async function ContactPage({
             <span className="eyebrow">Suport membri</span>
             <h2>Trimite-ne un mesaj</h2>
             <p className="muted">
-              Pentru intrebari despre cont, acces la materiale, upgrade la Premium sau o situatie juridica in care ai
-              nevoie de asistenta, contacteaza echipa HILEX si revenim cat mai curand.
+              Pentru întrebări despre cont, acces la materiale, upgrade la Premium sau o situație juridică în care ai
+              nevoie de asistență, contactează echipa HILEX și revenim cât mai curând.
             </p>
             {params.sent ? (
-              <p className="success-text">Mesajul tau a fost trimis. Revenim cat mai curand.</p>
+              <p className="success-text">Mesajul tău a fost trimis. Revenim cât mai curând.</p>
             ) : null}
             {params.error ? (
-              <p className="notice-text">Mesajul nu a putut fi trimis. Te rugam sa incerci din nou.</p>
+              <p className="notice-text">Mesajul nu a putut fi trimis. Te rugăm să încerci din nou.</p>
             ) : null}
             <form action="/api/contact" className="contact-form" id="contact-form" method="POST">
               <div className="field">
                 <label htmlFor="contact-name">Nume</label>
-                <input id="contact-name" name="name" placeholder="Numele tau" required type="text" />
+                <input id="contact-name" name="name" placeholder="Numele tău" required type="text" />
               </div>
               <div className="field">
                 <label htmlFor="contact-email">Email</label>
@@ -52,18 +52,18 @@ export default async function ContactPage({
               </div>
               <div className="field">
                 <label htmlFor="contact-topic">Cu ce te putem ajuta?</label>
-                <select id="contact-topic" name="topic" defaultValue="Situatie juridica - Dreptul Familiei">
-                  <option>Situatie juridica - Dreptul Familiei</option>
-                  <option>Situatie juridica - Imigratie</option>
-                  <option>Situatie juridica - Drept Civil</option>
-                  <option>Situatie juridica - Drept Penal</option>
-                  <option>Am nevoie de asistenta juridica</option>
-                  <option>Vreau sa programez o consultanta</option>
+                <select id="contact-topic" name="topic" defaultValue="Situație juridică - Dreptul Familiei">
+                  <option>Situație juridică - Dreptul Familiei</option>
+                  <option>Situație juridică - Imigrație</option>
+                  <option>Situație juridică - Drept Civil</option>
+                  <option>Situație juridică - Drept Penal</option>
+                  <option>Am nevoie de asistență juridică</option>
+                  <option>Vreau să programez o consultanță</option>
                   <option>Upgrade la Premium</option>
-                  <option>Problema cu platforma</option>
-                  <option>Nu vad materialele corecte</option>
-                  <option>Intrebare despre cont</option>
-                  <option>Alta intrebare</option>
+                  <option>Problemă cu platforma</option>
+                  <option>Nu văd materialele corecte</option>
+                  <option>Întrebare despre cont</option>
+                  <option>Altă întrebare</option>
                 </select>
               </div>
               <div className="field">
@@ -71,7 +71,7 @@ export default async function ContactPage({
                 <textarea
                   id="contact-message"
                   name="message"
-                  placeholder="Scrie aici exact ce problema ai..."
+                  placeholder="Scrie aici exact ce problemă ai..."
                   required
                   rows={7}
                 />
@@ -82,7 +82,7 @@ export default async function ContactPage({
             </form>
             <div className="contact-actions">
               <a className="btn primary consultation-btn" href="https://booking.fcos.co.uk" rel="noreferrer" target="_blank">
-                Programeaza consultanta
+                Programează consultanță
               </a>
               <a className="btn" href="https://hilex.co.uk" rel="noreferrer" target="_blank">
                 Website HILEX
@@ -95,7 +95,7 @@ export default async function ContactPage({
               <span className="eyebrow">Upgrade</span>
               <h3>Vrei acces Premium?</h3>
               <p className="muted">
-                Scrie-ne si te ajutam cu trecerea de la Basic la Premium, inclusiv diferenta de acces si pasii de
+                Scrie-ne și te ajutăm cu trecerea de la Basic la Premium, inclusiv diferența de acces și pașii de
                 activare.
               </p>
               <a className="btn" href="#contact-form">
@@ -104,18 +104,18 @@ export default async function ContactPage({
             </article>
 
             <article className="card contact-card">
-              <span className="eyebrow">Consultanta</span>
-              <h3>Vrei sa vorbesti cu cineva?</h3>
-              <p className="muted">Poti programa o consultanta direct prin pagina de booking Forest & Co.</p>
+              <span className="eyebrow">Consultanță</span>
+              <h3>Vrei să vorbești cu cineva?</h3>
+              <p className="muted">Poți programa o consultanță direct prin pagina de booking Forest & Co.</p>
               <a className="btn primary" href="https://booking.fcos.co.uk" rel="noreferrer" target="_blank">
-                Programeaza consultanta
+                Programează consultanță
               </a>
             </article>
 
             <article className="card contact-card notice-contact">
               <span className="eyebrow">Important</span>
               <p>
-                Pentru situatii urgente sau termene foarte scurte, contacteaza direct Forest & Co Solicitors prin
+                Pentru situații urgente sau termene foarte scurte, contactează direct Forest & Co Solicitors prin
                 canalele oficiale.
               </p>
             </article>
@@ -125,10 +125,10 @@ export default async function ContactPage({
         <div className="inner contact-footer-card card">
           <div>
             <span className="eyebrow">Resurse</span>
-            <h3>Continua sa explorezi materialele HILEX</h3>
+            <h3>Continuă să explorezi materialele HILEX</h3>
           </div>
           <Link className="btn" href="/library">
-            Inapoi la resurse
+            Înapoi la resurse
           </Link>
         </div>
       </section>

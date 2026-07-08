@@ -26,7 +26,7 @@ export default async function LoginPage({
       <section className="hero">
         <div className="inner">
           <h1>Login HILEX</h1>
-          <p>Intra in contul tau pentru a accesa resursele.</p>
+          <p>Intră în contul tău pentru a accesa resursele.</p>
         </div>
       </section>
       <section className="section">
@@ -34,7 +34,7 @@ export default async function LoginPage({
           <form className="card form" action={signIn}>
             {params.error ? (
               <p className="notice-text">
-                Datele de login nu sunt corecte sau parola nu a fost setata inca.
+                Datele de login nu sunt corecte sau parola nu a fost setată încă.
               </p>
             ) : null}
             <div className="field">

@@ -26,13 +26,13 @@ export async function AppHeader() {
         Hi<span>Lex</span>
       </Link>
       <nav className="nav">
-        <Link href="/">Acasa</Link>
+        <Link href="/">Acasă</Link>
         <Link href="/library">Resurse</Link>
         <Link href="/library?favorites=1">Favorite</Link>
         <Link href="/contact">Contact</Link>
         {showAdmin ? <Link href="/admin">Admin</Link> : null}
         <a className="btn consultation-nav-btn" href="https://booking.fcos.co.uk" rel="noreferrer" target="_blank">
-          Programeaza consultanta
+          Programează consultanță
         </a>
         <Link className="btn" href="/account">Cont</Link>
       </nav>

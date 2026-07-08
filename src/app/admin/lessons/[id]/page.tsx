@@ -3,6 +3,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { isAdminUser } from "@/lib/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { uploadMaterialThumbnail } from "@/lib/thumbnails";
+import { DeleteLessonForm } from "./DeleteLessonForm";
 import { VideoUploadPanel } from "./VideoUploadPanel";
 
 async function updateLesson(formData: FormData) {
@@ -122,7 +123,7 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
       <AppHeader />
       <section className="hero">
         <div className="inner">
-          <h1>Editeaza materialul</h1>
+          <h1>Editează materialul</h1>
           <p>{lesson.title}</p>
         </div>
       </section>
@@ -147,12 +148,12 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
                   </option>
                 ))}
               </select>
-              <p className="field-hint">Asta este categoria principala dupa care membrii pot filtra materialele.</p>
+              <p className="field-hint">Asta este categoria principală după care membrii pot filtra materialele.</p>
             </div>
             <div className="field">
-              <label>Subcategorie interna (optional)</label>
+              <label>Subcategorie internă (opțional)</label>
               <select name="subcategory_id" defaultValue={lesson.subcategory_id || ""}>
-                <option value="">Fara subcategorie</option>
+                <option value="">Fără subcategorie</option>
                 {(subcategories || []).map((subcategory) => {
                   const categoryName = categories?.find((category) => category.id === subcategory.category_id)?.name;
 
@@ -164,12 +165,12 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
                   );
                 })}
               </select>
-              <p className="field-hint">Momentan nu afisam subcategoriile ca filtru public in resurse.</p>
+              <p className="field-hint">Momentan nu afișăm subcategoriile ca filtru public în resurse.</p>
             </div>
             <div className="field">
               <label>Pachet material</label>
               <select name="access_level" defaultValue={lesson.access_level}>
-                <option value="basic">Basic - inclus pentru toti membrii</option>
+                <option value="basic">Basic - inclus pentru toți membrii</option>
                 <option value="premium">Premium - blocat pentru membrii Basic</option>
               </select>
             </div>
@@ -182,11 +183,11 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
               </select>
             </div>
             <div className="field">
-              <label>Descriere scurta</label>
+              <label>Descriere scurtă</label>
               <textarea name="excerpt" rows={3} defaultValue={lesson.excerpt || ""} />
             </div>
             <div className="field">
-              <label>Thumbnail / imagine de coperta</label>
+              <label>Thumbnail / imagine de copertă</label>
               {lesson.thumbnail_url ? (
                 <img alt="" className="thumbnail-preview" src={lesson.thumbnail_url} />
               ) : null}
@@ -195,7 +196,7 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
             <div className="field">
               <label>Video provider</label>
               <select name="video_provider" defaultValue={lesson.video_provider || ""}>
-                <option value="">Fara video</option>
+                <option value="">Fără video</option>
                 <option value="cloudflare_stream">Cloudflare Stream</option>
                 <option value="mux">Mux</option>
                 <option value="external">External</option>
@@ -210,15 +211,15 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
               <input name="video_playback_id" defaultValue={lesson.video_playback_id || ""} />
             </div>
             <div className="field">
-              <label>Text articol, cate un paragraf pe rand</label>
+              <label>Text articol, câte un paragraf pe rând</label>
               <textarea name="body" rows={10} defaultValue={body} />
             </div>
             <div className="field">
-              <label>Idei cheie, cate una pe rand</label>
+              <label>Idei cheie, câte una pe rând</label>
               <textarea name="key_points" rows={6} defaultValue={keyPoints} />
             </div>
             <button className="btn primary" type="submit">
-              Salveaza
+              Salvează
             </button>
           </form>
 
@@ -226,11 +227,11 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
 
           <div className="admin-panels">
             <section className="card form">
-              <h2>Adauga PDF</h2>
+              <h2>Adaugă PDF</h2>
               <form action="/api/admin/resources/upload" encType="multipart/form-data" method="POST" className="form">
                 <input type="hidden" name="lesson_id" value={lesson.id} />
                 <div className="field">
-                  <label>Titlu resursa</label>
+                  <label>Titlu resursă</label>
                   <input name="title" placeholder="Ex: Checklist documente" />
                 </div>
                 <div className="field">
@@ -241,17 +242,17 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
                   </select>
                 </div>
                 <div className="field">
-                  <label>Fisier PDF</label>
+                  <label>Fișier PDF</label>
                   <input accept="application/pdf" name="file" required type="file" />
                 </div>
                 <button className="btn primary" type="submit">
-                  Incarca PDF
+                  Încarcă PDF
                 </button>
               </form>
             </section>
 
             <section className="card form">
-              <h2>Adauga link</h2>
+              <h2>Adaugă link</h2>
               <form action="/api/admin/resources/link" method="POST" className="form">
                 <input type="hidden" name="lesson_id" value={lesson.id} />
                 <div className="field">
@@ -270,14 +271,14 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
                   </select>
                 </div>
                 <button className="btn primary" type="submit">
-                  Adauga link
+                  Adaugă link
                 </button>
               </form>
             </section>
           </div>
 
           <section className="card form">
-            <h2>Resurse atasate</h2>
+            <h2>Resurse atașate</h2>
             {resources.length ? (
               <div className="resource-list">
                 {resources.map((resource: { id: string; title: string; resource_type: string; url: string; access_level: string }) => (
@@ -289,15 +290,27 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
                     </span>
                     <form action={`/api/admin/resources/${resource.id}/delete`} method="POST">
                       <button className="btn" type="submit">
-                        Sterge
+                        Șterge
                       </button>
                     </form>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="muted">Nu exista resurse atasate inca.</p>
+              <p className="muted">Nu există resurse atașate încă.</p>
             )}
+          </section>
+
+          <section className="card danger-zone">
+            <div>
+              <span className="eyebrow">Atenție</span>
+              <h2>Ștergere definitivă</h2>
+              <p className="muted">
+                Ștergerea materialului elimină materialul, progresul, favoritele și resursele atașate. Acțiunea nu poate
+                fi anulată.
+              </p>
+            </div>
+            <DeleteLessonForm lessonId={lesson.id} lessonTitle={lesson.title} />
           </section>
         </div>
       </section>

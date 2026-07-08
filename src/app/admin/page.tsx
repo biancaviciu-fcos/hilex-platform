@@ -31,7 +31,7 @@ export default async function AdminPage() {
       <section className="hero">
         <div className="inner">
           <h1>Admin HILEX</h1>
-          <p>Gestioneaza continutul bibliotecii, drafturile si publicarea.</p>
+          <p>Gestionează conținutul resurselor, drafturile și publicarea.</p>
           <Link className="btn primary" href="/admin/lessons/new">
             Material nou
           </Link>
@@ -56,7 +56,7 @@ export default async function AdminPage() {
                   </span>
                 </div>
                 <h3>{lesson.title}</h3>
-                <p className="muted">{lesson.excerpt || "Fara descriere inca."}</p>
+                <p className="muted">{lesson.excerpt || "Fără descriere încă."}</p>
               </div>
             </Link>
           ))}

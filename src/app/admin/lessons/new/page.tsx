@@ -103,7 +103,7 @@ export default async function NewLessonPage() {
       <section className="hero">
         <div className="inner">
           <h1>Material nou</h1>
-          <p>Adauga un clip, articol sau ghid in resursele HILEX.</p>
+          <p>Adaugă un clip, articol sau ghid în resursele HILEX.</p>
         </div>
       </section>
       <section className="section">
@@ -126,12 +126,12 @@ export default async function NewLessonPage() {
                   </option>
                 ))}
               </select>
-              <p className="field-hint">Asta este categoria principala dupa care membrii pot filtra materialele.</p>
+              <p className="field-hint">Asta este categoria principală după care membrii pot filtra materialele.</p>
             </div>
             <div className="field">
-              <label>Subcategorie interna (optional)</label>
+              <label>Subcategorie internă (opțional)</label>
               <select name="subcategory_id">
-                <option value="">Fara subcategorie</option>
+                <option value="">Fără subcategorie</option>
                 {(subcategories || []).map((subcategory) => {
                   const categoryName = categories?.find((category) => category.id === subcategory.category_id)?.name;
 
@@ -143,33 +143,33 @@ export default async function NewLessonPage() {
                   );
                 })}
               </select>
-              <p className="field-hint">Momentan nu afisam subcategoriile ca filtru public in resurse.</p>
+              <p className="field-hint">Momentan nu afișăm subcategoriile ca filtru public în resurse.</p>
             </div>
             <div className="field">
               <label>Pachet material</label>
               <select name="access_level">
-                <option value="basic">Basic - inclus pentru toti membrii</option>
+                <option value="basic">Basic - inclus pentru toți membrii</option>
                 <option value="premium">Premium - blocat pentru membrii Basic</option>
               </select>
             </div>
             <div className="field">
-              <label>Descriere scurta</label>
+              <label>Descriere scurtă</label>
               <textarea name="excerpt" rows={3} />
             </div>
             <div className="field">
-              <label>Thumbnail / imagine de coperta</label>
+              <label>Thumbnail / imagine de copertă</label>
               <input accept="image/*" name="thumbnail" type="file" />
             </div>
             <div className="field">
-              <label>Text articol, cate un paragraf pe rand</label>
+              <label>Text articol, câte un paragraf pe rând</label>
               <textarea name="body" rows={8} />
             </div>
             <div className="field">
-              <label>Idei cheie, cate una pe rand</label>
+              <label>Idei cheie, câte una pe rând</label>
               <textarea name="key_points" rows={5} />
             </div>
             <button className="btn primary" type="submit">
-              Salveaza draft
+              Salvează draft
             </button>
           </form>
         </div>

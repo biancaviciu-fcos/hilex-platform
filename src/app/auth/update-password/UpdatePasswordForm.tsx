@@ -40,7 +40,7 @@ export function UpdatePasswordForm() {
         const { error } = await supabase.auth.exchangeCodeForSession(code);
         if (error) {
           if (await markReadyIfSessionExists()) return;
-          setMessage("Linkul de setare parola a expirat sau nu este valid. Cere un link nou.");
+          setMessage("Linkul de setare parolă a expirat sau nu este valid. Cere un link nou.");
           return;
         }
       }
@@ -53,7 +53,7 @@ export function UpdatePasswordForm() {
 
         if (error) {
           if (await markReadyIfSessionExists()) return;
-          setMessage("Linkul de setare parola a expirat sau nu este valid. Cere un link nou.");
+          setMessage("Linkul de setare parolă a expirat sau nu este valid. Cere un link nou.");
           return;
         }
       }
@@ -66,13 +66,13 @@ export function UpdatePasswordForm() {
 
         if (error) {
           if (await markReadyIfSessionExists()) return;
-          setMessage("Linkul de setare parola a expirat sau nu este valid. Cere un link nou.");
+          setMessage("Linkul de setare parolă a expirat sau nu este valid. Cere un link nou.");
           return;
         }
       }
 
       if (!(await markReadyIfSessionExists())) {
-        setMessage("Nu am putut valida sesiunea. Deschide linkul primit pe email in acelasi browser.");
+        setMessage("Nu am putut valida sesiunea. Deschide linkul primit pe email în același browser.");
       }
     }
 
@@ -84,7 +84,7 @@ export function UpdatePasswordForm() {
     setMessage("");
 
     if (password.length < 8) {
-      setMessage("Parola trebuie sa aiba cel putin 8 caractere.");
+      setMessage("Parola trebuie să aibă cel puțin 8 caractere.");
       return;
     }
 
@@ -108,7 +108,7 @@ export function UpdatePasswordForm() {
   return (
     <form className="card form" onSubmit={updatePassword}>
       <div className="field">
-        <label>Parola noua</label>
+        <label>Parola nouă</label>
         <input
           minLength={8}
           onChange={(event) => setPassword(event.target.value)}
@@ -118,7 +118,7 @@ export function UpdatePasswordForm() {
         />
       </div>
       <div className="field">
-        <label>Confirma parola</label>
+        <label>Confirmă parola</label>
         <input
           minLength={8}
           onChange={(event) => setConfirmPassword(event.target.value)}
@@ -129,7 +129,7 @@ export function UpdatePasswordForm() {
       </div>
       {message ? <p className="notice-text">{message}</p> : null}
       <button className="btn primary" disabled={!isReady || isSaving} type="submit">
-        {isSaving ? "Se salveaza..." : "Seteaza parola si intra in platforma"}
+        {isSaving ? "Se salvează..." : "Setează parola și intră în platformă"}
       </button>
     </form>
   );
