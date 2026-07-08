@@ -4,6 +4,19 @@ import { isAdminUser } from "@/lib/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { uploadMaterialThumbnail } from "@/lib/thumbnails";
 
+function safeResourceFileName(fileName: string) {
+  const extension = fileName.split(".").pop() || "pdf";
+  const name = fileName
+    .replace(/\.[^/.]+$/, "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  return `${name || "resursa"}.${extension}`;
+}
+
 async function createLesson(formData: FormData) {
   "use server";
 
@@ -27,8 +40,19 @@ async function createLesson(formData: FormData) {
   const categoryId = String(formData.get("category_id") || "");
   const subcategoryId = String(formData.get("subcategory_id") || "");
   const accessLevel = String(formData.get("access_level") || "basic");
+  const status = String(formData.get("status") || "draft");
   const excerpt = String(formData.get("excerpt") || "");
   const thumbnail = formData.get("thumbnail");
+  const durationMinutes = Number(formData.get("duration_minutes") || 0) || null;
+  const videoProvider = String(formData.get("video_provider") || "") || null;
+  const videoAssetId = String(formData.get("video_asset_id") || "") || null;
+  const videoPlaybackId = String(formData.get("video_playback_id") || "") || null;
+  const resourceTitle = String(formData.get("resource_title") || "");
+  const resourceAccessLevel = String(formData.get("resource_access_level") || "basic");
+  const resourceFile = formData.get("resource_file");
+  const linkTitle = String(formData.get("link_title") || "");
+  const linkUrl = String(formData.get("link_url") || "");
+  const linkAccessLevel = String(formData.get("link_access_level") || "basic");
   const body = String(formData.get("body") || "")
     .split("\n")
     .map((item) => item.trim())
@@ -46,10 +70,15 @@ async function createLesson(formData: FormData) {
       category_id: categoryId,
       subcategory_id: subcategoryId || null,
       access_level: accessLevel,
+      status,
       excerpt,
+      duration_minutes: durationMinutes,
+      video_provider: videoProvider,
+      video_asset_id: videoAssetId,
+      video_playback_id: videoPlaybackId,
       body,
       key_points: keyPoints,
-      status: "draft",
+      published_at: status === "published" ? new Date().toISOString() : null,
       created_by: user.id
     })
     .select("id")
@@ -68,7 +97,37 @@ async function createLesson(formData: FormData) {
     }
   }
 
-  redirect("/admin");
+  if (resourceFile instanceof File && resourceFile.size > 0) {
+    const path = `${material.id}/${Date.now()}-${safeResourceFileName(resourceFile.name)}`;
+    const { error: uploadError } = await supabase.storage
+      .from("lesson-resources")
+      .upload(path, resourceFile, {
+        contentType: resourceFile.type || "application/pdf",
+        upsert: false
+      });
+
+    if (!uploadError) {
+      await supabase.from("lesson_resources").insert({
+        lesson_id: material.id,
+        title: resourceTitle || resourceFile.name,
+        resource_type: "pdf",
+        url: path,
+        access_level: resourceAccessLevel
+      });
+    }
+  }
+
+  if (linkTitle && linkUrl) {
+    await supabase.from("lesson_resources").insert({
+      lesson_id: material.id,
+      title: linkTitle,
+      resource_type: "link",
+      url: linkUrl,
+      access_level: linkAccessLevel
+    });
+  }
+
+  redirect(`/admin/lessons/${material.id}`);
 }
 
 export default async function NewLessonPage() {
@@ -153,12 +212,46 @@ export default async function NewLessonPage() {
               </select>
             </div>
             <div className="field">
+              <label>Status</label>
+              <select name="status" defaultValue="draft">
+                <option value="draft">Draft</option>
+                <option value="published">Publicat</option>
+                <option value="archived">Arhivat</option>
+              </select>
+              <p className="field-hint">Alege Publicat dacă vrei ca materialul să apară imediat în Resurse.</p>
+            </div>
+            <div className="field">
               <label>Descriere scurtă</label>
               <textarea name="excerpt" rows={3} />
             </div>
             <div className="field">
+              <label>Durată video, în minute</label>
+              <input min="0" name="duration_minutes" placeholder="Ex: 12" type="number" />
+            </div>
+            <div className="field">
               <label>Thumbnail / imagine de copertă</label>
               <input accept="image/*" name="thumbnail" type="file" />
+            </div>
+            <div className="field">
+              <label>Video provider</label>
+              <select name="video_provider" defaultValue="">
+                <option value="">Fără video încă</option>
+                <option value="cloudflare_stream">Cloudflare Stream</option>
+                <option value="mux">Mux</option>
+                <option value="external">External</option>
+              </select>
+              <p className="field-hint">
+                Dacă vrei upload direct în Cloudflare, salvează materialul mai întâi. Vei ajunge imediat pe pagina de
+                editare, unde apare secțiunea completă de upload video.
+              </p>
+            </div>
+            <div className="field">
+              <label>Video asset id</label>
+              <input name="video_asset_id" placeholder="Opțional, dacă ai deja ID-ul din Cloudflare" />
+            </div>
+            <div className="field">
+              <label>Video playback id</label>
+              <input name="video_playback_id" placeholder="Opțional; pentru Cloudflare poate fi același ID" />
             </div>
             <div className="field">
               <label>Text articol, câte un paragraf pe rând</label>
@@ -168,8 +261,46 @@ export default async function NewLessonPage() {
               <label>Idei cheie, câte una pe rând</label>
               <textarea name="key_points" rows={5} />
             </div>
+            <section className="nested-form-panel">
+              <h2>PDF inițial</h2>
+              <p className="field-hint">Opțional: poți atașa primul PDF direct când creezi materialul.</p>
+              <div className="field">
+                <label>Titlu resursă PDF</label>
+                <input name="resource_title" placeholder="Ex: Checklist documente" />
+              </div>
+              <div className="field">
+                <label>Acces PDF</label>
+                <select name="resource_access_level" defaultValue="basic">
+                  <option value="basic">Basic</option>
+                  <option value="premium">Premium</option>
+                </select>
+              </div>
+              <div className="field">
+                <label>Fișier PDF</label>
+                <input accept="application/pdf" name="resource_file" type="file" />
+              </div>
+            </section>
+            <section className="nested-form-panel">
+              <h2>Link util inițial</h2>
+              <p className="field-hint">Opțional: poți adăuga primul link util direct la creare.</p>
+              <div className="field">
+                <label>Titlu link</label>
+                <input name="link_title" placeholder="Ex: GOV.UK guidance" />
+              </div>
+              <div className="field">
+                <label>URL</label>
+                <input name="link_url" placeholder="https://..." type="url" />
+              </div>
+              <div className="field">
+                <label>Acces link</label>
+                <select name="link_access_level" defaultValue="basic">
+                  <option value="basic">Basic</option>
+                  <option value="premium">Premium</option>
+                </select>
+              </div>
+            </section>
             <button className="btn primary" type="submit">
-              Salvează draft
+              Salvează materialul
             </button>
           </form>
         </div>

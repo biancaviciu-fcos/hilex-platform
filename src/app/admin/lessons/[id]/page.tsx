@@ -36,6 +36,7 @@ async function updateLesson(formData: FormData) {
   const videoProvider = String(formData.get("video_provider") || "") || null;
   const videoAssetId = String(formData.get("video_asset_id") || "") || null;
   const videoPlaybackId = String(formData.get("video_playback_id") || "") || null;
+  const durationMinutes = Number(formData.get("duration_minutes") || 0) || null;
   const body = String(formData.get("body") || "")
     .split("\n")
     .map((item) => item.trim())
@@ -59,6 +60,7 @@ async function updateLesson(formData: FormData) {
     access_level: accessLevel,
     status,
     excerpt,
+    duration_minutes: durationMinutes,
     video_provider: videoProvider,
     video_asset_id: videoAssetId,
     video_playback_id: videoPlaybackId,
@@ -185,6 +187,16 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
             <div className="field">
               <label>Descriere scurtă</label>
               <textarea name="excerpt" rows={3} defaultValue={lesson.excerpt || ""} />
+            </div>
+            <div className="field">
+              <label>Durată video, în minute</label>
+              <input
+                min="0"
+                name="duration_minutes"
+                placeholder="Ex: 12"
+                type="number"
+                defaultValue={lesson.duration_minutes || ""}
+              />
             </div>
             <div className="field">
               <label>Thumbnail / imagine de copertă</label>
