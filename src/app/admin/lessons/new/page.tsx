@@ -4,6 +4,8 @@ import { isAdminUser } from "@/lib/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { uploadMaterialThumbnail } from "@/lib/thumbnails";
 
+export const dynamic = "force-dynamic";
+
 function safeResourceFileName(fileName: string) {
   const extension = fileName.split(".").pop() || "pdf";
   const name = fileName
@@ -15,6 +17,16 @@ function safeResourceFileName(fileName: string) {
     .replace(/^-|-$/g, "");
 
   return `${name || "resursa"}.${extension}`;
+}
+
+function createSlug(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 90);
 }
 
 async function createLesson(formData: FormData) {
@@ -36,7 +48,8 @@ async function createLesson(formData: FormData) {
   if (!isAdminUser(profile?.role, user.email)) redirect("/library");
 
   const title = String(formData.get("title") || "");
-  const slug = String(formData.get("slug") || "");
+  const requestedSlug = String(formData.get("slug") || "");
+  let slug = createSlug(requestedSlug || title);
   const categoryId = String(formData.get("category_id") || "");
   const subcategoryId = String(formData.get("subcategory_id") || "");
   const accessLevel = String(formData.get("access_level") || "basic");
@@ -61,6 +74,20 @@ async function createLesson(formData: FormData) {
     .split("\n")
     .map((item) => item.trim())
     .filter(Boolean);
+
+  if (!slug) {
+    slug = `material-${Date.now()}`;
+  }
+
+  const { data: existingMaterial } = await supabase
+    .from("lessons")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (existingMaterial) {
+    slug = `${slug}-${Date.now().toString().slice(-6)}`;
+  }
 
   const { data: material, error } = await supabase
     .from("lessons")
@@ -174,7 +201,10 @@ export default async function NewLessonPage() {
             </div>
             <div className="field">
               <label>Slug</label>
-              <input name="slug" placeholder="ex: calatoria-cu-copilul" required />
+              <input name="slug" placeholder="Opțional: se generează automat din titlu" />
+              <p className="field-hint">
+                Poți lăsa câmpul gol. Dacă există deja un material cu același slug, platforma îl face unic automat.
+              </p>
             </div>
             <div className="field">
               <label>Aria de drept / filtru principal</label>

@@ -626,6 +626,11 @@ textarea {
   margin-top: 20px;
 }
 
+.admin-sections {
+  display: grid;
+  gap: 36px;
+}
+
 .danger-zone {
   align-items: center;
   border-color: #f3c8df;
