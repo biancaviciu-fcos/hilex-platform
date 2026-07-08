@@ -51,6 +51,8 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   const body = Array.isArray(lesson.body) ? lesson.body : [];
   const keyPoints = Array.isArray(lesson.key_points) ? lesson.key_points : [];
   const resources = Array.isArray(lesson.lesson_resources) ? lesson.lesson_resources : [];
+  const pdfResources = resources.filter((resource: { resource_type: string }) => resource.resource_type === "pdf");
+  const usefulLinks = resources.filter((resource: { resource_type: string }) => resource.resource_type === "link");
   const categoryName = relationName(lesson.categories);
   const subcategoryName = relationName(lesson.subcategories);
   const lessonAccess = lesson.access_level as AccessLevel;
@@ -127,9 +129,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
     );
 
   const resourcesWithUrls = await Promise.all(
-    resources.map(async (resource: { title: string; url: string; resource_type: string; access_level: string }) => {
-      if (resource.resource_type !== "pdf") return resource;
-
+    pdfResources.map(async (resource: { title: string; url: string; resource_type: string; access_level: string }) => {
       const { data } = await supabase.storage
         .from("lesson-resources")
         .createSignedUrl(resource.url, 60 * 15);
@@ -196,19 +196,38 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
           <div className="material-content-layout">
             <article className="card article-card material-article">
               <section id="details">
-              <h2>Explicații</h2>
-              {body.map((paragraph: string) => (
-                <p key={paragraph}>{paragraph}</p>
-              ))}
-            </section>
-              <section id="keys">
-              <h2>Idei cheie</h2>
-              <ul className="feature-list">
-                {keyPoints.map((point: string) => (
-                  <li key={point}>{point}</li>
+                <h2>Explicații</h2>
+                {body.map((paragraph: string) => (
+                  <p key={paragraph}>{paragraph}</p>
                 ))}
-              </ul>
-            </section>
+              </section>
+              <section id="keys">
+                <h2>Idei cheie</h2>
+                <ul className="feature-list">
+                  {keyPoints.map((point: string) => (
+                    <li key={point}>{point}</li>
+                  ))}
+                </ul>
+              </section>
+
+              <section id="useful-links">
+                <h2>Link-uri utile</h2>
+                {usefulLinks.length ? (
+                  <div className="useful-link-list">
+                    {usefulLinks.map((resource: { title: string; url: string; access_level: string }) => (
+                      <a className="useful-link-row" href={resource.url} key={resource.title} rel="noreferrer" target="_blank">
+                        <span>
+                          <strong>{resource.title}</strong>
+                          <small>{accessLabel(resource.access_level)}</small>
+                        </span>
+                        <strong>Deschide</strong>
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="muted">Nu există link-uri utile atașate încă.</p>
+                )}
+              </section>
             </article>
 
             <aside className="material-sidebar">
@@ -217,26 +236,27 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
                 <a href="#video">Clip video</a>
                 <a href="#details">Explicații</a>
                 <a href="#keys">Idei cheie</a>
+                <a href="#useful-links">Link-uri utile</a>
                 <a href="#resources">Resurse</a>
               </section>
 
               <section className="card material-side-card" id="resources">
                 <h3>Resurse</h3>
                 {resourcesWithUrls.length ? (
-                <div className="resource-list">
+                  <div className="resource-list">
                     {resourcesWithUrls.map((resource: { title: string; url: string; resource_type: string; access_level: string }) => (
-                    <a className="resource-row" href={resource.url} key={resource.title} rel="noreferrer" target="_blank">
-                      <span>
-                        <strong>{resource.title}</strong>
-                        <small>{accessLabel(resource.access_level)}</small>
-                      </span>
-                      <strong>{resource.resource_type.toUpperCase()}</strong>
-                    </a>
-                  ))}
-                </div>
-              ) : (
-                <p className="muted">Nu există resurse atașate încă.</p>
-              )}
+                      <a className="resource-row" href={resource.url} key={resource.title} rel="noreferrer" target="_blank">
+                        <span>
+                          <strong>{resource.title}</strong>
+                          <small>{accessLabel(resource.access_level)}</small>
+                        </span>
+                        <strong>PDF</strong>
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="muted">Nu există PDF-uri atașate încă.</p>
+                )}
               </section>
             </aside>
           </div>
