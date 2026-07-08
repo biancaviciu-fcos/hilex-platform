@@ -164,7 +164,7 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
                   );
                 })}
               </select>
-              <p className="field-hint">Momentan nu afisam subcategoriile ca filtru public in biblioteca.</p>
+              <p className="field-hint">Momentan nu afisam subcategoriile ca filtru public in resurse.</p>
             </div>
             <div className="field">
               <label>Pachet material</label>

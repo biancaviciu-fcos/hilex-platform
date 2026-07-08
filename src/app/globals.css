@@ -1545,6 +1545,13 @@ textarea {
   line-height: 1;
 }
 
+.status-link {
+  color: var(--white);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
 .member-home-topics {
   margin-top: 6px;
 }
@@ -1554,6 +1561,92 @@ textarea {
   gap: 12px;
   min-height: 220px;
   padding: 24px;
+}
+
+.home-feature-card {
+  align-items: center;
+  background: var(--navy);
+  border-radius: 8px;
+  color: var(--white);
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  margin-top: 28px;
+  padding: 28px;
+}
+
+.home-feature-card .eyebrow,
+.home-feature-card .muted {
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.home-feature-card h2 {
+  color: var(--white);
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.02;
+  margin: 8px 0;
+  max-width: 860px;
+}
+
+.home-resource-sections {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 28px;
+}
+
+.home-resource-section {
+  display: grid;
+  gap: 18px;
+}
+
+.compact-title {
+  align-items: start;
+  margin-bottom: 0;
+}
+
+.compact-title h2 {
+  font-size: 24px;
+  line-height: 1.12;
+}
+
+.home-material-list {
+  display: grid;
+  gap: 12px;
+}
+
+.home-material-card {
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--navy);
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 96px minmax(0, 1fr);
+  padding: 10px;
+}
+
+.home-material-card img,
+.material-placeholder {
+  align-items: center;
+  aspect-ratio: 16 / 10;
+  background: #eef4ff;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  object-fit: cover;
+  width: 100%;
+}
+
+.home-material-card h3 {
+  font-size: 18px;
+  line-height: 1.12;
+  margin-top: 8px;
+}
+
+.home-material-card p {
+  font-size: 14px;
+  margin-top: 6px;
 }
 
 .home-support-grid {
@@ -1584,8 +1677,14 @@ textarea {
 @media (max-width: 900px) {
   .member-landing-grid,
   .home-support-grid,
+  .home-resource-sections,
   .material-content-layout {
     grid-template-columns: 1fr;
+  }
+
+  .home-feature-card {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .library-filter-panel {

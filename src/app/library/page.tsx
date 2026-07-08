@@ -140,6 +140,18 @@ export default async function LibraryPage({
 
   const selectedCategory = categories?.find((item) => item.slug === category);
 
+  const { data: categoryLessonRows } = await supabase
+    .from("lessons")
+    .select("category_id")
+    .eq("status", "published");
+
+  const categoryCounts = new Map<string, number>();
+  (categoryLessonRows || []).forEach((lesson) => {
+    if (lesson.category_id) {
+      categoryCounts.set(lesson.category_id, (categoryCounts.get(lesson.category_id) || 0) + 1);
+    }
+  });
+
   const { data: favorites } = await supabase
     .from("favorite_lessons")
     .select("lesson_id")
@@ -188,8 +200,8 @@ export default async function LibraryPage({
       <AppHeader />
       <section className="hero library-hero">
         <div className="inner">
-          <h1>Biblioteca HILEX</h1>
-          <p>Clipuri, articole si resurse juridice pentru membri.</p>
+          <h1>Resurse HILEX</h1>
+          <p>Un centru de soluții juridice practice pentru membri.</p>
           <form className="search-row" action="/library">
             <input
               aria-label="Cauta"
@@ -213,7 +225,9 @@ export default async function LibraryPage({
                 href={`/library?category=${item.slug}`}
                 key={item.id}
               >
-                <h3>{item.name}</h3>
+                <h3>
+                  {item.name} ({categoryCounts.get(item.id) || 0})
+                </h3>
                 <p>{item.description}</p>
               </Link>
             ))}

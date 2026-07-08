@@ -7,6 +7,7 @@ alter table public.lesson_resources enable row level security;
 alter table public.video_uploads enable row level security;
 alter table public.favorite_lessons enable row level security;
 alter table public.lesson_progress enable row level security;
+alter table public.lesson_views enable row level security;
 
 create or replace function public.current_user_role()
 returns public.user_role
@@ -77,6 +78,11 @@ with check (user_id = auth.uid());
 
 create policy "Users can manage own lesson progress"
 on public.lesson_progress for all
+using (user_id = auth.uid())
+with check (user_id = auth.uid());
+
+create policy "Users can manage own lesson views"
+on public.lesson_views for all
 using (user_id = auth.uid())
 with check (user_id = auth.uid());
 

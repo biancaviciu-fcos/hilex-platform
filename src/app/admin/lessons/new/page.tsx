@@ -143,7 +143,7 @@ export default async function NewLessonPage() {
                   );
                 })}
               </select>
-              <p className="field-hint">Momentan nu afisam subcategoriile ca filtru public in biblioteca.</p>
+              <p className="field-hint">Momentan nu afisam subcategoriile ca filtru public in resurse.</p>
             </div>
             <div className="field">
               <label>Pachet material</label>

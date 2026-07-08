@@ -3,6 +3,33 @@ import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+type HomeMaterial = {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  access_level: string;
+  duration_minutes: number | null;
+  thumbnail_url: string | null;
+  category_id: string | null;
+};
+
+function MaterialMiniCard({ material }: { material: HomeMaterial }) {
+  return (
+    <Link className="home-material-card" href={`/library/${material.slug}`}>
+      {material.thumbnail_url ? <img alt="" src={material.thumbnail_url} /> : <span className="material-placeholder">▶</span>}
+      <div>
+        <div className="tag-row">
+          <span className={`tag ${material.access_level === "premium" ? "premium" : ""}`}>{material.access_level}</span>
+          {material.duration_minutes ? <span className="tag">{material.duration_minutes} min</span> : null}
+        </div>
+        <h3>{material.title}</h3>
+        {material.excerpt ? <p className="muted">{material.excerpt}</p> : null}
+      </div>
+    </Link>
+  );
+}
+
 export default async function HomePage() {
   const supabase = await createSupabaseServerClient();
   const {
@@ -26,11 +53,54 @@ export default async function HomePage() {
     .select("id,name,slug,description,sort_order")
     .order("sort_order");
 
-  const { count } = await supabase
+  const { data: lessons } = await supabase
     .from("lessons")
-    .select("id", { count: "exact", head: true })
+    .select("id,title,slug,excerpt,access_level,duration_minutes,thumbnail_url,category_id,published_at")
     .eq("status", "published");
 
+  const allLessons = ((lessons || []) as (HomeMaterial & { published_at?: string | null })[]).sort((first, second) => {
+    const firstDate = first.published_at ? new Date(first.published_at).getTime() : 0;
+    const secondDate = second.published_at ? new Date(second.published_at).getTime() : 0;
+    return secondDate - firstDate;
+  });
+  const categoryCounts = new Map<string, number>();
+
+  allLessons.forEach((lesson) => {
+    if (lesson.category_id) {
+      categoryCounts.set(lesson.category_id, (categoryCounts.get(lesson.category_id) || 0) + 1);
+    }
+  });
+
+  const { data: favorites } = await supabase
+    .from("favorite_lessons")
+    .select("lesson_id,created_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  const favoriteIds = new Set((favorites || []).map((item) => item.lesson_id));
+  const savedMaterials = allLessons.filter((lesson) => favoriteIds.has(lesson.id));
+
+  const { data: viewedRows } = await supabase
+    .from("lesson_views")
+    .select("lesson_id,viewed_at")
+    .eq("user_id", user.id)
+    .order("viewed_at", { ascending: false });
+
+  const recentlyViewed = (viewedRows || [])
+    .map((row) => allLessons.find((lesson) => lesson.id === row.lesson_id))
+    .filter(Boolean)
+    .slice(0, 3) as HomeMaterial[];
+  const recentCategoryIds = new Set([...savedMaterials, ...recentlyViewed].map((lesson) => lesson.category_id).filter(Boolean));
+  const recommendedMaterials = allLessons
+    .filter((lesson) => lesson.category_id && recentCategoryIds.has(lesson.category_id) && !favoriteIds.has(lesson.id))
+    .slice(0, 3);
+  const newThisWeek = allLessons.filter((lesson) => {
+    if (!lesson.published_at) return false;
+    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return new Date(lesson.published_at).getTime() >= sevenDaysAgo;
+  });
+  const newMaterials = (newThisWeek.length ? newThisWeek : allLessons).slice(0, 3);
+  const weeklyMaterial = allLessons[0];
   const accessLabel = subscription?.access_level === "premium" ? "Premium" : "Basic";
 
   return (
@@ -42,12 +112,12 @@ export default async function HomePage() {
             <span className="eyebrow hero-eyebrow">HILEX pentru membri</span>
             <h1>Bine ai venit in platforma HILEX</h1>
             <p>
-              Aici gasesti materiale juridice practice, organizate pe arii de drept, cu explicatii clare, clipuri si
-              resurse utile pentru viata in UK.
+              Găsești soluții practice, materiale video și resurse juridice create pentru situații reale din viața de zi
+              cu zi.
             </p>
             <div className="member-home-actions">
               <Link className="btn primary" href="/library">
-                Intra in biblioteca
+                Intra in resurse
               </Link>
               <Link className="btn ghost-on-navy" href="/contact">
                 Contacteaza-ne
@@ -55,9 +125,12 @@ export default async function HomePage() {
             </div>
           </div>
           <aside className="member-status-card">
-            <span className="eyebrow">Pachet activ</span>
+            <span className="eyebrow">Planul tău</span>
             <strong>{accessLabel}</strong>
-            <p>{count || 0} materiale disponibile in biblioteca.</p>
+            <p>{allLessons.length} materiale disponibile in resurse.</p>
+            <Link className="status-link" href="/library?favorites=1">
+              Ai salvat {savedMaterials.length} materiale
+            </Link>
           </aside>
         </div>
       </section>
@@ -78,18 +151,96 @@ export default async function HomePage() {
             {(categories || []).map((category) => (
               <Link className="topic-card home-topic-card" href={`/library?category=${category.slug}`} key={category.id}>
                 <span className="topic-icon">{category.name.slice(0, 1)}</span>
-                <h3>{category.name}</h3>
+                <h3>
+                  {category.name} ({categoryCounts.get(category.id) || 0})
+                </h3>
                 <p>{category.description}</p>
               </Link>
             ))}
           </div>
 
+          {weeklyMaterial ? (
+            <section className="home-feature-card">
+              <div>
+                <span className="eyebrow">Materialul săptămânii</span>
+                <h2>{weeklyMaterial.title}</h2>
+                {weeklyMaterial.excerpt ? <p className="muted">{weeklyMaterial.excerpt}</p> : null}
+              </div>
+              <Link className="btn primary" href={`/library/${weeklyMaterial.slug}`}>
+                Vezi materialul
+              </Link>
+            </section>
+          ) : null}
+
+          <div className="home-resource-sections">
+            <section className="card home-resource-section">
+              <div className="section-title compact-title">
+                <div>
+                  <span className="eyebrow">Materiale salvate</span>
+                  <h2>Ai salvat {savedMaterials.length} materiale</h2>
+                </div>
+                <Link className="btn" href="/library?favorites=1">
+                  Vezi toate
+                </Link>
+              </div>
+              <div className="home-material-list">
+                {savedMaterials.slice(0, 3).map((material) => (
+                  <MaterialMiniCard key={material.id} material={material} />
+                ))}
+                {!savedMaterials.length ? <p className="muted">Nu ai salvat materiale inca.</p> : null}
+              </div>
+            </section>
+
+            <section className="card home-resource-section">
+              <div className="section-title compact-title">
+                <div>
+                  <span className="eyebrow">Ultimele materiale accesate</span>
+                  <h2>Ultimele materiale accesate</h2>
+                </div>
+              </div>
+              <div className="home-material-list">
+                {recentlyViewed.map((material) => (
+                  <MaterialMiniCard key={material.id} material={material} />
+                ))}
+                {!recentlyViewed.length ? <p className="muted">Materialele parcurse vor aparea aici.</p> : null}
+              </div>
+            </section>
+
+            <section className="card home-resource-section">
+              <div className="section-title compact-title">
+                <div>
+                  <span className="eyebrow">Materiale noi</span>
+                  <h2>Materiale noi</h2>
+                </div>
+              </div>
+              <div className="home-material-list">
+                {newMaterials.map((material) => (
+                  <MaterialMiniCard key={material.id} material={material} />
+                ))}
+              </div>
+            </section>
+
+            <section className="card home-resource-section">
+              <div className="section-title compact-title">
+                <div>
+                  <span className="eyebrow">Recomandat pentru tine</span>
+                  <h2>Bazat pe materialele pe care le-ai urmărit</h2>
+                </div>
+              </div>
+              <div className="home-material-list">
+                {(recommendedMaterials.length ? recommendedMaterials : allLessons.slice(0, 3)).map((material) => (
+                  <MaterialMiniCard key={material.id} material={material} />
+                ))}
+              </div>
+            </section>
+          </div>
+
           <div className="home-support-grid">
             <article className="card">
-              <span className="eyebrow">Cum folosesti platforma</span>
+              <span className="eyebrow">Cum funcționează HiLex</span>
               <h3>Cauta, salveaza si revino la materiale.</h3>
               <p className="muted">
-                In biblioteca poti cauta dupa tema, domeniu sau cuvant cheie. Materialele importante pot fi salvate la
+                In resurse poti cauta dupa tema, domeniu sau cuvant cheie. Materialele importante pot fi salvate la
                 favorite pentru a le parcurge mai tarziu.
               </p>
               <Link className="btn" href="/library?favorites=1">

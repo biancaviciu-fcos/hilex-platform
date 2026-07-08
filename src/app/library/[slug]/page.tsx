@@ -76,7 +76,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
         <section className="hero compact">
           <div className="inner material-hero-inner">
             <p className="breadcrumbs">
-              <Link href="/library">Biblioteca</Link> / {categoryName || "Material"}
+              <Link href="/library">Resurse</Link> / {categoryName || "Material"}
               {subcategoryName ? ` / ${subcategoryName}` : ""}
             </p>
             <div className="material-meta">
@@ -115,6 +115,17 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
     );
   }
 
+  await supabase
+    .from("lesson_views")
+    .upsert(
+      {
+        user_id: user.id,
+        lesson_id: lesson.id,
+        viewed_at: new Date().toISOString()
+      },
+      { onConflict: "user_id,lesson_id" }
+    );
+
   const resourcesWithUrls = await Promise.all(
     resources.map(async (resource: { title: string; url: string; resource_type: string; access_level: string }) => {
       if (resource.resource_type !== "pdf") return resource;
@@ -136,7 +147,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
       <section className="hero compact">
         <div className="inner material-hero-inner">
           <p className="breadcrumbs">
-            <Link href="/library">Biblioteca</Link> / {categoryName || "Material"}
+            <Link href="/library">Resurse</Link> / {categoryName || "Material"}
             {subcategoryName ? ` / ${subcategoryName}` : ""}
           </p>
           <div className="material-meta">

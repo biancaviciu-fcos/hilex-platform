@@ -4,8 +4,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AccessLevel } from "@/lib/types";
 
 function planLabel(accessLevel?: string | null) {
-  if (accessLevel === "premium") return "Pachet Premium";
-  if (accessLevel === "basic") return "Pachet Basic";
+  if (accessLevel === "premium") return "Premium";
+  if (accessLevel === "basic") return "Basic";
   return "In verificare";
 }
 
@@ -108,7 +108,7 @@ export default async function AccountPage() {
         <div className="inner">
           <div className="account-summary card">
             <div>
-              <span className="eyebrow">Acces HILEX</span>
+              <span className="eyebrow">Planul tău</span>
               <h2>{planLabel(subscription?.access_level)}</h2>
               <p className="muted">
                 {subscription?.status === "active" || subscription?.status === "trialing"
