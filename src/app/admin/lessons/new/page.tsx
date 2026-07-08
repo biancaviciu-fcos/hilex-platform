@@ -2,162 +2,15 @@ import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { isAdminUser } from "@/lib/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { uploadMaterialThumbnail } from "@/lib/thumbnails";
 
 export const dynamic = "force-dynamic";
 
-function safeResourceFileName(fileName: string) {
-  const extension = fileName.split(".").pop() || "pdf";
-  const name = fileName
-    .replace(/\.[^/.]+$/, "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-
-  return `${name || "resursa"}.${extension}`;
-}
-
-function createSlug(value: string) {
-  return value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 90);
-}
-
-async function createLesson(formData: FormData) {
-  "use server";
-
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (!isAdminUser(profile?.role, user.email)) redirect("/library");
-
-  const title = String(formData.get("title") || "");
-  const requestedSlug = String(formData.get("slug") || "");
-  let slug = createSlug(requestedSlug || title);
-  const categoryId = String(formData.get("category_id") || "");
-  const subcategoryId = String(formData.get("subcategory_id") || "");
-  const accessLevel = String(formData.get("access_level") || "basic");
-  const status = String(formData.get("status") || "draft");
-  const excerpt = String(formData.get("excerpt") || "");
-  const thumbnail = formData.get("thumbnail");
-  const durationMinutes = Number(formData.get("duration_minutes") || 0) || null;
-  const videoProvider = String(formData.get("video_provider") || "") || null;
-  const videoAssetId = String(formData.get("video_asset_id") || "") || null;
-  const videoPlaybackId = String(formData.get("video_playback_id") || "") || null;
-  const resourceTitle = String(formData.get("resource_title") || "");
-  const resourceAccessLevel = String(formData.get("resource_access_level") || "basic");
-  const resourceFile = formData.get("resource_file");
-  const linkTitle = String(formData.get("link_title") || "");
-  const linkUrl = String(formData.get("link_url") || "");
-  const linkAccessLevel = String(formData.get("link_access_level") || "basic");
-  const body = String(formData.get("body") || "")
-    .split("\n")
-    .map((item) => item.trim())
-    .filter(Boolean);
-  const keyPoints = String(formData.get("key_points") || "")
-    .split("\n")
-    .map((item) => item.trim())
-    .filter(Boolean);
-
-  if (!slug) {
-    slug = `material-${Date.now()}`;
-  }
-
-  const { data: existingMaterial } = await supabase
-    .from("lessons")
-    .select("id")
-    .eq("slug", slug)
-    .maybeSingle();
-
-  if (existingMaterial) {
-    slug = `${slug}-${Date.now().toString().slice(-6)}`;
-  }
-
-  const { data: material, error } = await supabase
-    .from("lessons")
-    .insert({
-      title,
-      slug,
-      category_id: categoryId,
-      subcategory_id: subcategoryId || null,
-      access_level: accessLevel,
-      status,
-      excerpt,
-      duration_minutes: durationMinutes,
-      video_provider: videoProvider,
-      video_asset_id: videoAssetId,
-      video_playback_id: videoPlaybackId,
-      body,
-      key_points: keyPoints,
-      published_at: status === "published" ? new Date().toISOString() : null,
-      created_by: user.id
-    })
-    .select("id")
-    .single();
-
-  if (error || !material) redirect("/admin");
-
-  if (thumbnail instanceof File && thumbnail.size > 0) {
-    const thumbnailUrl = await uploadMaterialThumbnail(thumbnail, material.id);
-
-    if (thumbnailUrl) {
-      await supabase
-        .from("lessons")
-        .update({ thumbnail_url: thumbnailUrl, updated_at: new Date().toISOString() })
-        .eq("id", material.id);
-    }
-  }
-
-  if (resourceFile instanceof File && resourceFile.size > 0) {
-    const path = `${material.id}/${Date.now()}-${safeResourceFileName(resourceFile.name)}`;
-    const { error: uploadError } = await supabase.storage
-      .from("lesson-resources")
-      .upload(path, resourceFile, {
-        contentType: resourceFile.type || "application/pdf",
-        upsert: false
-      });
-
-    if (!uploadError) {
-      await supabase.from("lesson_resources").insert({
-        lesson_id: material.id,
-        title: resourceTitle || resourceFile.name,
-        resource_type: "pdf",
-        url: path,
-        access_level: resourceAccessLevel
-      });
-    }
-  }
-
-  if (linkTitle && linkUrl) {
-    await supabase.from("lesson_resources").insert({
-      lesson_id: material.id,
-      title: linkTitle,
-      resource_type: "link",
-      url: linkUrl,
-      access_level: linkAccessLevel
-    });
-  }
-
-  redirect(`/admin/lessons/${material.id}`);
-}
-
-export default async function NewLessonPage() {
+export default async function NewLessonPage({
+  searchParams
+}: {
+  searchParams?: Promise<{ error?: string }>;
+}) {
+  const params = await searchParams;
   const supabase = await createSupabaseServerClient();
   const {
     data: { user }
@@ -194,7 +47,8 @@ export default async function NewLessonPage() {
       </section>
       <section className="section">
         <div className="inner">
-          <form className="card form" action={createLesson} encType="multipart/form-data">
+          {params?.error ? <p className="notice-text error-text">{params.error}</p> : null}
+          <form className="card form" action="/api/admin/lessons/create" encType="multipart/form-data" method="POST">
             <div className="field">
               <label>Titlu</label>
               <input name="title" required />
