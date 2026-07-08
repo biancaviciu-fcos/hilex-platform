@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { isAdminUser } from "@/lib/admin";
+import { hasAdminPanelAccess } from "@/lib/adminAccess";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -27,6 +28,7 @@ export default async function AdminPage() {
     .single();
 
   if (!isAdminUser(profile?.role, user.email)) redirect("/library");
+  if (!(await hasAdminPanelAccess())) redirect("/admin/access?next=/admin");
 
   const { data: lessons } = await supabase
     .from("lessons")

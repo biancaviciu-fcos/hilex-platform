@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdminUser } from "@/lib/admin";
+import { hasAdminPanelAccess } from "@/lib/adminAccess";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { uploadMaterialThumbnail } from "@/lib/thumbnails";
@@ -45,12 +46,16 @@ export async function POST(request: Request) {
 
   const { data: profile } = await authSupabase
     .from("profiles")
-    .select("role")
+    .select("role,full_name")
     .eq("id", user.id)
     .single();
 
   if (!isAdminUser(profile?.role, user.email)) {
     return NextResponse.redirect(new URL("/library", request.url), { status: 303 });
+  }
+
+  if (!(await hasAdminPanelAccess())) {
+    return NextResponse.redirect(new URL("/admin/access?next=/admin/lessons/new", request.url), { status: 303 });
   }
 
   const formData = await request.formData();
@@ -65,6 +70,18 @@ export async function POST(request: Request) {
   if (!slug) slug = `material-${Date.now()}`;
 
   const supabase = createSupabaseAdminClient();
+  const { error: profileError } = await supabase.from("profiles").upsert({
+    id: user.id,
+    email: user.email || "",
+    full_name: profile?.full_name || user.user_metadata?.full_name || user.email || "Admin HILEX",
+    role: profile?.role || "admin",
+    updated_at: new Date().toISOString()
+  });
+
+  if (profileError) {
+    return redirectWithError(request, `Profilul admin nu a putut fi pregătit: ${profileError.message}`);
+  }
+
   const { data: existingMaterial } = await supabase
     .from("lessons")
     .select("id")

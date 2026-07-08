@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdminUser } from "@/lib/admin";
+import { hasAdminPanelAccess } from "@/lib/adminAccess";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
@@ -18,6 +19,10 @@ export async function POST(request: Request) {
 
   if (!isAdminUser(profile?.role, user.email)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  if (!(await hasAdminPanelAccess())) {
+    return NextResponse.redirect(new URL("/admin/access", request.url), { status: 303 });
   }
 
   const formData = await request.formData();

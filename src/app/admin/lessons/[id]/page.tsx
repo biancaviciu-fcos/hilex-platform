@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { isAdminUser } from "@/lib/admin";
+import { hasAdminPanelAccess } from "@/lib/adminAccess";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { uploadMaterialThumbnail } from "@/lib/thumbnails";
 import { DeleteLessonForm } from "./DeleteLessonForm";
@@ -23,6 +24,7 @@ async function updateLesson(formData: FormData) {
     .single();
 
   if (!isAdminUser(profile?.role, user.email)) redirect("/library");
+  if (!(await hasAdminPanelAccess())) redirect("/admin/access?next=/admin");
 
   const id = String(formData.get("id") || "");
   const title = String(formData.get("title") || "");
@@ -98,6 +100,7 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
     .single();
 
   if (!isAdminUser(profile?.role, user.email)) redirect("/library");
+  if (!(await hasAdminPanelAccess())) redirect(`/admin/access?next=/admin/lessons/${id}`);
 
   const { data: lesson } = await supabase
     .from("lessons")

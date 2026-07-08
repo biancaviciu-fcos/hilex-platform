@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { isAdminUser } from "@/lib/admin";
+import { hasAdminPanelAccess } from "@/lib/adminAccess";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -25,6 +26,7 @@ export default async function NewLessonPage({
     .single();
 
   if (!isAdminUser(profile?.role, user.email)) redirect("/library");
+  if (!(await hasAdminPanelAccess())) redirect("/admin/access?next=/admin/lessons/new");
 
   const { data: categories } = await supabase
     .from("categories")
