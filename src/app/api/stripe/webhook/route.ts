@@ -88,9 +88,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     cancel_at_period_end: subscription.cancel_at_period_end
   });
 
-  if (plan === "premium") {
-    await sendPremiumUpgradeEmail(email, name || undefined);
-  }
+  await sendMembershipWelcomeEmail(email, plan, name || undefined);
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
@@ -112,23 +110,38 @@ function toIso(value: number | null | undefined) {
   return value ? new Date(value * 1000).toISOString() : null;
 }
 
-async function sendPremiumUpgradeEmail(email: string, name?: string) {
+async function sendMembershipWelcomeEmail(email: string, plan: "basic" | "premium", name?: string) {
   const resendApiKey = process.env.RESEND_API_KEY;
 
   if (!resendApiKey) {
-    console.error("Missing RESEND_API_KEY for premium upgrade email");
+    console.error("Missing RESEND_API_KEY for membership welcome email");
     return;
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://membersaccess.hilex.co.uk";
   const from = process.env.EMAIL_FROM || "HILEX <membership@hilex.co.uk>";
   const firstName = escapeHtml(name?.split(" ")[0] || "Bună");
+  const planLabel = plan === "premium" ? "Premium" : "Essential";
+  const headline =
+    plan === "premium"
+      ? "Felicitări, planul tău HILEX este acum Premium"
+      : "Bun venit în HILEX Essential";
+  const intro =
+    plan === "premium"
+      ? "upgrade-ul tău a fost activat cu succes."
+      : "abonamentul tău a fost activat cu succes.";
+  const details =
+    plan === "premium"
+      ? "Ai acum acces la materialele Premium, resursele exclusive și conținutul prioritar din platformă."
+      : "Ai acum acces la materialele Essential, resursele juridice practice și conținutul inclus în planul tău.";
 
   const html = `
     <div style="font-family: Arial, sans-serif; color: #05083f; line-height: 1.55; max-width: 620px; margin: 0 auto; padding: 28px;">
-      <h1 style="font-size: 30px; margin: 0 0 12px;">Felicitări, planul tău HILEX este acum Premium</h1>
-      <p>${firstName}, upgrade-ul tău a fost activat cu succes.</p>
-      <p>Ai acum acces la materialele Premium, resursele exclusive și conținutul prioritar din platformă.</p>
+      <h1 style="font-size: 30px; margin: 0 0 12px;">${headline}</h1>
+      <p>${firstName}, ${intro}</p>
+      <p>${details}</p>
+      <p>Plan activ: <strong>${planLabel}</strong></p>
+      <p>Dacă este prima dată când intri în HILEX, vei primi și emailul pentru setarea parolei contului tău.</p>
       <p style="margin: 28px 0;">
         <a href="${siteUrl}/library" style="background: #d9047c; color: #ffffff; padding: 14px 22px; text-decoration: none; border-radius: 8px; font-weight: 700;">Intră în resurse</a>
       </p>
@@ -145,14 +158,17 @@ async function sendPremiumUpgradeEmail(email: string, name?: string) {
     body: JSON.stringify({
       from,
       to: email,
-      subject: "Planul tău HILEX a fost upgradat la Premium",
+      subject: plan === "premium" ? "Planul tău HILEX a fost upgradat la Premium" : "Bun venit în HILEX Essential",
       html,
-      text: `Felicitări, planul tău HILEX este acum Premium. Intră în resurse: ${siteUrl}/library`
+      text:
+        plan === "premium"
+          ? `Felicitări, planul tău HILEX este acum Premium. Intră în resurse: ${siteUrl}/library`
+          : `Bun venit în HILEX Essential. Abonamentul tău a fost activat. Intră în resurse: ${siteUrl}/library`
     })
   });
 
   if (!response.ok) {
-    console.error("Premium upgrade email failed", await response.text());
+    console.error("Membership welcome email failed", await response.text());
   }
 }
 
