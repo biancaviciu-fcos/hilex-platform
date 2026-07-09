@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
+import { UpgradePremiumModal } from "@/components/UpgradePremiumModal";
 import { canAccessLesson } from "@/lib/access";
 import { accessLabel } from "@/lib/labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -99,30 +100,7 @@ function LessonCard({
       </Link>
       {locked ? (
         <div className="locked-card-actions">
-          <details className="upgrade-popover">
-            <summary className="btn primary">Upgrade la Premium</summary>
-            <div className="upgrade-modal-backdrop">
-              <div className="upgrade-modal-card">
-                <span className="eyebrow">Upgrade Premium</span>
-                <h3>Deblochează materialele Premium</h3>
-                <p className="muted">
-                  Premium îți oferă acces la materialele exclusive, resurse prioritare și conținut avansat din platforma
-                  HILEX.
-                </p>
-                <ul className="feature-list pink">
-                  <li>Acces la materialele Premium</li>
-                  <li>Resurse și ghiduri exclusive</li>
-                  <li>Acces prioritar la anumite materiale noi</li>
-                </ul>
-                <form action="/api/stripe/checkout" method="POST">
-                  <input name="plan" type="hidden" value="premium" />
-                  <button className="btn primary" type="submit">
-                    Fă upgrade acum
-                  </button>
-                </form>
-              </div>
-            </div>
-          </details>
+          <UpgradePremiumModal compact />
         </div>
       ) : null}
       <form action={`/api/favorites/${lesson.id}`} method="POST">

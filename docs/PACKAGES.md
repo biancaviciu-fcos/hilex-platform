@@ -1,8 +1,8 @@
 # Pachete HILEX
 
-## Pachet Basic
+## Pachet Essential
 
-Pret: `£120 + TVA / an`
+Pret: `£140 + TVA / an`
 
 Descriere:
 
@@ -34,7 +34,7 @@ Descriere:
 
 Pentru cei care isi doresc suport mai rapid si acces prioritar.
 
-Include tot ce este in Pachetul BASIC, plus:
+Include tot ce este in Pachetul ESSENTIAL, plus:
 
 - Acces complet la ecosistemul HiLex
 - Pana la 90 minute credit anual
@@ -51,3 +51,9 @@ CTA:
 Nota:
 
 `Prioritate in raspunsuri si suport dedicat.`
+
+## Premium Upgrade
+
+Pret: `£100 + TVA`
+
+Plata diferentei de la Essential la Premium.

@@ -15,17 +15,19 @@ In Supabase rulam:
 
 ## Stripe
 
-Cream doua produse:
+Cream produsele/preturile:
 
-- HILEX Basic, abonament anual: `£120 + TVA / an`
+- HILEX Essential, abonament anual: `£140 + TVA / an`
 - HILEX Premium, abonament anual: `£240 + TVA / an`
+- HILEX Premium Upgrade, plata diferenta: `£100 + TVA`
 
 Avem nevoie de:
 
 - secret key
 - publishable key
-- price id pentru Basic
+- price id pentru Essential
 - price id pentru Premium
+- price id pentru Premium Upgrade
 - webhook secret
 
 Webhook URL:

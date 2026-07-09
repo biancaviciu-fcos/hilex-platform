@@ -34,15 +34,17 @@ Add environment variables from `.env.example`.
 
 ## 4. Stripe
 
-Create two annual recurring prices:
+Create two annual recurring prices and one one-time upgrade price:
 
-- Basic: `£120 + VAT / year`
+- Essential: `£140 + VAT / year`
 - Premium: `£240 + VAT / year`
+- Premium Upgrade: `£100 + VAT`, one-time payment
 
 Add the Stripe price IDs to Vercel:
 
 - `STRIPE_BASIC_PRICE_ID`
 - `STRIPE_PREMIUM_PRICE_ID`
+- `STRIPE_PREMIUM_UPGRADE_PRICE_ID`
 
 Webhook endpoint:
 

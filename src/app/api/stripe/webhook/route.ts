@@ -44,14 +44,17 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const subscriptionId = String(session.subscription || "");
   const email = session.customer_details?.email;
   const name = session.customer_details?.name;
+  const checkoutPlan = session.metadata?.checkout_plan;
   const plan = session.metadata?.plan === "premium" ? "premium" : "basic";
 
-  if (!email || !subscriptionId) return;
+  if (!email) return;
 
   const { data: existingUsers } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
-  let userId = existingUsers.users.find((item) => item.email === email)?.id;
+  let userId = session.metadata?.user_id || existingUsers.users.find((item) => item.email === email)?.id;
 
   if (!userId) {
+    if (checkoutPlan === "premium_upgrade") return;
+
     const { data: invitedUser, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
       data: { full_name: name || "" },
       redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/update-password`
@@ -73,6 +76,44 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     full_name: name,
     role: "member"
   });
+
+  if (checkoutPlan === "premium_upgrade") {
+    const { data: existingSubscription } = await supabase
+      .from("subscriptions")
+      .select("id,stripe_subscription_id")
+      .eq("user_id", userId)
+      .in("status", ["active", "trialing", "past_due"])
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (existingSubscription?.id) {
+      await supabase
+        .from("subscriptions")
+        .update({
+          access_level: "premium",
+          status: "active",
+          stripe_customer_id: customerId,
+          stripe_price_id: process.env.STRIPE_PREMIUM_UPGRADE_PRICE_ID,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", existingSubscription.id);
+    } else {
+      await supabase.from("subscriptions").insert({
+        user_id: userId,
+        access_level: "premium",
+        status: "active",
+        stripe_customer_id: customerId,
+        stripe_subscription_id: `upgrade_${session.id}`,
+        stripe_price_id: process.env.STRIPE_PREMIUM_UPGRADE_PRICE_ID
+      });
+    }
+
+    await sendMembershipWelcomeEmail(email, "premium", name || undefined);
+    return;
+  }
+
+  if (!subscriptionId) return;
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 

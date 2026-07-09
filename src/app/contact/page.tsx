@@ -98,7 +98,7 @@ export default async function ContactPage({
                 Poți face upgrade automat la Premium și vei primi acces după finalizarea plății.
               </p>
               <form action="/api/stripe/checkout" method="POST">
-                <input name="plan" type="hidden" value="premium" />
+                <input name="plan" type="hidden" value="premium_upgrade" />
                 <button className="btn primary" type="submit">
                   Fă upgrade acum
                 </button>

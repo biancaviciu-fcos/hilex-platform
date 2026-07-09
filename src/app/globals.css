@@ -666,18 +666,6 @@ textarea {
   margin-top: 18px;
 }
 
-.upgrade-popover {
-  position: relative;
-}
-
-.upgrade-popover summary {
-  list-style: none;
-}
-
-.upgrade-popover summary::-webkit-details-marker {
-  display: none;
-}
-
 .upgrade-modal-backdrop {
   align-items: center;
   background: rgba(2, 8, 63, 0.58);
@@ -697,6 +685,7 @@ textarea {
   max-width: 620px;
   padding: clamp(22px, 4vw, 36px);
   width: min(620px, 100%);
+  position: relative;
 }
 
 .upgrade-modal-card h3 {
@@ -704,6 +693,31 @@ textarea {
   font-size: clamp(28px, 4vw, 42px);
   line-height: 1.08;
   margin: 8px 0 12px;
+}
+
+.upgrade-modal-close {
+  align-items: center;
+  background: #fff4fb;
+  border: 1px solid #f3c8df;
+  border-radius: 999px;
+  color: var(--navy);
+  cursor: pointer;
+  display: flex;
+  font-size: 28px;
+  font-weight: 850;
+  height: 42px;
+  justify-content: center;
+  line-height: 1;
+  position: absolute;
+  right: 18px;
+  top: 18px;
+  width: 42px;
+}
+
+.upgrade-pay-button,
+.upgrade-trigger-full {
+  justify-content: center;
+  width: 100%;
 }
 
 .admin-panels {

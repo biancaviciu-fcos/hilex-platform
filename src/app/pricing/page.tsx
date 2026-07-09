@@ -31,7 +31,7 @@ export default function PricingPage() {
         <div className="inner grid">
           <form className="card pricing-large" action="/api/stripe/checkout" method="POST">
             <h3>Pachet Essential</h3>
-            <div className="big-price">£120 <span>+TVA / an</span></div>
+            <div className="big-price">£140 <span>+TVA / an</span></div>
             <p className="muted">Pentru momentele în care ai nevoie de claritate și vrei să iei decizia corectă.</p>
             <ul className="feature-list">
               {essentialItems.map((item) => (

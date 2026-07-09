@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
+import { UpgradePremiumModal } from "@/components/UpgradePremiumModal";
 import { canAccessLesson } from "@/lib/access";
 import { accessLabel } from "@/lib/labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -92,35 +93,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
                   explicațiile și resursele atașate.
                 </p>
                 <div className="locked-actions">
-                  <details className="upgrade-popover">
-                    <summary className="btn primary">Vezi opțiunea Premium</summary>
-                    <div className="upgrade-modal-backdrop">
-                      <div className="upgrade-modal-card">
-                        <span className="eyebrow">Upgrade Premium</span>
-                        <h3>Deblochează toate materialele Premium</h3>
-                        <p className="muted">
-                          Premium îți oferă acces la materialele exclusive, resurse prioritare și conținut avansat din
-                          platforma HILEX.
-                        </p>
-                        <ul className="feature-list pink">
-                          <li>Acces la materialele Premium</li>
-                          <li>Resurse și ghiduri exclusive</li>
-                          <li>Acces prioritar la anumite materiale noi</li>
-                        </ul>
-                        <div className="locked-actions">
-                          <form action="/api/stripe/checkout" method="POST">
-                            <input name="plan" type="hidden" value="premium" />
-                            <button className="btn primary" type="submit">
-                              Fă upgrade acum
-                            </button>
-                          </form>
-                          <Link className="btn" href="/library">
-                            Înapoi la resurse
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </details>
+                  <UpgradePremiumModal />
                   <Link className="btn" href="/library">
                     Înapoi la resurse
                   </Link>
