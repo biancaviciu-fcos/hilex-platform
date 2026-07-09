@@ -13,7 +13,40 @@ function statusLabel(status: string) {
   return "Draft";
 }
 
-export default async function AdminPage() {
+function emailTestMessage(value?: string | string[]) {
+  const status = Array.isArray(value) ? value[0] : value;
+
+  if (status === "sent") {
+    return "Emailul test a fost trimis. Verifică inboxul și spamul.";
+  }
+
+  if (status === "failed") {
+    return "Emailul test nu a putut fi trimis. Verifică RESEND_API_KEY, EMAIL_FROM și domeniul din Resend.";
+  }
+
+  if (status === "missing-email") {
+    return "Nu am găsit o adresă de email pentru contul de admin.";
+  }
+
+  if (status === "forbidden") {
+    return "Nu ai acces pentru această verificare.";
+  }
+
+  if (status === "login") {
+    return "Trebuie să fii logată ca admin pentru a trimite emailul test.";
+  }
+
+  return "";
+}
+
+export default async function AdminPage({
+  searchParams
+}: {
+  searchParams?: Promise<{ emailTest?: string | string[] }>;
+}) {
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const emailMessage = emailTestMessage(resolvedSearchParams.emailTest);
+  const emailMessageIsSuccess = resolvedSearchParams.emailTest === "sent";
   const supabase = await createSupabaseServerClient();
   const {
     data: { user }
@@ -86,6 +119,25 @@ export default async function AdminPage() {
       </section>
       <section className="section">
         <div className="inner admin-sections">
+          <section className="card">
+            <div className="section-title compact-title">
+              <div>
+                <h2>Verificare emailuri</h2>
+                <p className="muted">
+                  Trimite un email test către contul tău de admin pentru a verifica dacă Resend este configurat corect.
+                </p>
+              </div>
+              <form action="/api/admin/test-email" method="POST">
+                <button className="btn primary" type="submit">
+                  Trimite email test
+                </button>
+              </form>
+            </div>
+            {emailMessage ? (
+              <p className={emailMessageIsSuccess ? "success-box" : "error-box"}>{emailMessage}</p>
+            ) : null}
+          </section>
+
           <section>
             <div className="section-title">
               <h2>Drafturi ({draftLessons.length})</h2>

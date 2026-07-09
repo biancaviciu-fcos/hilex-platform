@@ -25,6 +25,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
+  console.log("HILEX Stripe webhook received", {
+    type: event.type,
+    id: event.id
+  });
+
   if (event.type === "checkout.session.completed") {
     await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
   }
@@ -75,7 +80,14 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   let userId = metadataUserId || existingUsers.users.find((item) => item.email === email)?.id;
 
   if (!userId) {
-    if (checkoutPlan === "premium_upgrade") return;
+    if (checkoutPlan === "premium_upgrade") {
+      console.error("HILEX premium upgrade checkout did not resolve a user", {
+        sessionId: session.id,
+        email,
+        metadataUserId
+      });
+      return;
+    }
 
     const { data: invitedUser, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
       data: { full_name: name || "" },
@@ -90,7 +102,14 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     userId = invitedUser.user?.id;
   }
 
-  if (!userId) return;
+  if (!userId) {
+    console.error("HILEX checkout completed but userId is missing", {
+      checkoutPlan,
+      sessionId: session.id,
+      email
+    });
+    return;
+  }
 
   await supabase.from("profiles").upsert({
     id: userId,
@@ -131,7 +150,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       });
     }
 
-    await sendMembershipWelcomeEmail(email, "premium", name || undefined);
+    await sendMembershipWelcomeEmail(email, "premium", name || undefined, session.id);
     return;
   }
 
@@ -151,7 +170,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     cancel_at_period_end: subscription.cancel_at_period_end
   });
 
-  await sendMembershipWelcomeEmail(email, plan, name || undefined);
+  await sendMembershipWelcomeEmail(email, plan, name || undefined, session.id);
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
@@ -173,7 +192,7 @@ function toIso(value: number | null | undefined) {
   return value ? new Date(value * 1000).toISOString() : null;
 }
 
-async function sendMembershipWelcomeEmail(email: string, plan: "basic" | "premium", name?: string) {
+async function sendMembershipWelcomeEmail(email: string, plan: "basic" | "premium", name?: string, sessionId?: string) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://membersaccess.hilex.co.uk";
   const firstName = escapeHtml(name?.split(" ")[0] || "Bună");
   const planLabel = plan === "premium" ? "Premium" : "Essential";
@@ -205,6 +224,14 @@ async function sendMembershipWelcomeEmail(email: string, plan: "basic" | "premiu
   `;
 
   try {
+    console.log("HILEX sending membership email", {
+      to: email,
+      plan,
+      sessionId,
+      hasResendKey: Boolean(process.env.RESEND_API_KEY),
+      emailFrom: process.env.EMAIL_FROM || "HILEX <membership@hilex.co.uk>"
+    });
+
     await sendEmail({
       to: email,
       subject: plan === "premium" ? "Planul tău HILEX a fost upgradat la Premium" : "Bun venit în HILEX Essential",
@@ -214,8 +241,19 @@ async function sendMembershipWelcomeEmail(email: string, plan: "basic" | "premiu
           ? `Felicitări, planul tău HILEX este acum Premium. Intră în resurse: ${siteUrl}/library`
           : `Bun venit în HILEX Essential. Abonamentul tău a fost activat. Intră în resurse: ${siteUrl}/library`
     });
+
+    console.log("HILEX membership email sent", {
+      to: email,
+      plan,
+      sessionId
+    });
   } catch (error) {
-    console.error("Membership welcome email failed", error);
+    console.error("Membership welcome email failed", {
+      to: email,
+      plan,
+      sessionId,
+      error
+    });
   }
 }
 

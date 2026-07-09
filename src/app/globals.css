@@ -756,6 +756,26 @@ textarea {
   gap: 36px;
 }
 
+.success-box,
+.error-box {
+  border-radius: 8px;
+  font-weight: 750;
+  margin-top: 16px;
+  padding: 14px 16px;
+}
+
+.success-box {
+  background: #ecfdf3;
+  border: 1px solid #b7efcf;
+  color: #166534;
+}
+
+.error-box {
+  background: #fff1f8;
+  border: 1px solid #f3c8df;
+  color: #8a1552;
+}
+
 .danger-zone {
   align-items: center;
   border-color: #f3c8df;
