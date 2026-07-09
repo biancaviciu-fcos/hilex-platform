@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { sendEmail } from "@/lib/email";
 import { stripe } from "@/lib/stripe";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -42,15 +43,36 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const supabase = createSupabaseAdminClient();
   const customerId = String(session.customer || "");
   const subscriptionId = String(session.subscription || "");
-  const email = session.customer_details?.email;
-  const name = session.customer_details?.name;
   const checkoutPlan = session.metadata?.checkout_plan;
+  const metadataUserId = session.metadata?.user_id || "";
   const plan = session.metadata?.plan === "premium" ? "premium" : "basic";
 
-  if (!email) return;
-
   const { data: existingUsers } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
-  let userId = session.metadata?.user_id || existingUsers.users.find((item) => item.email === email)?.id;
+  const metadataUser = metadataUserId ? existingUsers.users.find((item) => item.id === metadataUserId) : undefined;
+  let email = session.customer_details?.email || session.customer_email || metadataUser?.email || "";
+  let name = session.customer_details?.name || String(metadataUser?.user_metadata?.full_name || "");
+
+  if (!email && metadataUserId) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("email,full_name")
+      .eq("id", metadataUserId)
+      .maybeSingle();
+
+    email = profile?.email || "";
+    name = name || profile?.full_name || "";
+  }
+
+  if (!email) {
+    console.error("HILEX checkout completed without an email", {
+      checkoutPlan,
+      sessionId: session.id,
+      metadataUserId
+    });
+    return;
+  }
+
+  let userId = metadataUserId || existingUsers.users.find((item) => item.email === email)?.id;
 
   if (!userId) {
     if (checkoutPlan === "premium_upgrade") return;
@@ -152,15 +174,7 @@ function toIso(value: number | null | undefined) {
 }
 
 async function sendMembershipWelcomeEmail(email: string, plan: "basic" | "premium", name?: string) {
-  const resendApiKey = process.env.RESEND_API_KEY;
-
-  if (!resendApiKey) {
-    console.error("Missing RESEND_API_KEY for membership welcome email");
-    return;
-  }
-
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://membersaccess.hilex.co.uk";
-  const from = process.env.EMAIL_FROM || "HILEX <membership@hilex.co.uk>";
   const firstName = escapeHtml(name?.split(" ")[0] || "Bună");
   const planLabel = plan === "premium" ? "Premium" : "Essential";
   const headline =
@@ -190,14 +204,8 @@ async function sendMembershipWelcomeEmail(email: string, plan: "basic" | "premiu
     </div>
   `;
 
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendApiKey}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      from,
+  try {
+    await sendEmail({
       to: email,
       subject: plan === "premium" ? "Planul tău HILEX a fost upgradat la Premium" : "Bun venit în HILEX Essential",
       html,
@@ -205,11 +213,9 @@ async function sendMembershipWelcomeEmail(email: string, plan: "basic" | "premiu
         plan === "premium"
           ? `Felicitări, planul tău HILEX este acum Premium. Intră în resurse: ${siteUrl}/library`
           : `Bun venit în HILEX Essential. Abonamentul tău a fost activat. Intră în resurse: ${siteUrl}/library`
-    })
-  });
-
-  if (!response.ok) {
-    console.error("Membership welcome email failed", await response.text());
+    });
+  } catch (error) {
+    console.error("Membership welcome email failed", error);
   }
 }
 
