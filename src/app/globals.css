@@ -429,31 +429,29 @@ textarea {
 
 .locked-overlay {
   align-items: center;
-  background: rgba(2, 8, 63, 0.78);
-  border-radius: 0;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(243, 200, 223, 0.95);
+  border-radius: 999px;
+  box-shadow: 0 10px 24px rgba(2, 8, 63, 0.18);
   color: var(--white);
-  display: grid;
-  gap: 6px;
+  display: inline-flex;
   height: auto;
-  inset: 0;
   justify-items: center;
-  padding: 18px;
+  left: 14px;
+  padding: 8px 12px;
   position: absolute;
   text-align: center;
+  top: 14px;
   width: auto;
 }
 
 .locked-overlay strong {
   background: var(--pink);
   border-radius: 999px;
+  color: var(--white);
   font-size: 12px;
   padding: 6px 10px;
   text-transform: uppercase;
-}
-
-.locked-overlay small {
-  font-weight: 850;
-  line-height: 1.35;
 }
 
 .upgrade-note {

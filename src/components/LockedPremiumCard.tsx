@@ -28,7 +28,6 @@ export function LockedPremiumCard({
             {thumbnailUrl ? <img alt="" src={thumbnailUrl} /> : <span>▶</span>}
             <span className="locked-overlay">
               <strong>Premium</strong>
-              <small>Fă upgrade la Premium pentru a avea acces</small>
             </span>
           </span>
           <span className="lesson-content">
