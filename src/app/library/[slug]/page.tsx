@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
 import { UpgradePremiumModal } from "@/components/UpgradePremiumModal";
+import { VideoCoverPlayer } from "@/components/VideoCoverPlayer";
 import { canAccessLesson } from "@/lib/access";
 import { accessLabel } from "@/lib/labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -163,11 +164,9 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
         <div className="inner material-page">
           <section className="material-video-shell" id="video">
             {lesson.video_provider === "cloudflare_stream" && lesson.video_playback_id ? (
-              <iframe
-                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-                allowFullScreen
-                className="video-embed"
-                src={`https://iframe.videodelivery.net/${lesson.video_playback_id}`}
+              <VideoCoverPlayer
+                playbackId={lesson.video_playback_id}
+                thumbnailUrl={lesson.thumbnail_url}
                 title={lesson.title}
               />
             ) : (
