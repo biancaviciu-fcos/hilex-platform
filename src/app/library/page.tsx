@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
+import { LockedPremiumCard } from "@/components/LockedPremiumCard";
 import { UpgradePremiumModal } from "@/components/UpgradePremiumModal";
 import { canAccessLesson } from "@/lib/access";
 import { accessLabel } from "@/lib/labels";
@@ -74,30 +75,34 @@ function LessonCard({
 
   return (
     <article className={`lesson-card ${locked ? "locked" : ""}`}>
-      <Link className="lesson-card-main" href={`/library/${lesson.slug}`}>
-        <div className="lesson-thumb">
-          {lesson.thumbnail_url ? <img alt="" src={lesson.thumbnail_url} /> : <span>▶</span>}
-          {locked ? (
-            <div className="locked-overlay">
-              <strong>Premium</strong>
-              <small>Fă upgrade la Premium pentru a avea acces</small>
-            </div>
-          ) : null}
-        </div>
-        <div className="lesson-content">
-          <div className="tag-row">
-            <span className={`tag ${lesson.access_level === "premium" ? "premium" : ""}`}>
-              {accessLabel(lesson.access_level)}
-            </span>
-            {lesson.duration_minutes ? <span className="tag">{lesson.duration_minutes} min</span> : null}
-            {categoryName ? <span className="tag">{categoryName}</span> : null}
-            {isCompleted ? <span className="tag completed">Parcurs</span> : null}
+      {locked ? (
+        <LockedPremiumCard
+          categoryName={categoryName}
+          durationMinutes={lesson.duration_minutes}
+          excerpt={lesson.excerpt}
+          isCompleted={isCompleted}
+          thumbnailUrl={lesson.thumbnail_url}
+          title={lesson.title}
+        />
+      ) : (
+        <Link className="lesson-card-main" href={`/library/${lesson.slug}`}>
+          <div className="lesson-thumb">
+            {lesson.thumbnail_url ? <img alt="" src={lesson.thumbnail_url} /> : <span>▶</span>}
           </div>
-          <h3>{lesson.title}</h3>
-          <p className="muted">{lesson.excerpt}</p>
-          {locked ? <p className="upgrade-note">Fă upgrade la Premium pentru a avea acces la acest material.</p> : null}
-        </div>
-      </Link>
+          <div className="lesson-content">
+            <div className="tag-row">
+              <span className={`tag ${lesson.access_level === "premium" ? "premium" : ""}`}>
+                {accessLabel(lesson.access_level)}
+              </span>
+              {lesson.duration_minutes ? <span className="tag">{lesson.duration_minutes} min</span> : null}
+              {categoryName ? <span className="tag">{categoryName}</span> : null}
+              {isCompleted ? <span className="tag completed">Parcurs</span> : null}
+            </div>
+            <h3>{lesson.title}</h3>
+            <p className="muted">{lesson.excerpt}</p>
+          </div>
+        </Link>
+      )}
       {locked ? (
         <div className="locked-card-actions">
           <UpgradePremiumModal compact />

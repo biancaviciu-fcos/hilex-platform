@@ -1,18 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import type { ReactNode } from "react";
 
 type UpgradePremiumModalProps = {
   compact?: boolean;
+  triggerClassName?: string;
+  triggerContent?: ReactNode;
 };
 
-export function UpgradePremiumModal({ compact = false }: UpgradePremiumModalProps) {
+export function UpgradePremiumModal({ compact = false, triggerClassName, triggerContent }: UpgradePremiumModalProps) {
   const [open, setOpen] = useState(false);
+  const className = triggerClassName || `btn primary ${compact ? "upgrade-trigger-full" : ""}`;
 
   return (
     <>
-      <button className={`btn primary ${compact ? "upgrade-trigger-full" : ""}`} onClick={() => setOpen(true)} type="button">
-        {compact ? "Upgrade la Premium" : "Vezi opțiunea Premium"}
+      <button className={className} onClick={() => setOpen(true)} type="button">
+        {triggerContent || (compact ? "Upgrade la Premium" : "Vezi opțiunea Premium")}
       </button>
       {open ? (
         <div className="upgrade-modal-backdrop" role="presentation">

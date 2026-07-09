@@ -272,11 +272,19 @@ textarea {
 }
 
 .lesson-card-main {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
   display: block;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+  width: 100%;
 }
 
 .lesson-card.locked .lesson-thumb img,
-.lesson-card.locked .lesson-thumb > span {
+.lesson-card.locked .lesson-thumb > span:not(.locked-overlay) {
   filter: saturate(0.5);
   opacity: 0.38;
 }
@@ -296,6 +304,19 @@ textarea {
   color: var(--navy);
   font-size: 20px;
   margin: 0 0 8px;
+}
+
+.lesson-card-title {
+  color: var(--navy);
+  display: block;
+  font-size: 20px;
+  font-weight: 950;
+  line-height: 1.14;
+  margin: 0 0 2px;
+}
+
+.lesson-card-excerpt {
+  display: block;
 }
 
 .topic-card p,
@@ -409,14 +430,17 @@ textarea {
 .locked-overlay {
   align-items: center;
   background: rgba(2, 8, 63, 0.78);
+  border-radius: 0;
   color: var(--white);
   display: grid;
   gap: 6px;
+  height: auto;
   inset: 0;
   justify-items: center;
   padding: 18px;
   position: absolute;
   text-align: center;
+  width: auto;
 }
 
 .locked-overlay strong {
