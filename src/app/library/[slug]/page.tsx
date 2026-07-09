@@ -75,7 +75,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
     return (
       <main className="page">
         <AppHeader />
-        <section className="hero compact">
+        <section className="hero compact material-hero">
           <div className="inner material-hero-inner">
             <p className="breadcrumbs">
               <Link href="/library">Resurse</Link> / {categoryName || "Material"}
@@ -144,7 +144,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   return (
     <main className="page">
       <AppHeader />
-      <section className="hero compact">
+      <section className="hero compact material-hero">
         <div className="inner material-hero-inner">
           <p className="breadcrumbs">
             <Link href="/library">Resurse</Link> / {categoryName || "Material"}
@@ -160,18 +160,20 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
           </div>
           <h1>{lesson.title}</h1>
           <p>{lesson.excerpt}</p>
-          <form action={`/api/favorites/${lesson.id}`} method="POST">
-            <input name="next" type="hidden" value={`/library/${lesson.slug}`} />
-            <button className={`btn hero-favorite-btn ${favorite ? "active" : ""}`} type="submit">
-              {favorite ? "Salvat pentru mai târziu" : "Salvează pentru mai târziu"}
-            </button>
-          </form>
-          <form action={`/api/progress/${lesson.id}`} method="POST">
-            <input name="next" type="hidden" value={`/library/${lesson.slug}`} />
-            <button className={`btn hero-progress-btn ${progress ? "active" : ""}`} type="submit">
-              {progress ? "Material parcurs" : "Marchează ca parcurs"}
-            </button>
-          </form>
+          <div className="material-hero-actions">
+            <form action={`/api/favorites/${lesson.id}`} method="POST">
+              <input name="next" type="hidden" value={`/library/${lesson.slug}`} />
+              <button className={`btn hero-favorite-btn ${favorite ? "active" : ""}`} type="submit">
+                {favorite ? "Salvat pentru mai târziu" : "Salvează pentru mai târziu"}
+              </button>
+            </form>
+            <form action={`/api/progress/${lesson.id}`} method="POST">
+              <input name="next" type="hidden" value={`/library/${lesson.slug}`} />
+              <button className={`btn hero-progress-btn ${progress ? "active" : ""}`} type="submit">
+                {progress ? "Material parcurs" : "Marchează ca parcurs"}
+              </button>
+            </form>
+          </div>
         </div>
       </section>
       <section className="section">
