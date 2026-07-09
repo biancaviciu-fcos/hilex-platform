@@ -3,6 +3,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { isAdminUser } from "@/lib/admin";
 import { hasAdminPanelAccess } from "@/lib/adminAccess";
 import { accessLabel } from "@/lib/labels";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { uploadMaterialThumbnail } from "@/lib/thumbnails";
 import { DeleteLessonForm } from "./DeleteLessonForm";
@@ -77,7 +78,19 @@ async function updateLesson(formData: FormData) {
     updatePayload.thumbnail_url = thumbnailUrl;
   }
 
-  await supabase
+  const adminSupabase = createSupabaseAdminClient();
+
+  if (profile?.role !== "admin" && profile?.role !== "owner") {
+    await adminSupabase.from("profiles").upsert({
+      id: user.id,
+      email: user.email || "",
+      full_name: user.user_metadata?.full_name || user.email || "Admin HILEX",
+      role: "admin",
+      updated_at: new Date().toISOString()
+    });
+  }
+
+  await adminSupabase
     .from("lessons")
     .update(updatePayload)
     .eq("id", id);
@@ -103,19 +116,31 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
   if (!isAdminUser(profile?.role, user.email)) redirect("/library");
   if (!(await hasAdminPanelAccess())) redirect(`/admin/access?next=/admin/lessons/${id}`);
 
-  const { data: lesson } = await supabase
+  const adminSupabase = createSupabaseAdminClient();
+
+  if (profile?.role !== "admin" && profile?.role !== "owner") {
+    await adminSupabase.from("profiles").upsert({
+      id: user.id,
+      email: user.email || "",
+      full_name: user.user_metadata?.full_name || user.email || "Admin HILEX",
+      role: "admin",
+      updated_at: new Date().toISOString()
+    });
+  }
+
+  const { data: lesson } = await adminSupabase
     .from("lessons")
     .select("*, lesson_resources(id,title,resource_type,url,access_level)")
     .eq("id", id)
     .single();
   if (!lesson) notFound();
 
-  const { data: categories } = await supabase
+  const { data: categories } = await adminSupabase
     .from("categories")
     .select("id,name")
     .order("sort_order");
 
-  const { data: subcategories } = await supabase
+  const { data: subcategories } = await adminSupabase
     .from("subcategories")
     .select("id,name,category_id")
     .order("sort_order");

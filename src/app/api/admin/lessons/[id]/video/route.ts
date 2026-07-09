@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdminUser } from "@/lib/admin";
 import { hasAdminPanelAccess } from "@/lib/adminAccess";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function POST(
@@ -29,6 +30,8 @@ export async function POST(
     return NextResponse.redirect(new URL("/admin/access", request.url), { status: 303 });
   }
 
+  const adminSupabase = createSupabaseAdminClient();
+
   const formData = await request.formData();
   const videoAssetId = String(formData.get("video_asset_id") || "");
 
@@ -36,7 +39,7 @@ export async function POST(
     return NextResponse.json({ error: "Missing video asset id" }, { status: 400 });
   }
 
-  await supabase
+  await adminSupabase
     .from("lessons")
     .update({
       video_provider: "cloudflare_stream",

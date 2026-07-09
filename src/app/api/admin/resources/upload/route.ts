@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdminUser } from "@/lib/admin";
 import { hasAdminPanelAccess } from "@/lib/adminAccess";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -27,6 +28,8 @@ export async function POST(request: Request) {
     return NextResponse.redirect(new URL("/admin/access", request.url), { status: 303 });
   }
 
+  const adminSupabase = createSupabaseAdminClient();
+
   const formData = await request.formData();
   const lessonId = String(formData.get("lesson_id") || "");
   const file = formData.get("file");
@@ -45,7 +48,7 @@ export async function POST(request: Request) {
     .replace(/^-|-$/g, "");
   const path = `${lessonId}/${Date.now()}-${safeName}.${extension}`;
 
-  const { error: uploadError } = await supabase.storage
+  const { error: uploadError } = await adminSupabase.storage
     .from("lesson-resources")
     .upload(path, file, {
       contentType: file.type || "application/pdf",
@@ -56,7 +59,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: uploadError.message }, { status: 500 });
   }
 
-  await supabase.from("lesson_resources").insert({
+  await adminSupabase.from("lesson_resources").insert({
     lesson_id: lessonId,
     title: String(formData.get("title") || file.name),
     resource_type: "pdf",

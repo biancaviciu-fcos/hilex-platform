@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdminUser } from "@/lib/admin";
 import { hasAdminPanelAccess } from "@/lib/adminAccess";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
@@ -25,6 +26,8 @@ export async function POST(request: Request) {
     return NextResponse.redirect(new URL("/admin/access", request.url), { status: 303 });
   }
 
+  const adminSupabase = createSupabaseAdminClient();
+
   const formData = await request.formData();
   const lessonId = String(formData.get("lesson_id") || "");
   const title = String(formData.get("title") || "");
@@ -35,7 +38,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing title, URL or material" }, { status: 400 });
   }
 
-  await supabase.from("lesson_resources").insert({
+  await adminSupabase.from("lesson_resources").insert({
     lesson_id: lessonId,
     title,
     resource_type: "link",

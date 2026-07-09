@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdminUser } from "@/lib/admin";
 import { hasAdminPanelAccess } from "@/lib/adminAccess";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function thumbnailPathFromPublicUrl(url?: string | null) {
@@ -40,7 +41,9 @@ export async function POST(
     return NextResponse.redirect(new URL("/admin/access", request.url), { status: 303 });
   }
 
-  const { data: lesson } = await supabase
+  const adminSupabase = createSupabaseAdminClient();
+
+  const { data: lesson } = await adminSupabase
     .from("lessons")
     .select("id,thumbnail_url,lesson_resources(resource_type,url)")
     .eq("id", id)
@@ -55,16 +58,16 @@ export async function POST(
   });
 
   if (pdfPaths.length) {
-    await supabase.storage.from("lesson-resources").remove(pdfPaths);
+    await adminSupabase.storage.from("lesson-resources").remove(pdfPaths);
   }
 
   const thumbnailPath = thumbnailPathFromPublicUrl(lesson.thumbnail_url);
 
   if (thumbnailPath) {
-    await supabase.storage.from("lesson-thumbnails").remove([thumbnailPath]);
+    await adminSupabase.storage.from("lesson-thumbnails").remove([thumbnailPath]);
   }
 
-  await supabase.from("lessons").delete().eq("id", id);
+  await adminSupabase.from("lessons").delete().eq("id", id);
 
   return NextResponse.redirect(new URL("/admin", request.url), {
     status: 303

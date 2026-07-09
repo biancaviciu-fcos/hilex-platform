@@ -70,11 +70,12 @@ export async function POST(request: Request) {
   if (!slug) slug = `material-${Date.now()}`;
 
   const supabase = createSupabaseAdminClient();
+  const adminRole = profile?.role === "owner" ? "owner" : "admin";
   const { error: profileError } = await supabase.from("profiles").upsert({
     id: user.id,
     email: user.email || "",
     full_name: profile?.full_name || user.user_metadata?.full_name || user.email || "Admin HILEX",
-    role: profile?.role || "admin",
+    role: adminRole,
     updated_at: new Date().toISOString()
   });
 

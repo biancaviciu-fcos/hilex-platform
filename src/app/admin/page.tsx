@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { isAdminUser } from "@/lib/admin";
 import { hasAdminPanelAccess } from "@/lib/adminAccess";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -63,7 +64,19 @@ export default async function AdminPage({
   if (!isAdminUser(profile?.role, user.email)) redirect("/library");
   if (!(await hasAdminPanelAccess())) redirect("/admin/access?next=/admin");
 
-  const { data: lessons } = await supabase
+  const adminSupabase = createSupabaseAdminClient();
+
+  if (profile?.role !== "admin" && profile?.role !== "owner") {
+    await adminSupabase.from("profiles").upsert({
+      id: user.id,
+      email: user.email || "",
+      full_name: user.user_metadata?.full_name || user.email || "Admin HILEX",
+      role: "admin",
+      updated_at: new Date().toISOString()
+    });
+  }
+
+  const { data: lessons } = await adminSupabase
     .from("lessons")
     .select("id,title,slug,status,access_level,excerpt,thumbnail_url")
     .order("created_at", { ascending: false });

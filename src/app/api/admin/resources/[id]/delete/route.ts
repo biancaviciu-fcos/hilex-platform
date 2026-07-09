@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdminUser } from "@/lib/admin";
 import { hasAdminPanelAccess } from "@/lib/adminAccess";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function POST(
@@ -29,7 +30,9 @@ export async function POST(
     return NextResponse.redirect(new URL("/admin/access", request.url), { status: 303 });
   }
 
-  const { data: resource } = await supabase
+  const adminSupabase = createSupabaseAdminClient();
+
+  const { data: resource } = await adminSupabase
     .from("lesson_resources")
     .select("lesson_id,resource_type,url")
     .eq("id", id)
@@ -37,10 +40,10 @@ export async function POST(
 
   if (!resource) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  await supabase.from("lesson_resources").delete().eq("id", id);
+  await adminSupabase.from("lesson_resources").delete().eq("id", id);
 
   if (resource.resource_type === "pdf") {
-    await supabase.storage.from("lesson-resources").remove([resource.url]);
+    await adminSupabase.storage.from("lesson-resources").remove([resource.url]);
   }
 
   return NextResponse.redirect(new URL(`/admin/lessons/${resource.lesson_id}`, request.url), {
