@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { canAccessLesson } from "@/lib/access";
+import { accessLabel } from "@/lib/labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AccessLevel } from "@/lib/types";
 
@@ -84,7 +85,9 @@ function LessonCard({
         </div>
         <div className="lesson-content">
           <div className="tag-row">
-            <span className={`tag ${lesson.access_level === "premium" ? "premium" : ""}`}>{lesson.access_level}</span>
+            <span className={`tag ${lesson.access_level === "premium" ? "premium" : ""}`}>
+              {accessLabel(lesson.access_level)}
+            </span>
             {lesson.duration_minutes ? <span className="tag">{lesson.duration_minutes} min</span> : null}
             {categoryName ? <span className="tag">{categoryName}</span> : null}
             {isCompleted ? <span className="tag completed">Parcurs</span> : null}
@@ -94,6 +97,34 @@ function LessonCard({
           {locked ? <p className="upgrade-note">Fă upgrade la Premium pentru a avea acces la acest material.</p> : null}
         </div>
       </Link>
+      {locked ? (
+        <div className="locked-card-actions">
+          <details className="upgrade-popover">
+            <summary className="btn primary">Upgrade la Premium</summary>
+            <div className="upgrade-modal-backdrop">
+              <div className="upgrade-modal-card">
+                <span className="eyebrow">Upgrade Premium</span>
+                <h3>Deblochează materialele Premium</h3>
+                <p className="muted">
+                  Premium îți oferă acces la materialele exclusive, resurse prioritare și conținut avansat din platforma
+                  HILEX.
+                </p>
+                <ul className="feature-list pink">
+                  <li>Acces la materialele Premium</li>
+                  <li>Resurse și ghiduri exclusive</li>
+                  <li>Acces prioritar la anumite materiale noi</li>
+                </ul>
+                <form action="/api/stripe/checkout" method="POST">
+                  <input name="plan" type="hidden" value="premium" />
+                  <button className="btn primary" type="submit">
+                    Fă upgrade acum
+                  </button>
+                </form>
+              </div>
+            </div>
+          </details>
+        </div>
+      ) : null}
       <form action={`/api/favorites/${lesson.id}`} method="POST">
         <input name="next" type="hidden" value={next} />
         <button className={`favorite-btn ${isFavorite ? "active" : ""}`} type="submit">
@@ -260,8 +291,8 @@ export default async function LibraryPage({
             <div className="field">
               <label htmlFor="access">Pachet</label>
               <select defaultValue={access} id="access" name="access">
-                <option value="">Basic și Premium</option>
-                <option value="basic">Basic</option>
+                <option value="">Essential și Premium</option>
+                <option value="basic">Essential</option>
                 <option value="premium">Premium</option>
               </select>
             </div>

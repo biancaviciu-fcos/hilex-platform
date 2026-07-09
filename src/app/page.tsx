@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
+import { accessLabel as formatAccessLabel, categoryIcon } from "@/lib/labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type HomeMaterial = {
@@ -20,7 +21,9 @@ function MaterialMiniCard({ material }: { material: HomeMaterial }) {
       {material.thumbnail_url ? <img alt="" src={material.thumbnail_url} /> : <span className="material-placeholder">▶</span>}
       <div>
         <div className="tag-row">
-          <span className={`tag ${material.access_level === "premium" ? "premium" : ""}`}>{material.access_level}</span>
+          <span className={`tag ${material.access_level === "premium" ? "premium" : ""}`}>
+            {formatAccessLabel(material.access_level)}
+          </span>
           {material.duration_minutes ? <span className="tag">{material.duration_minutes} min</span> : null}
         </div>
         <h3>{material.title}</h3>
@@ -90,10 +93,6 @@ export default async function HomePage() {
     .map((row) => allLessons.find((lesson) => lesson.id === row.lesson_id))
     .filter(Boolean)
     .slice(0, 3) as HomeMaterial[];
-  const recentCategoryIds = new Set([...savedMaterials, ...recentlyViewed].map((lesson) => lesson.category_id).filter(Boolean));
-  const recommendedMaterials = allLessons
-    .filter((lesson) => lesson.category_id && recentCategoryIds.has(lesson.category_id) && !favoriteIds.has(lesson.id))
-    .slice(0, 3);
   const newThisWeek = allLessons.filter((lesson) => {
     if (!lesson.published_at) return false;
     const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
@@ -101,7 +100,7 @@ export default async function HomePage() {
   });
   const newMaterials = (newThisWeek.length ? newThisWeek : allLessons).slice(0, 3);
   const weeklyMaterial = allLessons[0];
-  const accessLabel = subscription?.access_level === "premium" ? "Premium" : "Basic";
+  const accessLabel = formatAccessLabel(subscription?.access_level);
 
   return (
     <main className="page member-shell">
@@ -120,7 +119,7 @@ export default async function HomePage() {
                 Intră în resurse
               </Link>
               <Link className="btn ghost-on-navy" href="/contact">
-                Contacteaza-ne
+                Contactează-ne
               </Link>
             </div>
           </div>
@@ -150,7 +149,9 @@ export default async function HomePage() {
           <div className="topic-grid member-home-topics">
             {(categories || []).map((category) => (
               <Link className="topic-card home-topic-card" href={`/library?category=${category.slug}`} key={category.id}>
-                <span className="topic-icon">{category.name.slice(0, 1)}</span>
+                <span className="topic-icon" aria-hidden="true">
+                  {categoryIcon(category.slug, category.name)}
+                </span>
                 <h3>
                   {category.name} ({categoryCounts.get(category.id) || 0})
                 </h3>
@@ -215,20 +216,6 @@ export default async function HomePage() {
               </div>
               <div className="home-material-list">
                 {newMaterials.map((material) => (
-                  <MaterialMiniCard key={material.id} material={material} />
-                ))}
-              </div>
-            </section>
-
-            <section className="card home-resource-section">
-              <div className="section-title compact-title">
-                <div>
-                  <span className="eyebrow">Recomandat pentru tine</span>
-                  <h2>Bazat pe materialele pe care le-ai urmărit</h2>
-                </div>
-              </div>
-              <div className="home-material-list">
-                {(recommendedMaterials.length ? recommendedMaterials : allLessons.slice(0, 3)).map((material) => (
                   <MaterialMiniCard key={material.id} material={material} />
                 ))}
               </div>

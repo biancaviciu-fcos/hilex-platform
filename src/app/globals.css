@@ -228,6 +228,13 @@ textarea {
   width: 54px;
 }
 
+.home-topic-card .topic-icon {
+  background: #fff4fb;
+  border: 1px solid #f3c8df;
+  color: var(--navy);
+  font-size: 27px;
+}
+
 .filter-panel {
   align-items: end;
   background: var(--white);
@@ -367,6 +374,16 @@ textarea {
 .favorite-btn.active {
   background: var(--navy);
   color: var(--white);
+}
+
+.locked-card-actions {
+  border-top: 1px solid #f3c8df;
+  padding: 12px 14px;
+}
+
+.locked-card-actions .btn {
+  justify-content: center;
+  width: 100%;
 }
 
 .hero-favorite-btn {
@@ -647,6 +664,46 @@ textarea {
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 18px;
+}
+
+.upgrade-popover {
+  position: relative;
+}
+
+.upgrade-popover summary {
+  list-style: none;
+}
+
+.upgrade-popover summary::-webkit-details-marker {
+  display: none;
+}
+
+.upgrade-modal-backdrop {
+  align-items: center;
+  background: rgba(2, 8, 63, 0.58);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 20px;
+  position: fixed;
+  z-index: 50;
+}
+
+.upgrade-modal-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 30px 90px rgba(2, 8, 63, 0.28);
+  max-width: 620px;
+  padding: clamp(22px, 4vw, 36px);
+  width: min(620px, 100%);
+}
+
+.upgrade-modal-card h3 {
+  color: var(--navy);
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.08;
+  margin: 8px 0 12px;
 }
 
 .admin-panels {

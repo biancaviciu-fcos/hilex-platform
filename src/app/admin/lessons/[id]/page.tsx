@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { isAdminUser } from "@/lib/admin";
 import { hasAdminPanelAccess } from "@/lib/adminAccess";
+import { accessLabel } from "@/lib/labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { uploadMaterialThumbnail } from "@/lib/thumbnails";
 import { DeleteLessonForm } from "./DeleteLessonForm";
@@ -175,8 +176,8 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
             <div className="field">
               <label>Pachet material</label>
               <select name="access_level" defaultValue={lesson.access_level}>
-                <option value="basic">Basic - inclus pentru toți membrii</option>
-                <option value="premium">Premium - blocat pentru membrii Basic</option>
+                <option value="basic">Essential - inclus pentru toți membrii</option>
+                <option value="premium">Premium - blocat pentru membrii Essential</option>
               </select>
             </div>
             <div className="field">
@@ -252,7 +253,7 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
                 <div className="field">
                   <label>Acces</label>
                   <select name="access_level" defaultValue="basic">
-                    <option value="basic">Basic</option>
+                    <option value="basic">Essential</option>
                     <option value="premium">Premium</option>
                   </select>
                 </div>
@@ -281,7 +282,7 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
                 <div className="field">
                   <label>Acces</label>
                   <select name="access_level" defaultValue="basic">
-                    <option value="basic">Basic</option>
+                    <option value="basic">Essential</option>
                     <option value="premium">Premium</option>
                   </select>
                 </div>
@@ -301,7 +302,7 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
                     <span>
                       <strong>{resource.title}</strong>
                       <br />
-                      <small>{resource.resource_type} · {resource.access_level}</small>
+                      <small>{resource.resource_type} · {accessLabel(resource.access_level)}</small>
                     </span>
                     <form action={`/api/admin/resources/${resource.id}/delete`} method="POST">
                       <button className="btn" type="submit">

@@ -60,7 +60,7 @@ export default async function AdminPage() {
               <div className="tag-row">
                 <span className="tag">{statusLabel(lesson.status)}</span>
                 <span className={`tag ${lesson.access_level === "premium" ? "premium" : ""}`}>
-                  {lesson.access_level === "premium" ? "Premium" : "Basic"}
+                  {lesson.access_level === "premium" ? "Premium" : "Essential"}
                 </span>
               </div>
               <h3>{lesson.title}</h3>

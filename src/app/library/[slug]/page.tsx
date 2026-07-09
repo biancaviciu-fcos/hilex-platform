@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
 import { canAccessLesson } from "@/lib/access";
+import { accessLabel } from "@/lib/labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AccessLevel } from "@/lib/types";
 
@@ -12,10 +13,6 @@ function relationName(value: unknown) {
   }
 
   return (value as { name?: string } | null)?.name;
-}
-
-function accessLabel(accessLevel: string) {
-  return accessLevel === "premium" ? "Premium" : "Basic";
 }
 
 export default async function LessonPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -64,13 +61,6 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
     .eq("lesson_id", lesson.id)
     .maybeSingle();
 
-  const { data: progress } = await supabase
-    .from("lesson_progress")
-    .select("lesson_id")
-    .eq("user_id", user.id)
-    .eq("lesson_id", lesson.id)
-    .maybeSingle();
-
   if (locked) {
     return (
       <main className="page">
@@ -102,9 +92,35 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
                   explicațiile și resursele atașate.
                 </p>
                 <div className="locked-actions">
-                  <Link className="btn primary" href="/contact">
-                    Cere upgrade la Premium
-                  </Link>
+                  <details className="upgrade-popover">
+                    <summary className="btn primary">Vezi opțiunea Premium</summary>
+                    <div className="upgrade-modal-backdrop">
+                      <div className="upgrade-modal-card">
+                        <span className="eyebrow">Upgrade Premium</span>
+                        <h3>Deblochează toate materialele Premium</h3>
+                        <p className="muted">
+                          Premium îți oferă acces la materialele exclusive, resurse prioritare și conținut avansat din
+                          platforma HILEX.
+                        </p>
+                        <ul className="feature-list pink">
+                          <li>Acces la materialele Premium</li>
+                          <li>Resurse și ghiduri exclusive</li>
+                          <li>Acces prioritar la anumite materiale noi</li>
+                        </ul>
+                        <div className="locked-actions">
+                          <form action="/api/stripe/checkout" method="POST">
+                            <input name="plan" type="hidden" value="premium" />
+                            <button className="btn primary" type="submit">
+                              Fă upgrade acum
+                            </button>
+                          </form>
+                          <Link className="btn" href="/library">
+                            Înapoi la resurse
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </details>
                   <Link className="btn" href="/library">
                     Înapoi la resurse
                   </Link>
@@ -165,12 +181,6 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
               <input name="next" type="hidden" value={`/library/${lesson.slug}`} />
               <button className={`btn hero-favorite-btn ${favorite ? "active" : ""}`} type="submit">
                 {favorite ? "Salvat pentru mai târziu" : "Salvează pentru mai târziu"}
-              </button>
-            </form>
-            <form action={`/api/progress/${lesson.id}`} method="POST">
-              <input name="next" type="hidden" value={`/library/${lesson.slug}`} />
-              <button className={`btn hero-progress-btn ${progress ? "active" : ""}`} type="submit">
-                {progress ? "Material parcurs" : "Marchează ca parcurs"}
               </button>
             </form>
           </div>

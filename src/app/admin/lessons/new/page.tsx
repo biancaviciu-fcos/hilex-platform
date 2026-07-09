@@ -93,8 +93,8 @@ export default async function NewLessonPage({
             <div className="field">
               <label>Pachet material</label>
               <select name="access_level">
-                <option value="basic">Basic - inclus pentru toți membrii</option>
-                <option value="premium">Premium - blocat pentru membrii Basic</option>
+                <option value="basic">Essential - inclus pentru toți membrii</option>
+                <option value="premium">Premium - blocat pentru membrii Essential</option>
               </select>
             </div>
             <div className="field">
@@ -157,7 +157,7 @@ export default async function NewLessonPage({
               <div className="field">
                 <label>Acces PDF</label>
                 <select name="resource_access_level" defaultValue="basic">
-                  <option value="basic">Basic</option>
+                  <option value="basic">Essential</option>
                   <option value="premium">Premium</option>
                 </select>
               </div>
@@ -180,7 +180,7 @@ export default async function NewLessonPage({
               <div className="field">
                 <label>Acces link</label>
                 <select name="link_access_level" defaultValue="basic">
-                  <option value="basic">Basic</option>
+                  <option value="basic">Essential</option>
                   <option value="premium">Premium</option>
                 </select>
               </div>

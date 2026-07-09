@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { priceIdForPlan, stripe } from "@/lib/stripe";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -10,6 +11,10 @@ export async function POST(request: Request) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
     const marketingSiteUrl = process.env.NEXT_PUBLIC_MARKETING_SITE_URL || siteUrl;
     const priceId = priceIdForPlan(plan);
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
 
     if (!siteUrl || !priceId) {
       return NextResponse.json(
@@ -25,7 +30,8 @@ export async function POST(request: Request) {
       subscription_data: {
         metadata: { plan }
       },
-      metadata: { plan },
+      customer_email: user?.email,
+      metadata: { plan, user_id: user?.id || "" },
       success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${marketingSiteUrl}/#pachete`
     });

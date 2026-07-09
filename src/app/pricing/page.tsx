@@ -1,5 +1,5 @@
 export default function PricingPage() {
-  const basicItems = [
+  const essentialItems = [
     "Acces la platforma HiLex",
     "Acces la video-uri informative și ghiduri utile pentru viața în UK",
     "Până la 45 minute credit anual",
@@ -30,11 +30,11 @@ export default function PricingPage() {
       <section className="section">
         <div className="inner grid">
           <form className="card pricing-large" action="/api/stripe/checkout" method="POST">
-            <h3>Pachet Basic</h3>
+            <h3>Pachet Essential</h3>
             <div className="big-price">£120 <span>+TVA / an</span></div>
             <p className="muted">Pentru momentele în care ai nevoie de claritate și vrei să iei decizia corectă.</p>
             <ul className="feature-list">
-              {basicItems.map((item) => (
+              {essentialItems.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
@@ -50,7 +50,7 @@ export default function PricingPage() {
             <div className="big-price">£240 <span>+TVA / an</span></div>
             <p className="muted">Pentru cei care își doresc suport mai rapid și acces prioritar.</p>
             <p>
-              <strong>Include tot ce este în Pachetul BASIC, plus:</strong>
+              <strong>Include tot ce este în Pachetul ESSENTIAL, plus:</strong>
             </p>
             <ul className="feature-list pink">
               {premiumItems.map((item) => (

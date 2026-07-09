@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
+import { accessLabel } from "@/lib/labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AccessLevel } from "@/lib/types";
 
 function planLabel(accessLevel?: string | null) {
-  if (accessLevel === "premium") return "Premium";
-  if (accessLevel === "basic") return "Basic";
+  if (accessLevel === "premium" || accessLevel === "basic") return accessLabel(accessLevel);
   return "În verificare";
 }
 

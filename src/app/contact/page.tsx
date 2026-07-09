@@ -95,12 +95,14 @@ export default async function ContactPage({
               <span className="eyebrow">Upgrade</span>
               <h3>Vrei acces Premium?</h3>
               <p className="muted">
-                Scrie-ne și te ajutăm cu trecerea de la Basic la Premium, inclusiv diferența de acces și pașii de
-                activare.
+                Poți face upgrade automat la Premium și vei primi acces după finalizarea plății.
               </p>
-              <a className="btn" href="#contact-form">
-                Cere upgrade
-              </a>
+              <form action="/api/stripe/checkout" method="POST">
+                <input name="plan" type="hidden" value="premium" />
+                <button className="btn primary" type="submit">
+                  Fă upgrade acum
+                </button>
+              </form>
             </article>
 
             <article className="card contact-card">
