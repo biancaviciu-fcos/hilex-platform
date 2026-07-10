@@ -1,7 +1,7 @@
 "use client";
 
 import type { MouseEvent } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type FavoriteHeartButtonProps = {
   initialIsFavorite: boolean;
@@ -16,6 +16,10 @@ export function FavoriteHeartButton({
 }: FavoriteHeartButtonProps) {
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    setIsFavorite(initialIsFavorite);
+  }, [initialIsFavorite]);
 
   async function toggleFavorite(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
