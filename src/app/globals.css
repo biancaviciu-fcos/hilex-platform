@@ -344,6 +344,13 @@ textarea {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.favorites-page-spacer {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 18px;
+  min-height: 10px;
+}
+
 .lesson-thumb {
   align-items: center;
   aspect-ratio: 16 / 9;

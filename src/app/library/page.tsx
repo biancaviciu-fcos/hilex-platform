@@ -149,7 +149,7 @@ export default async function LibraryPage({
     .select("id,name,slug,description,sort_order")
     .order("sort_order");
 
-  const selectedCategory = categories?.find((item) => item.slug === category);
+  const selectedCategory = onlyFavorites ? null : categories?.find((item) => item.slug === category);
 
   const { data: categoryLessonRows } = await supabase
     .from("lessons")
@@ -186,11 +186,11 @@ export default async function LibraryPage({
     lessonsQuery = lessonsQuery.or(`title.ilike.%${query}%,excerpt.ilike.%${query}%`);
   }
 
-  if (category && selectedCategory) {
+  if (!onlyFavorites && category && selectedCategory) {
     lessonsQuery = lessonsQuery.eq("category_id", selectedCategory.id);
   }
 
-  if (access) {
+  if (!onlyFavorites && access) {
     lessonsQuery = lessonsQuery.eq("access_level", access);
   }
 
@@ -205,14 +205,19 @@ export default async function LibraryPage({
       <AppHeader />
       <section className="hero library-hero">
         <div className="inner">
-          <h1>Resurse HILEX</h1>
-          <p>Un centru de soluții juridice practice pentru membri.</p>
+          <h1>{onlyFavorites ? "Favoritele tale" : "Resurse HILEX"}</h1>
+          <p>
+            {onlyFavorites
+              ? `${savedIds.size} materiale salvate pentru mai târziu.`
+              : "Un centru de soluții juridice practice pentru membri."}
+          </p>
           <form className="search-row" action="/library">
+            {onlyFavorites ? <input name="favorites" type="hidden" value="1" /> : null}
             <input
               aria-label="Caută"
               defaultValue={query}
               name="q"
-              placeholder="Caută după temă, categorie sau cuvânt cheie"
+              placeholder={onlyFavorites ? "Caută în favoritele tale" : "Caută după temă, categorie sau cuvânt cheie"}
             />
             <button className="btn primary" type="submit">
               Caută
@@ -223,75 +228,83 @@ export default async function LibraryPage({
 
       <section className="section">
         <div className="inner">
-          <div className="topic-grid library-topic-grid">
-            {(categories || []).map((item) => (
-              <Link
-                className={`topic-card library-topic-card ${category === item.slug ? "active" : ""}`}
-                href={`/library?category=${item.slug}`}
-                key={item.id}
-              >
-                <h3>
-                  {item.name} ({categoryCounts.get(item.id) || 0})
-                </h3>
-                <p>{item.description}</p>
-              </Link>
-            ))}
-          </div>
-
-          <div className="subcategory-filter">
-            <span className="eyebrow">Filtre rapide</span>
-            <div className="tag-row">
-              {quickFilters.map((item) => (
-                <Link className="tag filter-tag" href={item.href} key={item.label}>
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <form className="filter-panel library-filter-panel" action="/library">
-            <input name="q" type="hidden" value={query} />
-            <div className="field">
-              <label htmlFor="category">Aria de drept</label>
-              <select defaultValue={category} id="category" name="category">
-                <option value="">Toate ariile de drept</option>
+          {!onlyFavorites ? (
+            <>
+              <div className="topic-grid library-topic-grid">
                 {(categories || []).map((item) => (
-                  <option key={item.id} value={item.slug}>
-                    {item.name}
-                  </option>
+                  <Link
+                    className={`topic-card library-topic-card ${category === item.slug ? "active" : ""}`}
+                    href={`/library?category=${item.slug}`}
+                    key={item.id}
+                  >
+                    <h3>
+                      {item.name} ({categoryCounts.get(item.id) || 0})
+                    </h3>
+                    <p>{item.description}</p>
+                  </Link>
                 ))}
-              </select>
-            </div>
-            <div className="field">
-              <label htmlFor="access">Pachet</label>
-              <select defaultValue={access} id="access" name="access">
-                <option value="">Essential și Premium</option>
-                <option value="basic">Essential</option>
-                <option value="premium">Premium</option>
-              </select>
-            </div>
-            <label className="checkbox-filter">
-              <input defaultChecked={onlyFavorites} name="favorites" type="checkbox" value="1" />
-              Doar favorite
-            </label>
-            <button className="btn primary" type="submit">
-              Aplică
-            </button>
-            <Link className="btn" href="/library">
-              Resetează
-            </Link>
-          </form>
+              </div>
 
-          <div className="section-title">
-            <div>
-              <h2>{onlyFavorites ? "Favoritele tale" : "Materiale disponibile"}</h2>
-              <p className="muted">
-                {onlyFavorites
-                  ? `${savedIds.size} materiale salvate pentru mai târziu`
-                  : `${lessons.length} rezultate`}
-              </p>
+              <div className="subcategory-filter">
+                <span className="eyebrow">Filtre rapide</span>
+                <div className="tag-row">
+                  {quickFilters.map((item) => (
+                    <Link className="tag filter-tag" href={item.href} key={item.label}>
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              <form className="filter-panel library-filter-panel" action="/library">
+                <input name="q" type="hidden" value={query} />
+                <div className="field">
+                  <label htmlFor="category">Aria de drept</label>
+                  <select defaultValue={category} id="category" name="category">
+                    <option value="">Toate ariile de drept</option>
+                    {(categories || []).map((item) => (
+                      <option key={item.id} value={item.slug}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="field">
+                  <label htmlFor="access">Pachet</label>
+                  <select defaultValue={access} id="access" name="access">
+                    <option value="">Essential și Premium</option>
+                    <option value="basic">Essential</option>
+                    <option value="premium">Premium</option>
+                  </select>
+                </div>
+                <label className="checkbox-filter">
+                  <input name="favorites" type="checkbox" value="1" />
+                  Doar favorite
+                </label>
+                <button className="btn primary" type="submit">
+                  Aplică
+                </button>
+                <Link className="btn" href="/library">
+                  Resetează
+                </Link>
+              </form>
+
+              <div className="section-title">
+                <div>
+                  <h2>Materiale disponibile</h2>
+                  <p className="muted">{`${lessons.length} rezultate`}</p>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="favorites-page-spacer">
+              {query ? (
+                <Link className="btn" href="/library?favorites=1">
+                  Resetează căutarea
+                </Link>
+              ) : null}
             </div>
-          </div>
+          )}
 
           {favoriteError ? (
             <p className="error-box">
