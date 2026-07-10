@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import type { MouseEvent } from "react";
+import { useState } from "react";
 
 type FavoriteHeartButtonProps = {
   initialIsFavorite: boolean;
@@ -14,34 +15,43 @@ export function FavoriteHeartButton({
   variant = "card"
 }: FavoriteHeartButtonProps) {
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
-  const [isPending, startTransition] = useTransition();
+  const [isSaving, setIsSaving] = useState(false);
 
-  function toggleFavorite() {
+  async function toggleFavorite(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (isSaving) return;
+
     const previousValue = isFavorite;
+    setIsSaving(true);
     setIsFavorite(!previousValue);
 
-    startTransition(async () => {
-      try {
-        const response = await fetch(`/api/favorites/${lessonId}`, {
-          method: "POST",
-          headers: {
-            Accept: "application/json"
-          }
-        });
-
-        if (!response.ok) {
-          setIsFavorite(previousValue);
-          return;
+    try {
+      const response = await fetch(`/api/favorites/${lessonId}`, {
+        body: JSON.stringify({ favorite: !previousValue }),
+        credentials: "same-origin",
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
         }
+      });
 
-        const result = (await response.json()) as { isFavorite?: boolean };
-        if (typeof result.isFavorite === "boolean") {
-          setIsFavorite(result.isFavorite);
-        }
-      } catch {
+      if (!response.ok) {
         setIsFavorite(previousValue);
+        return;
       }
-    });
+
+      const result = (await response.json()) as { isFavorite?: boolean };
+      if (typeof result.isFavorite === "boolean") {
+        setIsFavorite(result.isFavorite);
+      }
+    } catch {
+      setIsFavorite(previousValue);
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
@@ -49,8 +59,9 @@ export function FavoriteHeartButton({
       aria-label={isFavorite ? "Scoate de la favorite" : "Adaugă la favorite"}
       className={`favorite-heart-button ${variant === "hero" ? "hero-heart" : ""} ${
         isFavorite ? "active" : ""
-      } ${isPending ? "saving" : ""}`}
-      disabled={isPending}
+      } ${isSaving ? "saving" : ""}`}
+      aria-pressed={isFavorite}
+      disabled={isSaving}
       onClick={toggleFavorite}
       title={isFavorite ? "Salvat la favorite" : "Adaugă la favorite"}
       type="button"
