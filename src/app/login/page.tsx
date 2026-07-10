@@ -25,7 +25,7 @@ export default async function LoginPage({
     <main className="page login-page">
       <section className="login-shell">
         <div className="login-panel">
-          <img className="login-logo" alt="HiLex" src="/hilex-logo.png" />
+          <img className="login-logo" alt="HiLex" src="/hilex-logo-transparent.png" />
           <div className="login-heading">
             <h1>Autentificare HiLex</h1>
             <p>Intră în contul tău pentru a accesa resursele.</p>
