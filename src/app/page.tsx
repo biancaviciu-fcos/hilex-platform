@@ -5,9 +5,6 @@ import { accessLabel as formatAccessLabel, categoryIcon } from "@/lib/labels";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 type HomeMaterial = {
   id: string;
   title: string;
