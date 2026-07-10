@@ -2200,6 +2200,7 @@ textarea {
 
 .whatsapp-widget-text {
   font-size: 15px;
+  white-space: nowrap;
 }
 
 @media (max-width: 760px) {
