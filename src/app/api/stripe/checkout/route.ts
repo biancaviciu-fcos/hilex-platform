@@ -31,6 +31,14 @@ export async function POST(request: Request) {
       line_items: [{ price: priceId, quantity: 1 }],
       allow_promotion_codes: true,
       automatic_tax: { enabled: true },
+      custom_fields: [
+        {
+          key: "phone",
+          label: { type: "custom", custom: "Număr de telefon" },
+          type: "text",
+          optional: false
+        }
+      ],
       ...(checkoutPlan === "premium_upgrade" ? {} : { subscription_data: { metadata: { plan: accessPlan } } }),
       customer_email: user?.email,
       metadata: { plan: accessPlan, checkout_plan: checkoutPlan, user_id: user?.id || "" },

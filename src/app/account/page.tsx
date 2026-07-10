@@ -53,7 +53,7 @@ export default async function AccountPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name,email,role")
+    .select("full_name,email,phone,role")
     .eq("id", user.id)
     .single();
 
@@ -143,6 +143,10 @@ export default async function AccountPage() {
             <article className="card stat-card">
               <span className="eyebrow">Email</span>
               <strong>{profile?.email || user.email}</strong>
+            </article>
+            <article className="card stat-card">
+              <span className="eyebrow">Telefon</span>
+              <strong>{profile?.phone || "Necompletat"}</strong>
             </article>
             <article className="card stat-card">
               <span className="eyebrow">Status</span>

@@ -1,6 +1,9 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(
   request: Request,
@@ -31,10 +34,20 @@ export async function POST(
     return NextResponse.redirect(new URL("/login", request.url), { status: 303 });
   }
 
+  let desiredFavoriteState: boolean | null = null;
   let next = "/library";
   if (!wantsJson) {
     const formData = await request.formData();
     next = String(formData.get("next") || "/library");
+  } else {
+    try {
+      const body = (await request.json()) as { favorite?: boolean };
+      if (typeof body.favorite === "boolean") {
+        desiredFavoriteState = body.favorite;
+      }
+    } catch {
+      desiredFavoriteState = null;
+    }
   }
 
   const adminSupabase = createSupabaseAdminClient();
@@ -44,7 +57,7 @@ export async function POST(
     .eq("id", user.id)
     .maybeSingle();
 
-  await adminSupabase.from("profiles").upsert({
+  const { error: profileError } = await adminSupabase.from("profiles").upsert({
     id: user.id,
     email: user.email || "",
     full_name: existingProfile?.full_name || user.user_metadata?.full_name || user.email || "Membru HILEX",
@@ -52,13 +65,17 @@ export async function POST(
     updated_at: new Date().toISOString()
   });
 
+  if (profileError) {
+    return respondWithError(`profile-save-failed: ${profileError.message}`, 500, next);
+  }
+
   const { data: lesson } = await adminSupabase
     .from("lessons")
-    .select("id")
+    .select("id,slug,status")
     .eq("id", lessonId)
     .maybeSingle();
 
-  if (!lesson) {
+  if (!lesson || lesson.status !== "published") {
     return respondWithError("material-not-found", 404, next);
   }
 
@@ -69,7 +86,9 @@ export async function POST(
     .eq("lesson_id", lessonId)
     .maybeSingle();
 
-  if (existing) {
+  const shouldBeFavorite = desiredFavoriteState ?? !existing;
+
+  if (!shouldBeFavorite && existing) {
     const { error } = await adminSupabase
       .from("favorite_lessons")
       .delete()
@@ -77,27 +96,44 @@ export async function POST(
       .eq("lesson_id", lessonId);
 
     if (error) {
-      return respondWithError("remove-failed", 500, next);
+      return respondWithError(`remove-failed: ${error.message}`, 500, next);
     }
+
+    revalidatePath("/");
+    revalidatePath("/library");
+    revalidatePath(`/library/${lesson.slug}`);
 
     if (wantsJson) {
       return NextResponse.json({ isFavorite: false, ok: true });
     }
-  } else {
+  } else if (shouldBeFavorite && !existing) {
     const { error } = await adminSupabase
       .from("favorite_lessons")
-      .insert({
-        user_id: user.id,
-        lesson_id: lessonId
-      });
+      .upsert(
+        {
+          user_id: user.id,
+          lesson_id: lessonId
+        },
+        { onConflict: "user_id,lesson_id" }
+      );
 
     if (error) {
-      return respondWithError("save-failed", 500, next);
+      return respondWithError(`save-failed: ${error.message}`, 500, next);
     }
+
+    revalidatePath("/");
+    revalidatePath("/library");
+    revalidatePath(`/library/${lesson.slug}`);
 
     if (wantsJson) {
       return NextResponse.json({ isFavorite: true, ok: true });
     }
+  } else if (wantsJson) {
+    revalidatePath("/");
+    revalidatePath("/library");
+    revalidatePath(`/library/${lesson.slug}`);
+
+    return NextResponse.json({ isFavorite: shouldBeFavorite, ok: true });
   }
 
   return NextResponse.redirect(new URL(next, request.url), { status: 303 });

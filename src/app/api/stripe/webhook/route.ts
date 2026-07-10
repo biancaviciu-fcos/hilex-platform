@@ -56,6 +56,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const metadataUser = metadataUserId ? existingUsers.users.find((item) => item.id === metadataUserId) : undefined;
   let email = session.customer_details?.email || session.customer_email || metadataUser?.email || "";
   let name = session.customer_details?.name || String(metadataUser?.user_metadata?.full_name || "");
+  const phone = session.customer_details?.phone || getCheckoutCustomField(session, "phone");
 
   if (!email && metadataUserId) {
     const { data: profile } = await supabase
@@ -117,6 +118,21 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     full_name: name,
     role: "member"
   });
+
+  if (phone) {
+    const { error: phoneError } = await supabase
+      .from("profiles")
+      .update({ phone, updated_at: new Date().toISOString() })
+      .eq("id", userId);
+
+    if (phoneError) {
+      console.error("HILEX profile phone update failed", {
+        userId,
+        sessionId: session.id,
+        error: phoneError
+      });
+    }
+  }
 
   if (checkoutPlan === "premium_upgrade") {
     const { data: existingSubscription } = await supabase
@@ -190,6 +206,11 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
 
 function toIso(value: number | null | undefined) {
   return value ? new Date(value * 1000).toISOString() : null;
+}
+
+function getCheckoutCustomField(session: Stripe.Checkout.Session, key: string) {
+  const field = session.custom_fields?.find((item) => item.key === key);
+  return field?.text?.value || field?.numeric?.value || field?.dropdown?.value || "";
 }
 
 async function sendMembershipWelcomeEmail(email: string, plan: "basic" | "premium", name?: string, sessionId?: string) {
