@@ -846,6 +846,14 @@ textarea {
   color: #8a1552;
 }
 
+.empty-state-card {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+  margin-top: 12px;
+  padding: 26px;
+}
+
 .danger-zone {
   align-items: center;
   border-color: #f3c8df;

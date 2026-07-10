@@ -5,6 +5,7 @@ import { UpgradePremiumModal } from "@/components/UpgradePremiumModal";
 import { VideoCoverPlayer } from "@/components/VideoCoverPlayer";
 import { canAccessLesson } from "@/lib/access";
 import { accessLabel } from "@/lib/labels";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AccessLevel } from "@/lib/types";
 
@@ -56,7 +57,8 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   const subcategoryName = relationName(lesson.subcategories);
   const lessonAccess = lesson.access_level as AccessLevel;
   const locked = !canAccessLesson(userAccess, lessonAccess);
-  const { data: favorite } = await supabase
+  const adminSupabase = createSupabaseAdminClient();
+  const { data: favorite } = await adminSupabase
     .from("favorite_lessons")
     .select("lesson_id")
     .eq("user_id", user.id)

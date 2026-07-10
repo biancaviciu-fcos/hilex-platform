@@ -5,6 +5,7 @@ import { LockedPremiumCard } from "@/components/LockedPremiumCard";
 import { UpgradePremiumModal } from "@/components/UpgradePremiumModal";
 import { canAccessLesson } from "@/lib/access";
 import { accessLabel } from "@/lib/labels";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AccessLevel } from "@/lib/types";
 
@@ -121,13 +122,14 @@ function LessonCard({
 export default async function LibraryPage({
   searchParams
 }: {
-  searchParams: Promise<{ q?: string; category?: string; access?: string; favorites?: string }>;
+  searchParams: Promise<{ q?: string; category?: string; access?: string; favorites?: string; favoriteError?: string }>;
 }) {
   const params = await searchParams;
   const query = params.q?.trim() || "";
   const category = params.category?.trim() || "";
   const access = params.access === "basic" || params.access === "premium" ? params.access : "";
   const onlyFavorites = params.favorites === "1";
+  const favoriteError = params.favoriteError || "";
   const supabase = await createSupabaseServerClient();
   const {
     data: { user }
@@ -146,6 +148,7 @@ export default async function LibraryPage({
     .maybeSingle();
 
   const userAccess = (subscription?.access_level || null) as AccessLevel | null;
+  const adminSupabase = createSupabaseAdminClient();
 
   const { data: categories } = await supabase
     .from("categories")
@@ -166,7 +169,7 @@ export default async function LibraryPage({
     }
   });
 
-  const { data: favorites } = await supabase
+  const { data: favorites } = await adminSupabase
     .from("favorite_lessons")
     .select("lesson_id")
     .eq("user_id", user.id);
@@ -293,23 +296,47 @@ export default async function LibraryPage({
 
           <div className="section-title">
             <div>
-              <h2>Materiale disponibile</h2>
-              <p className="muted">{lessons.length} rezultate</p>
+              <h2>{onlyFavorites ? "Favoritele tale" : "Materiale disponibile"}</h2>
+              <p className="muted">
+                {onlyFavorites
+                  ? `${savedIds.size} materiale salvate pentru mai târziu`
+                  : `${lessons.length} rezultate`}
+              </p>
             </div>
           </div>
 
-          <div className="lesson-grid">
-            {lessons.map((lesson) => (
-              <LessonCard
-                isFavorite={savedIds.has(lesson.id)}
-                isCompleted={completedIds.has(lesson.id)}
-                key={lesson.id}
-                lesson={lesson}
-                next={next}
-                userAccess={userAccess}
-              />
-            ))}
-          </div>
+          {favoriteError ? (
+            <p className="error-box">
+              Nu am putut actualiza favoritele acum. Reîncearcă sau revino pe această pagină după refresh.
+            </p>
+          ) : null}
+
+          {lessons.length ? (
+            <div className="lesson-grid">
+              {lessons.map((lesson) => (
+                <LessonCard
+                  isFavorite={savedIds.has(lesson.id)}
+                  isCompleted={completedIds.has(lesson.id)}
+                  key={lesson.id}
+                  lesson={lesson}
+                  next={next}
+                  userAccess={userAccess}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="card empty-state-card">
+              <h3>{onlyFavorites ? "Nu ai salvat materiale încă." : "Nu există materiale pentru filtrele alese."}</h3>
+              <p className="muted">
+                {onlyFavorites
+                  ? "Apasă pe „Salvează pentru mai târziu” pe orice material, iar acesta va apărea aici."
+                  : "Încearcă să schimbi filtrele sau să revii la toate resursele."}
+              </p>
+              <Link className="btn primary" href="/library">
+                Vezi toate resursele
+              </Link>
+            </div>
+          )}
         </div>
       </section>
     </main>

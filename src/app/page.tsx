@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { accessLabel as formatAccessLabel, categoryIcon } from "@/lib/labels";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type HomeMaterial = {
@@ -35,6 +36,7 @@ function MaterialMiniCard({ material }: { material: HomeMaterial }) {
 
 export default async function HomePage() {
   const supabase = await createSupabaseServerClient();
+  const adminSupabase = createSupabaseAdminClient();
   const {
     data: { user }
   } = await supabase.auth.getUser();
@@ -74,7 +76,7 @@ export default async function HomePage() {
     }
   });
 
-  const { data: favorites } = await supabase
+  const { data: favorites } = await adminSupabase
     .from("favorite_lessons")
     .select("lesson_id,created_at")
     .eq("user_id", user.id)
