@@ -2,6 +2,7 @@
 
 import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type FavoriteHeartButtonProps = {
   initialIsFavorite: boolean;
@@ -14,8 +15,10 @@ export function FavoriteHeartButton({
   lessonId,
   variant = "card"
 }: FavoriteHeartButtonProps) {
+  const router = useRouter();
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
 
   useEffect(() => {
     setIsFavorite(initialIsFavorite);
@@ -29,6 +32,7 @@ export function FavoriteHeartButton({
 
     const previousValue = isFavorite;
     setIsSaving(true);
+    setSaveError(false);
     setIsFavorite(!previousValue);
 
     try {
@@ -44,6 +48,7 @@ export function FavoriteHeartButton({
 
       if (!response.ok) {
         setIsFavorite(previousValue);
+        setSaveError(true);
         return;
       }
 
@@ -51,8 +56,10 @@ export function FavoriteHeartButton({
       if (typeof result.isFavorite === "boolean") {
         setIsFavorite(result.isFavorite);
       }
+      router.refresh();
     } catch {
       setIsFavorite(previousValue);
+      setSaveError(true);
     } finally {
       setIsSaving(false);
     }
@@ -67,7 +74,7 @@ export function FavoriteHeartButton({
       aria-pressed={isFavorite}
       disabled={isSaving}
       onClick={toggleFavorite}
-      title={isFavorite ? "Salvat la favorite" : "Adaugă la favorite"}
+      title={saveError ? "Nu s-a putut salva. Reîncearcă." : isFavorite ? "Salvat la favorite" : "Adaugă la favorite"}
       type="button"
     >
       <span aria-hidden="true">♥</span>

@@ -1,4 +1,6 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -48,17 +50,36 @@ export async function POST(
     }
   }
 
-  const { data: lesson } = await supabase
+  const adminSupabase = createSupabaseAdminClient();
+  const { data: existingProfile } = await adminSupabase
+    .from("profiles")
+    .select("role,full_name")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const { error: profileError } = await adminSupabase.from("profiles").upsert({
+    id: user.id,
+    email: user.email || "",
+    full_name: existingProfile?.full_name || user.user_metadata?.full_name || user.email || "Membru HILEX",
+    role: existingProfile?.role || "member",
+    updated_at: new Date().toISOString()
+  });
+
+  if (profileError) {
+    return respondWithError(`profile-save-failed: ${profileError.message}`, 500, next);
+  }
+
+  const { data: lesson } = await adminSupabase
     .from("lessons")
-    .select("id")
+    .select("id,slug,status")
     .eq("id", lessonId)
     .maybeSingle();
 
-  if (!lesson) {
+  if (!lesson || lesson.status !== "published") {
     return respondWithError("material-not-found", 404, next);
   }
 
-  const { data: existing } = await supabase
+  const { data: existing } = await adminSupabase
     .from("favorite_lessons")
     .select("lesson_id")
     .eq("user_id", user.id)
@@ -68,21 +89,25 @@ export async function POST(
   const shouldBeFavorite = desiredFavoriteState ?? !existing;
 
   if (!shouldBeFavorite && existing) {
-    const { error } = await supabase
+    const { error } = await adminSupabase
       .from("favorite_lessons")
       .delete()
       .eq("user_id", user.id)
       .eq("lesson_id", lessonId);
 
     if (error) {
-      return respondWithError("remove-failed", 500, next);
+      return respondWithError(`remove-failed: ${error.message}`, 500, next);
     }
+
+    revalidatePath("/");
+    revalidatePath("/library");
+    revalidatePath(`/library/${lesson.slug}`);
 
     if (wantsJson) {
       return NextResponse.json({ isFavorite: false, ok: true });
     }
   } else if (shouldBeFavorite && !existing) {
-    const { error } = await supabase
+    const { error } = await adminSupabase
       .from("favorite_lessons")
       .upsert(
         {
@@ -93,13 +118,21 @@ export async function POST(
       );
 
     if (error) {
-      return respondWithError("save-failed", 500, next);
+      return respondWithError(`save-failed: ${error.message}`, 500, next);
     }
+
+    revalidatePath("/");
+    revalidatePath("/library");
+    revalidatePath(`/library/${lesson.slug}`);
 
     if (wantsJson) {
       return NextResponse.json({ isFavorite: true, ok: true });
     }
   } else if (wantsJson) {
+    revalidatePath("/");
+    revalidatePath("/library");
+    revalidatePath(`/library/${lesson.slug}`);
+
     return NextResponse.json({ isFavorite: shouldBeFavorite, ok: true });
   }
 
