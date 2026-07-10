@@ -265,6 +265,7 @@ textarea {
   box-shadow: 0 8px 24px rgba(2, 8, 63, 0.05);
   color: var(--ink);
   overflow: hidden;
+  position: relative;
 }
 
 .lesson-card.locked {
@@ -381,20 +382,46 @@ textarea {
   padding: 15px;
 }
 
-.favorite-btn {
-  background: #fff4fb;
-  border: 0;
-  border-top: 1px solid #f3c8df;
-  color: #7b124c;
+.favorite-heart-button {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(217, 4, 124, 0.22);
+  border-radius: 999px;
+  box-shadow: 0 10px 22px rgba(2, 8, 63, 0.16);
+  color: var(--navy);
   cursor: pointer;
-  font-weight: 900;
-  padding: 12px 14px;
-  width: 100%;
+  display: inline-flex;
+  font-size: 23px;
+  height: 46px;
+  justify-content: center;
+  line-height: 1;
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+  width: 46px;
+  z-index: 5;
 }
 
-.favorite-btn.active {
-  background: var(--navy);
+.favorite-heart-button:hover {
+  transform: translateY(-1px);
+}
+
+.favorite-heart-button.active {
+  background: var(--pink);
+  border-color: var(--pink);
   color: var(--white);
+}
+
+.favorite-heart-button.saving {
+  cursor: progress;
+  opacity: 0.72;
+}
+
+.favorite-heart-button.hero-heart {
+  height: 48px;
+  position: static;
+  width: 48px;
 }
 
 .locked-card-actions {
@@ -405,16 +432,6 @@ textarea {
 .locked-card-actions .btn {
   justify-content: center;
   width: 100%;
-}
-
-.hero-favorite-btn {
-  margin-top: 10px;
-}
-
-.hero-favorite-btn.active {
-  background: var(--pink);
-  border-color: var(--pink);
-  color: var(--white);
 }
 
 .hero-progress-btn {
@@ -2029,7 +2046,7 @@ textarea {
   margin: 0;
 }
 
-.material-hero .hero-favorite-btn,
+.material-hero .favorite-heart-button.hero-heart,
 .material-hero .hero-progress-btn {
   margin-top: 0;
   min-height: 38px;

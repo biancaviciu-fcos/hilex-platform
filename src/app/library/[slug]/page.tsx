@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
+import { FavoriteHeartButton } from "@/components/FavoriteHeartButton";
 import { UpgradePremiumModal } from "@/components/UpgradePremiumModal";
 import { VideoCoverPlayer } from "@/components/VideoCoverPlayer";
 import { canAccessLesson } from "@/lib/access";
@@ -153,12 +154,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
           <h1>{lesson.title}</h1>
           <p>{lesson.excerpt}</p>
           <div className="material-hero-actions">
-            <form action={`/api/favorites/${lesson.id}`} method="POST">
-              <input name="next" type="hidden" value={`/library/${lesson.slug}`} />
-              <button className={`btn hero-favorite-btn ${favorite ? "active" : ""}`} type="submit">
-                {favorite ? "Salvat pentru mai târziu" : "Salvează pentru mai târziu"}
-              </button>
-            </form>
+            <FavoriteHeartButton initialIsFavorite={Boolean(favorite)} lessonId={lesson.id} variant="hero" />
           </div>
         </div>
       </section>

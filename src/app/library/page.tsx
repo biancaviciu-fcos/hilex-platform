@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
+import { FavoriteHeartButton } from "@/components/FavoriteHeartButton";
 import { LockedPremiumCard } from "@/components/LockedPremiumCard";
 import { UpgradePremiumModal } from "@/components/UpgradePremiumModal";
 import { canAccessLesson } from "@/lib/access";
@@ -61,14 +62,12 @@ function LessonCard({
   lesson,
   userAccess,
   isFavorite,
-  isCompleted,
-  next
+  isCompleted
 }: {
   lesson: LessonCardData;
   userAccess: AccessLevel | null;
   isFavorite: boolean;
   isCompleted: boolean;
-  next: string;
 }) {
   const lessonAccess = lesson.access_level as AccessLevel;
   const locked = !canAccessLesson(userAccess, lessonAccess);
@@ -76,6 +75,7 @@ function LessonCard({
 
   return (
     <article className={`lesson-card ${locked ? "locked" : ""}`}>
+      <FavoriteHeartButton initialIsFavorite={isFavorite} lessonId={lesson.id} />
       {locked ? (
         <LockedPremiumCard
           categoryName={categoryName}
@@ -109,12 +109,6 @@ function LessonCard({
           <UpgradePremiumModal compact />
         </div>
       ) : null}
-      <form action={`/api/favorites/${lesson.id}`} method="POST">
-        <input name="next" type="hidden" value={next} />
-        <button className={`favorite-btn ${isFavorite ? "active" : ""}`} type="submit">
-          {isFavorite ? "Salvat" : "Salvează pentru mai târziu"}
-        </button>
-      </form>
     </article>
   );
 }
@@ -205,12 +199,6 @@ export default async function LibraryPage({
     ? (allLessons || []).filter((lesson) => savedIds.has(lesson.id))
     : allLessons || [];
   const lessons = sortForAccess(filteredLessons as LessonCardData[], userAccess);
-  const next = `/library?${new URLSearchParams({
-    ...(query ? { q: query } : {}),
-    ...(category ? { category } : {}),
-    ...(access ? { access } : {}),
-    ...(onlyFavorites ? { favorites: "1" } : {})
-  }).toString()}`;
 
   return (
     <main className="page member-shell">
@@ -319,7 +307,6 @@ export default async function LibraryPage({
                   isCompleted={completedIds.has(lesson.id)}
                   key={lesson.id}
                   lesson={lesson}
-                  next={next}
                   userAccess={userAccess}
                 />
               ))}
@@ -329,7 +316,7 @@ export default async function LibraryPage({
               <h3>{onlyFavorites ? "Nu ai salvat materiale încă." : "Nu există materiale pentru filtrele alese."}</h3>
               <p className="muted">
                 {onlyFavorites
-                  ? "Apasă pe „Salvează pentru mai târziu” pe orice material, iar acesta va apărea aici."
+                  ? "Apasă pe inima de pe orice material, iar acesta va apărea aici."
                   : "Încearcă să schimbi filtrele sau să revii la toate resursele."}
               </p>
               <Link className="btn primary" href="/library">

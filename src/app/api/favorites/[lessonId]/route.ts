@@ -7,17 +7,36 @@ export async function POST(
   { params }: { params: Promise<{ lessonId: string }> }
 ) {
   const { lessonId } = await params;
+  const wantsJson = request.headers.get("accept")?.includes("application/json") || false;
   const supabase = await createSupabaseServerClient();
   const {
     data: { user }
   } = await supabase.auth.getUser();
 
+  const respondWithError = (code: string, status = 400, next = "/library") => {
+    if (wantsJson) {
+      return NextResponse.json({ error: code, ok: false }, { status });
+    }
+
+    const url = new URL(next, request.url);
+    url.searchParams.set("favoriteError", code);
+    return NextResponse.redirect(url, { status: 303 });
+  };
+
   if (!user) {
+    if (wantsJson) {
+      return NextResponse.json({ error: "not-authenticated", ok: false }, { status: 401 });
+    }
+
     return NextResponse.redirect(new URL("/login", request.url), { status: 303 });
   }
 
-  const formData = await request.formData();
-  const next = String(formData.get("next") || "/library");
+  let next = "/library";
+  if (!wantsJson) {
+    const formData = await request.formData();
+    next = String(formData.get("next") || "/library");
+  }
+
   const adminSupabase = createSupabaseAdminClient();
   const { data: existingProfile } = await adminSupabase
     .from("profiles")
@@ -40,9 +59,7 @@ export async function POST(
     .maybeSingle();
 
   if (!lesson) {
-    const url = new URL(next, request.url);
-    url.searchParams.set("favoriteError", "material-not-found");
-    return NextResponse.redirect(url, { status: 303 });
+    return respondWithError("material-not-found", 404, next);
   }
 
   const { data: existing } = await adminSupabase
@@ -60,9 +77,11 @@ export async function POST(
       .eq("lesson_id", lessonId);
 
     if (error) {
-      const url = new URL(next, request.url);
-      url.searchParams.set("favoriteError", "remove-failed");
-      return NextResponse.redirect(url, { status: 303 });
+      return respondWithError("remove-failed", 500, next);
+    }
+
+    if (wantsJson) {
+      return NextResponse.json({ isFavorite: false, ok: true });
     }
   } else {
     const { error } = await adminSupabase
@@ -73,9 +92,11 @@ export async function POST(
       });
 
     if (error) {
-      const url = new URL(next, request.url);
-      url.searchParams.set("favoriteError", "save-failed");
-      return NextResponse.redirect(url, { status: 303 });
+      return respondWithError("save-failed", 500, next);
+    }
+
+    if (wantsJson) {
+      return NextResponse.json({ isFavorite: true, ok: true });
     }
   }
 
