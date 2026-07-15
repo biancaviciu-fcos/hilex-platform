@@ -649,6 +649,25 @@ textarea {
   padding: 14px 18px 18px;
 }
 
+.premium-extra-info-card {
+  align-items: center;
+  background: linear-gradient(135deg, #fff4fb, #f7f9ff);
+  border: 1px solid #f3c8df;
+  border-radius: 10px;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 22px;
+}
+
+.premium-extra-info-card h2 {
+  margin: 4px 0 8px;
+}
+
+.premium-extra-info-card p {
+  margin: 0;
+}
+
 .video-placeholder {
   align-items: center;
   aspect-ratio: 16 / 9;
@@ -1766,6 +1785,7 @@ textarea {
   .contact-layout,
   .home-intro-grid,
   .large-topic-grid,
+  .premium-extra-info-card,
   .filter-panel,
   .search-row {
     grid-template-columns: 1fr;

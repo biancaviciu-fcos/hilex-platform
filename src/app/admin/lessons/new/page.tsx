@@ -148,14 +148,15 @@ export default async function NewLessonPage({
               <textarea name="key_points" rows={5} />
             </div>
             <div className="field">
-              <label>Ce mai trebuie să știi</label>
+              <label>Ce mai trebuie să știi (Premium)</label>
               <textarea
                 name="extra_info"
                 placeholder={"Scrie întrebarea pe primul rând, apoi răspunsul dedesubt.\n\nExemplu:\nPot folosi acest material ca sfat juridic personal?\nNu. Materialele oferă informații generale și ghidare practică, dar nu înlocuiesc consultanța juridică pe cazul tău."}
                 rows={8}
               />
               <p className="field-hint">
-                Pentru mai multe întrebări, lasă o linie goală între fiecare întrebare și răspuns.
+                Această secțiune apare doar pentru membrii Premium. Pentru mai multe întrebări, lasă o linie goală
+                între fiecare întrebare și răspuns.
               </p>
             </div>
             <section className="nested-form-panel">

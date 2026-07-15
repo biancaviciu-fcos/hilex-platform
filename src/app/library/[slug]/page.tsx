@@ -74,6 +74,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   const subcategoryName = relationName(lesson.subcategories);
   const lessonAccess = lesson.access_level as AccessLevel;
   const locked = !canAccessLesson(userAccess, lessonAccess);
+  const canViewPremiumExtraInfo = userAccess === "premium";
   const adminSupabase = createSupabaseAdminClient();
   const { data: favorite } = await adminSupabase
     .from("favorite_lessons")
@@ -208,7 +209,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
                 </ul>
               </section>
 
-              {extraInfo.length ? (
+              {extraInfo.length && canViewPremiumExtraInfo ? (
                 <section id="extra-info">
                   <h2>Ce mai trebuie să știi</h2>
                   <div className="material-extra-info-list">
@@ -219,6 +220,20 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
                       </details>
                     ))}
                   </div>
+                </section>
+              ) : null}
+
+              {extraInfo.length && !canViewPremiumExtraInfo ? (
+                <section className="premium-extra-info-card" id="extra-info">
+                  <div>
+                    <span className="eyebrow">Conținut Premium</span>
+                    <h2>Ce mai trebuie să știi</h2>
+                    <p className="muted">
+                      Această secțiune conține clarificări suplimentare și răspunsuri practice disponibile doar
+                      membrilor Premium.
+                    </p>
+                  </div>
+                  <UpgradePremiumModal compact triggerClassName="btn primary" triggerContent="Deblochează cu Premium" />
                 </section>
               ) : null}
 

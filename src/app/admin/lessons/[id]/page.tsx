@@ -293,7 +293,7 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
               <textarea name="key_points" rows={6} defaultValue={keyPoints} />
             </div>
             <div className="field">
-              <label>Ce mai trebuie să știi</label>
+              <label>Ce mai trebuie să știi (Premium)</label>
               <textarea
                 name="extra_info"
                 rows={8}
@@ -301,7 +301,7 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
                 placeholder={"Scrie întrebarea pe primul rând, apoi răspunsul dedesubt.\n\nPentru mai multe întrebări, lasă o linie goală între fiecare bloc."}
               />
               <p className="field-hint">
-                Această secțiune apare pe pagina materialului, sub text și idei cheie.
+                Această secțiune apare doar pentru membrii Premium, sub text și idei cheie.
               </p>
             </div>
             <button className="btn primary" type="submit">
