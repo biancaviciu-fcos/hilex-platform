@@ -36,6 +36,22 @@ function createSlug(value: string) {
     .slice(0, 90);
 }
 
+function parseExtraInfo(value: string) {
+  return value
+    .split(/\n\s*\n/g)
+    .map((block) => block.trim())
+    .filter(Boolean)
+    .map((block) => {
+      const [question = "", ...answerLines] = block.split("\n");
+
+      return {
+        question: question.trim(),
+        answer: answerLines.join("\n").trim()
+      };
+    })
+    .filter((item) => item.question && item.answer);
+}
+
 export async function POST(request: Request) {
   const authSupabase = await createSupabaseServerClient();
   const {
@@ -109,6 +125,7 @@ export async function POST(request: Request) {
     .split("\n")
     .map((item) => item.trim())
     .filter(Boolean);
+  const extraInfo = parseExtraInfo(String(formData.get("extra_info") || ""));
 
   const { data: material, error } = await supabase
     .from("lessons")
@@ -126,6 +143,7 @@ export async function POST(request: Request) {
       video_playback_id: videoPlaybackId,
       body,
       key_points: keyPoints,
+      extra_info: extraInfo,
       published_at: status === "published" ? new Date().toISOString() : null,
       created_by: user.id
     })

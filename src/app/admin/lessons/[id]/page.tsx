@@ -9,6 +9,36 @@ import { uploadMaterialThumbnail } from "@/lib/thumbnails";
 import { DeleteLessonForm } from "./DeleteLessonForm";
 import { VideoUploadPanel } from "./VideoUploadPanel";
 
+function parseExtraInfo(value: string) {
+  return value
+    .split(/\n\s*\n/g)
+    .map((block) => block.trim())
+    .filter(Boolean)
+    .map((block) => {
+      const [question = "", ...answerLines] = block.split("\n");
+
+      return {
+        question: question.trim(),
+        answer: answerLines.join("\n").trim()
+      };
+    })
+    .filter((item) => item.question && item.answer);
+}
+
+function formatExtraInfo(value: unknown) {
+  if (!Array.isArray(value)) return "";
+
+  return value
+    .map((item) => {
+      const entry = item as { question?: unknown; answer?: unknown };
+      const question = typeof entry.question === "string" ? entry.question : "";
+      const answer = typeof entry.answer === "string" ? entry.answer : "";
+      return question && answer ? `${question}\n${answer}` : "";
+    })
+    .filter(Boolean)
+    .join("\n\n");
+}
+
 async function updateLesson(formData: FormData) {
   "use server";
 
@@ -49,6 +79,7 @@ async function updateLesson(formData: FormData) {
     .split("\n")
     .map((item) => item.trim())
     .filter(Boolean);
+  const extraInfo = parseExtraInfo(String(formData.get("extra_info") || ""));
 
   let thumbnailUrl: string | null = null;
 
@@ -70,6 +101,7 @@ async function updateLesson(formData: FormData) {
     video_playback_id: videoPlaybackId,
     body,
     key_points: keyPoints,
+    extra_info: extraInfo,
     published_at: status === "published" ? new Date().toISOString() : null,
     updated_at: new Date().toISOString()
   };
@@ -147,6 +179,7 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
 
   const body = Array.isArray(lesson.body) ? lesson.body.join("\n\n") : "";
   const keyPoints = Array.isArray(lesson.key_points) ? lesson.key_points.join("\n") : "";
+  const extraInfo = formatExtraInfo(lesson.extra_info);
   const resources = Array.isArray(lesson.lesson_resources) ? lesson.lesson_resources : [];
 
   return (
@@ -258,6 +291,18 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
             <div className="field">
               <label>Idei cheie, câte una pe rând</label>
               <textarea name="key_points" rows={6} defaultValue={keyPoints} />
+            </div>
+            <div className="field">
+              <label>Ce mai trebuie să știi</label>
+              <textarea
+                name="extra_info"
+                rows={8}
+                defaultValue={extraInfo}
+                placeholder={"Scrie întrebarea pe primul rând, apoi răspunsul dedesubt.\n\nPentru mai multe întrebări, lasă o linie goală între fiecare bloc."}
+              />
+              <p className="field-hint">
+                Această secțiune apare pe pagina materialului, sub text și idei cheie.
+              </p>
             </div>
             <button className="btn primary" type="submit">
               Salvează

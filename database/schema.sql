@@ -62,6 +62,7 @@ create table public.lessons (
   excerpt text,
   body jsonb not null default '[]'::jsonb,
   key_points jsonb not null default '[]'::jsonb,
+  extra_info jsonb not null default '[]'::jsonb,
   access_level public.access_level not null default 'basic',
   status public.content_status not null default 'draft',
   duration_minutes integer,

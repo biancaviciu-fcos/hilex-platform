@@ -147,6 +147,17 @@ export default async function NewLessonPage({
               <label>Idei cheie, câte una pe rând</label>
               <textarea name="key_points" rows={5} />
             </div>
+            <div className="field">
+              <label>Ce mai trebuie să știi</label>
+              <textarea
+                name="extra_info"
+                placeholder={"Scrie întrebarea pe primul rând, apoi răspunsul dedesubt.\n\nExemplu:\nPot folosi acest material ca sfat juridic personal?\nNu. Materialele oferă informații generale și ghidare practică, dar nu înlocuiesc consultanța juridică pe cazul tău."}
+                rows={8}
+              />
+              <p className="field-hint">
+                Pentru mai multe întrebări, lasă o linie goală între fiecare întrebare și răspuns.
+              </p>
+            </div>
             <section className="nested-form-panel">
               <h2>PDF inițial</h2>
               <p className="field-hint">Opțional: poți atașa primul PDF direct când creezi materialul.</p>

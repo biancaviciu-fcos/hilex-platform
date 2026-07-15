@@ -19,6 +19,21 @@ function relationName(value: unknown) {
   return (value as { name?: string } | null)?.name;
 }
 
+function extraInfoItems(value: unknown) {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item) => {
+      const entry = item as { question?: unknown; answer?: unknown };
+
+      return {
+        question: typeof entry.question === "string" ? entry.question : "",
+        answer: typeof entry.answer === "string" ? entry.answer : ""
+      };
+    })
+    .filter((item) => item.question && item.answer);
+}
+
 export default async function LessonPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const supabase = await createSupabaseServerClient();
@@ -51,6 +66,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
 
   const body = Array.isArray(lesson.body) ? lesson.body : [];
   const keyPoints = Array.isArray(lesson.key_points) ? lesson.key_points : [];
+  const extraInfo = extraInfoItems(lesson.extra_info);
   const resources = Array.isArray(lesson.lesson_resources) ? lesson.lesson_resources : [];
   const pdfResources = resources.filter((resource: { resource_type: string }) => resource.resource_type === "pdf");
   const usefulLinks = resources.filter((resource: { resource_type: string }) => resource.resource_type === "link");
@@ -192,6 +208,20 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
                 </ul>
               </section>
 
+              {extraInfo.length ? (
+                <section id="extra-info">
+                  <h2>Ce mai trebuie să știi</h2>
+                  <div className="material-extra-info-list">
+                    {extraInfo.map((item) => (
+                      <details className="material-extra-info-item" key={item.question}>
+                        <summary>{item.question}</summary>
+                        <p>{item.answer}</p>
+                      </details>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+
               <section id="useful-links">
                 <h2>Link-uri utile</h2>
                 {usefulLinks.length ? (
@@ -218,6 +248,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
                 <a href="#video">Clip video</a>
                 <a href="#details">Explicații</a>
                 <a href="#keys">Idei cheie</a>
+                {extraInfo.length ? <a href="#extra-info">Ce mai trebuie să știi</a> : null}
                 <a href="#useful-links">Link-uri utile</a>
                 <a href="#resources">Resurse</a>
               </section>

@@ -604,6 +604,51 @@ textarea {
   line-height: 1.7;
 }
 
+.material-extra-info-list {
+  display: grid;
+  gap: 10px;
+}
+
+.material-extra-info-item {
+  background: #f7f9ff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0;
+}
+
+.material-extra-info-item summary {
+  color: var(--navy);
+  cursor: pointer;
+  font-weight: 850;
+  line-height: 1.35;
+  list-style: none;
+  padding: 16px 18px;
+}
+
+.material-extra-info-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.material-extra-info-item summary::after {
+  color: var(--pink);
+  content: "+";
+  float: right;
+  font-size: 22px;
+  line-height: 1;
+  margin-left: 14px;
+}
+
+.material-extra-info-item[open] summary::after {
+  content: "−";
+}
+
+.material-extra-info-item p {
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  margin: 0;
+  padding: 14px 18px 18px;
+}
+
 .video-placeholder {
   align-items: center;
   aspect-ratio: 16 / 9;
@@ -1218,6 +1263,17 @@ textarea {
 
 .login-card .btn {
   width: 100%;
+}
+
+.success-login-card {
+  text-align: center;
+}
+
+.success-login-card p {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.55;
+  margin: 0;
 }
 
 .login-support-card {
