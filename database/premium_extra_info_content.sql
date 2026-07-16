@@ -1,4 +1,8 @@
--- Run this once in Supabase SQL Editor to add Premium-only "Ce mai trebuie sa stii" content.
+-- Run this once in Supabase SQL Editor.
+-- It creates the extra_info column if needed, then adds Premium-only content for selected materials.
+
+alter table public.lessons
+add column if not exists extra_info jsonb not null default '[]'::jsonb;
 
 update public.lessons
 set extra_info = $json$
