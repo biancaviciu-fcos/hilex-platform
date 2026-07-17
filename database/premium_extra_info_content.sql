@@ -146,3 +146,149 @@ set extra_info = $json$
 where slug in ('cum-obtii-dreptul-de-sedere-in-uk', 'drept-de-sedere-uk')
    or lower(title) like '%drept%ședere%uk%'
    or lower(title) like '%drept%sedere%uk%';
+
+update public.lessons
+set extra_info = $json$
+[
+  {
+    "question": "Dacă sunt acuzat, înseamnă automat că voi fi condamnat?",
+    "answer": "Nu. O acuzație penală reprezintă începutul unei proceduri judiciare, nu dovada vinovăției. Acuzarea trebuie să demonstreze, în fața instanței, că infracțiunea a fost comisă și că există suficiente probe pentru o condamnare. Beneficiați de prezumția de nevinovăție până la pronunțarea unei hotărâri definitive."
+  },
+  {
+    "question": "Ar trebui să explic imediat poliției versiunea mea asupra evenimentelor?",
+    "answer": "Este firesc să doriți să vă explicați poziția, însă este recomandat să înțelegeți mai întâi natura acuzațiilor și drepturile pe care le aveți. Declarațiile făcute într-un stadiu incipient pot avea un impact important asupra întregii proceduri, motiv pentru care este prudent să solicitați consiliere juridică înainte de a răspunde la întrebări."
+  },
+  {
+    "question": "Ce se întâmplă dacă poliția îmi confiscă telefonul, laptopul sau alte dispozitive?",
+    "answer": "În anumite investigații, autoritățile pot ridica dispozitive electronice pentru examinare, dacă apreciază că acestea conțin probe relevante. Analiza poate dura o perioadă considerabilă, în funcție de complexitatea investigației. Este important să cunoașteți drepturile pe care le aveți în această etapă și posibilitățile de contestare, acolo unde legea le permite."
+  },
+  {
+    "question": "Pot continua să lucrez dacă sunt cercetat pentru o infracțiune?",
+    "answer": "Depinde de natura acuzației, de profesia dumneavoastră și de obligațiile contractuale pe care le aveți. În anumite domenii reglementate, o investigație penală poate avea consecințe asupra activității profesionale, chiar înainte de pronunțarea unei hotărâri definitive."
+  },
+  {
+    "question": "Ce înseamnă să fiu eliberat pe cauțiune și ce obligații pot avea?",
+    "answer": "Eliberarea pe cauțiune nu înseamnă că procedura s-a încheiat. Pot exista condiții precum prezentarea periodică la poliție, interdicția de a contacta anumite persoane sau restricții privind deplasările. Încălcarea acestor obligații poate avea consecințe importante asupra cazului."
+  },
+  {
+    "question": "Dacă aleg să mă declar vinovat, voi primi automat o pedeapsă mai mică?",
+    "answer": "Nu există o regulă aplicabilă în toate cazurile. Modul în care instanța stabilește pedeapsa depinde de numeroși factori, inclusiv de natura infracțiunii, circumstanțele personale și momentul în care este făcută recunoașterea. O astfel de decizie ar trebui luată doar după ce înțelegeți pe deplin implicațiile juridice."
+  },
+  {
+    "question": "Ce greșeli fac cel mai des persoanele acuzate de o infracțiune?",
+    "answer": "Printre cele mai frecvente greșeli se numără discutarea cazului cu alte persoane, publicarea de informații pe rețelele sociale, distrugerea unor documente sau mesaje, contactarea presupusei victime fără recomandare juridică și furnizarea unor declarații fără a înțelege consecințele acestora."
+  },
+  {
+    "question": "Dacă sunt achitat, vor rămâne informațiile despre acuzație în evidențele autorităților?",
+    "answer": "Situația diferă în funcție de tipul evidențelor și de circumstanțele fiecărui caz. În anumite situații, informațiile pot continua să existe în registrele autorităților sau pot apărea în verificări specifice, chiar dacă procedura penală s-a încheiat favorabil."
+  },
+  {
+    "question": "Pot călători în afara UK dacă sunt cercetat sau acuzat?",
+    "answer": "Depinde de măsurile dispuse în cazul dumneavoastră. Uneori nu există nicio restricție privind deplasările, însă în alte situații instanța sau poliția pot impune condiții care limitează posibilitatea de a părăsi țara. Este recomandat să verificați aceste aspecte înainte de a face orice plan de călătorie."
+  },
+  {
+    "question": "Când ar trebui să contactez un avocat specializat în drept penal?",
+    "answer": "Ideal, imediat ce aflați că sunteți investigat, chemat la interviu sau informat că există suspiciuni privind implicarea dumneavoastră într-o infracțiune. Primele decizii luate într-un dosar penal pot influența semnificativ evoluția cazului, iar asistența juridică din timp vă poate ajuta să vă protejați drepturile și să evitați greșeli care pot fi dificil de remediat ulterior."
+  }
+]$json$::jsonb
+where slug in ('am-fost-acuzat-de-o-infractiune-grava', 'acuzat-infractiune-grava')
+   or lower(title) like '%acuzat%infracțiune%grav%'
+   or lower(title) like '%acuzat%infractiune%grav%';
+
+update public.lessons
+set extra_info = $json$
+[
+  {
+    "question": "Dacă mi-a fost înghețat contul bancar, înseamnă că sunt acuzat de o infracțiune?",
+    "answer": "Nu. Înghețarea unui cont bancar nu înseamnă automat că veți fi acuzat sau condamnat pentru o infracțiune. În multe situații, autoritățile utilizează această măsură pentru a investiga proveniența fondurilor înainte de a lua o decizie cu privire la eventuale proceduri ulterioare."
+  },
+  {
+    "question": "Pot continua să îmi încasez salariul dacă există un Account Freezing Order?",
+    "answer": "Depinde de condițiile impuse prin ordinul emis de instanță și de circumstanțele fiecărui caz. În anumite situații, pot exista posibilități de a solicita acces la fonduri pentru cheltuieli esențiale sau pentru venituri care nu fac obiectul suspiciunilor investigate."
+  },
+  {
+    "question": "Ce tip de documente pot demonstra proveniența legală a banilor?",
+    "answer": "Autoritățile analizează întregul traseu al fondurilor, nu doar un singur document. Contractele de muncă, extrasele bancare, facturile, contractele comerciale, documentele fiscale, contractele de vânzare sau alte înscrisuri relevante pot contribui la demonstrarea provenienței legale a banilor."
+  },
+  {
+    "question": "Dacă nu mai am toate documentele justificative, înseamnă că voi pierde banii?",
+    "answer": "Nu neapărat. Lipsa unor documente nu conduce automat la confiscarea fondurilor. În funcție de circumstanțe, pot exista și alte mijloace prin care proveniența banilor poate fi explicată și susținută. Cu toate acestea, este recomandat să începeți cât mai repede reconstruirea istoricului financiar."
+  },
+  {
+    "question": "Autoritățile pot îngheța orice sumă aflată în cont?",
+    "answer": "Fiecare caz este analizat individual. Măsura trebuie să fie justificată și proporțională cu scopul investigației. Dacă apreciați că ordinul este nejustificat sau afectează în mod disproporționat situația dumneavoastră, există proceduri prin care acesta poate fi contestat."
+  },
+  {
+    "question": "Ce greșeli fac cel mai des persoanele cărora le este înghețat contul?",
+    "answer": "Cele mai frecvente greșeli sunt ignorarea corespondenței primite de la autorități, furnizarea incompletă a documentelor, încercarea de a explica situația fără o analiză juridică prealabilă și amânarea solicitării de asistență. Timpul este adesea un factor important în aceste proceduri."
+  },
+  {
+    "question": "Dacă banii provin din activități desfășurate în numerar, îi pot justifica?",
+    "answer": "Da, însă poate fi necesară o documentație mai amplă. Activitățile desfășurate legal în numerar nu sunt, prin ele însele, ilegale, însă este important să existe dovezi care să susțină modul în care au fost obținute și utilizate fondurile."
+  },
+  {
+    "question": "Pot contesta un Account Freezing Order înainte ca autoritățile să decidă confiscarea banilor?",
+    "answer": "Da. În funcție de circumstanțele cazului, legislația permite contestarea anumitor măsuri dispuse în cadrul procedurii. Este important să acționați rapid și să respectați termenele aplicabile, deoarece acestea pot influența posibilitățile de apărare."
+  },
+  {
+    "question": "Dacă autoritățile decid confiscarea banilor, cazul este definitiv închis?",
+    "answer": "Nu întotdeauna. În funcție de situația concretă și de hotărârea pronunțată, pot exista căi de atac sau alte demersuri juridice disponibile. Opțiunile diferă de la un caz la altul și trebuie analizate individual."
+  },
+  {
+    "question": "Când este recomandat să contactez un avocat într-un caz POCA?",
+    "answer": "Imediat ce aflați despre înghețarea contului, reținerea banilor sau solicitarea unor explicații privind proveniența fondurilor. Cu cât analiza juridică începe mai devreme, cu atât există mai multe posibilități de a pregăti documentația necesară și de a răspunde eficient solicitărilor autorităților."
+  }
+]$json$::jsonb
+where slug in ('conturi-inghetate-si-bani-retinuti-in-uk-poca', 'conturi-inghetate-poca', 'bani-retinuti-poca')
+   or lower(title) like '%conturi%înghețate%'
+   or lower(title) like '%conturi%inghetate%'
+   or lower(title) like '%poca%'
+   or lower(title) like '%account freezing%';
+
+update public.lessons
+set extra_info = $json$
+[
+  {
+    "question": "Cum pot afla dacă sunt suspect, martor sau doar o persoană de interes în anchetă?",
+    "answer": "Faptul că ați fost contactat de poliție nu înseamnă automat că sunteți suspect. Rolul dumneavoastră în cadrul investigației influențează drepturile și obligațiile pe care le aveți, motiv pentru care este important să înțelegeți în ce calitate sunteți chemat înainte de orice discuție sau interviu."
+  },
+  {
+    "question": "Dacă mă prezint voluntar la secția de poliție, pot fi arestat?",
+    "answer": "Da, este posibil în anumite circumstanțe. Prezentarea voluntară nu exclude posibilitatea ca poliția să decidă arestarea dacă apreciază că sunt îndeplinite condițiile prevăzute de lege. Din acest motiv, este recomandat să solicitați consiliere juridică înainte de interviu, indiferent dacă ați fost invitat sau obligat să vă prezentați."
+  },
+  {
+    "question": "Poliția mi-a spus că este doar o discuție informală. Ar trebui să tratez situația cu seriozitate?",
+    "answer": "Da. Chiar dacă întâlnirea este prezentată ca fiind informală, informațiile pe care le furnizați pot avea relevanță în cadrul investigației. Este important să înțelegeți scopul întâlnirii și consecințele declarațiilor făcute înainte de a răspunde la întrebări."
+  },
+  {
+    "question": "Poate poliția să îmi solicite telefonul mobil sau parola dispozitivului?",
+    "answer": "În anumite situații, autoritățile pot solicita acces la dispozitive electronice sau pot ridica aceste dispozitive pentru examinare. Drepturile și obligațiile dumneavoastră depind de natura investigației și de temeiul legal pe care se bazează solicitarea. Este recomandat să înțelegeți implicațiile juridice înainte de a lua o decizie."
+  },
+  {
+    "question": "Ce se întâmplă dacă aleg să nu răspund la întrebările poliției?",
+    "answer": "Dreptul la tăcere există în anumite situații, însă exercitarea acestuia poate avea implicații juridice care trebuie înțelese în contextul fiecărui caz. Decizia de a răspunde sau nu la întrebări ar trebui luată după ce ați primit consiliere juridică și ați înțeles natura investigației."
+  },
+  {
+    "question": "Pot discuta cazul meu cu familia, colegii sau pe rețelele sociale?",
+    "answer": "Este recomandat să manifestați prudență. Comentariile făcute în spațiul public sau comunicările cu alte persoane pot deveni relevante în cadrul investigației și, în anumite situații, pot afecta desfășurarea procedurilor. În general, este indicat să evitați discutarea detaliilor cazului până când primiți recomandări juridice."
+  },
+  {
+    "question": "Cât timp poate dura o investigație fără ca poliția să decidă dacă mă acuză sau nu?",
+    "answer": "Nu există un termen unic aplicabil tuturor cazurilor. Durata unei investigații depinde de complexitatea probelor, numărul persoanelor implicate și natura presupusei infracțiuni. Unele investigații se finalizează rapid, în timp ce altele pot dura luni sau chiar mai mult."
+  },
+  {
+    "question": "Dacă poliția nu mă mai contactează, înseamnă că investigația s-a încheiat?",
+    "answer": "Nu neapărat. Lipsa comunicării nu înseamnă automat că dosarul a fost închis. În unele situații, investigațiile continuă fără ca persoanele implicate să primească actualizări periodice. Dacă aveți nelămuriri cu privire la stadiul cazului, este recomandat să solicitați consiliere juridică."
+  },
+  {
+    "question": "Ce greșeli fac cel mai des persoanele contactate de poliție?",
+    "answer": "Printre cele mai frecvente greșeli se numără prezentarea la interviu fără pregătire, presupunerea că situația este lipsită de importanță, furnizarea unor explicații incomplete sau contradictorii, ștergerea mesajelor ori documentelor relevante și discutarea cazului cu persoane care ar putea deveni martori."
+  },
+  {
+    "question": "Când este momentul potrivit să contactez un avocat?",
+    "answer": "Cel mai bun moment este înainte de primul interviu sau de prima discuție cu poliția. Chiar dacă apreciați că nu ați făcut nimic greșit, înțelegerea drepturilor și obligațiilor dumneavoastră de la început poate influența semnificativ modul în care evoluează investigația și vă poate ajuta să evitați consecințe nedorite."
+  }
+]$json$::jsonb
+where slug in ('m-a-contactat-politia-ce-trebuie-sa-fac', 'm-a-contactat-politia')
+   or lower(title) like '%contactat%poliția%'
+   or lower(title) like '%contactat%politia%';
