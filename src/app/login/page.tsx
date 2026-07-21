@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 async function signIn(formData: FormData) {
@@ -7,6 +8,16 @@ async function signIn(formData: FormData) {
 
   const email = String(formData.get("email") || "");
   const password = String(formData.get("password") || "");
+  const remember = formData.get("remember") === "1";
+  const cookieStore = await cookies();
+
+  cookieStore.set("hilex_remember", remember ? "1" : "0", {
+    path: "/",
+    maxAge: remember ? 60 * 60 * 24 * 365 : 0,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production"
+  });
+
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
@@ -42,6 +53,12 @@ export default async function LoginPage({
             <div className="field">
               <label>Parola</label>
               <input name="password" type="password" required />
+            </div>
+            <div className="login-options-row">
+              <label className="remember-login">
+                <input name="remember" type="checkbox" value="1" />
+                <span>Ține-mă minte pe acest dispozitiv</span>
+              </label>
             </div>
             <div className="login-help-row">
               <Link href="/forgot-password">Am uitat parola</Link>

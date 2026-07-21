@@ -10,6 +10,7 @@ type CookieToSet = {
 
 export async function createSupabaseServerClient() {
   const cookieStore = await cookies();
+  const rememberSession = cookieStore.get("hilex_remember")?.value === "1";
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,7 +22,7 @@ export async function createSupabaseServerClient() {
         },
         setAll(cookiesToSet: CookieToSet[]) {
           cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
+            cookieStore.set(name, value, rememberSession && value ? { ...options, maxAge: 60 * 60 * 24 * 365 } : options);
           });
         }
       }

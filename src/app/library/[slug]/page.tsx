@@ -171,6 +171,9 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
           <h1>{lesson.title}</h1>
           <p>{lesson.excerpt}</p>
           <div className="material-hero-actions">
+            <Link className="btn material-back-btn" href="/library">
+              Înapoi la toate resursele
+            </Link>
             <FavoriteHeartButton initialIsFavorite={Boolean(favorite)} lessonId={lesson.id} variant="hero" />
           </div>
         </div>

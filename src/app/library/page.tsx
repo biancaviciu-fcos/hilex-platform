@@ -18,6 +18,9 @@ type LessonCardData = {
   title: string;
   slug: string;
   excerpt: string | null;
+  body?: unknown;
+  key_points?: unknown;
+  extra_info?: unknown;
   access_level: string;
   duration_minutes: number | null;
   thumbnail_url: string | null;
@@ -31,6 +34,94 @@ function relationName(value: unknown) {
   }
 
   return (value as { name?: string } | null)?.name;
+}
+
+function relationSearchText(value: unknown) {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => {
+        const relation = item as { name?: string | null; slug?: string | null; description?: string | null };
+        return [relation.name, relation.slug, relation.description].filter(Boolean).join(" ");
+      })
+      .join(" ");
+  }
+
+  const relation = value as { name?: string | null; slug?: string | null; description?: string | null } | null;
+  return relation ? [relation.name, relation.slug, relation.description].filter(Boolean).join(" ") : "";
+}
+
+function jsonSearchText(value: unknown): string {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  if (Array.isArray(value)) return value.map(jsonSearchText).join(" ");
+  if (typeof value === "object") return Object.values(value as Record<string, unknown>).map(jsonSearchText).join(" ");
+  return String(value);
+}
+
+function normalizeSearchText(value: unknown) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+const smartSearchGroups = [
+  ["divort", "divortul", "separare", "casatorie", "sot", "sotie", "bunuri", "finante", "copii"],
+  ["familie", "familiei", "copil", "copii", "parinte", "parental", "custodie", "arrangements", "minor"],
+  ["imigrare", "imigratie", "viza", "visa", "sedere", "cetatenie", "spouse", "family visa", "ilr", "settlement"],
+  ["penal", "politie", "police", "cazier", "acuzat", "infractiune", "investigatie", "poca", "cont", "inghetat"],
+  ["vecin", "vecini", "neighbour", "neighbor", "galagie", "zgomot", "gard", "hotar", "limita", "proprietate", "locuinta", "chirie", "landlord", "tenant", "disputa"],
+  ["munca", "angajator", "contract", "job", "employment", "salariu", "concediere"],
+  ["locuinta", "locuinte", "locuire", "chirie", "proprietate", "landlord", "tenant", "vecini"],
+  ["hmrc", "tax", "taxe", "impozit", "self assessment", "fiscal"],
+  ["business", "afacere", "companie", "contracte", "comercial", "firma"],
+  ["sofer", "soferi", "driving", "licenta", "permis", "amenda", "puncte"]
+];
+
+function expandedSearchTerms(query: string) {
+  const normalized = normalizeSearchText(query);
+  const tokens = normalized.split(" ").filter((token) => token.length > 1);
+  const expanded = new Set(tokens);
+
+  smartSearchGroups.forEach((group) => {
+    const normalizedGroup = group.map(normalizeSearchText);
+    const matchesGroup = normalizedGroup.some((term) => normalized.includes(term) || tokens.includes(term));
+
+    if (matchesGroup) {
+      normalizedGroup.forEach((term) => expanded.add(term));
+    }
+  });
+
+  return { normalized, tokens, expanded: Array.from(expanded).filter((term) => term.length > 1) };
+}
+
+function lessonSearchScore(lesson: LessonCardData, query: string) {
+  const { normalized, tokens, expanded } = expandedSearchTerms(query);
+  if (!normalized) return 1;
+
+  const searchable = normalizeSearchText(
+    [
+      lesson.title,
+      lesson.excerpt,
+      jsonSearchText(lesson.body),
+      jsonSearchText(lesson.key_points),
+      jsonSearchText(lesson.extra_info),
+      relationSearchText(lesson.categories)
+    ].join(" ")
+  );
+
+  let score = searchable.includes(normalized) ? 12 : 0;
+  tokens.forEach((token) => {
+    if (searchable.includes(token)) score += 3;
+  });
+  expanded.forEach((term) => {
+    if (searchable.includes(term)) score += 1;
+  });
+
+  return score;
 }
 
 function favoriteIds(rows: { lesson_id: string }[] | null) {
@@ -182,12 +273,8 @@ export default async function LibraryPage({
 
   let lessonsQuery = supabase
     .from("lessons")
-    .select("id,title,slug,excerpt,access_level,duration_minutes,status,thumbnail_url,categories(name,slug)")
+    .select("id,title,slug,excerpt,body,key_points,extra_info,access_level,duration_minutes,status,thumbnail_url,categories(name,slug,description)")
     .eq("status", "published");
-
-  if (query) {
-    lessonsQuery = lessonsQuery.or(`title.ilike.%${query}%,excerpt.ilike.%${query}%`);
-  }
 
   if (!onlyFavorites && category && selectedCategory) {
     lessonsQuery = lessonsQuery.eq("category_id", selectedCategory.id);
@@ -198,9 +285,16 @@ export default async function LibraryPage({
   }
 
   const { data: allLessons } = await lessonsQuery.order("published_at", { ascending: false });
-  const filteredLessons = onlyFavorites
-    ? (allLessons || []).filter((lesson) => savedIds.has(lesson.id))
+  const searchedLessons = query
+    ? (allLessons || [])
+        .map((lesson) => ({ lesson, score: lessonSearchScore(lesson as LessonCardData, query) }))
+        .filter((item) => item.score > 0)
+        .sort((first, second) => second.score - first.score)
+        .map((item) => item.lesson)
     : allLessons || [];
+  const filteredLessons = onlyFavorites
+    ? searchedLessons.filter((lesson) => savedIds.has(lesson.id))
+    : searchedLessons;
   const lessons = sortForAccess(filteredLessons as LessonCardData[], userAccess);
 
   return (

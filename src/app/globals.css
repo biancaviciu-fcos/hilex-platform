@@ -257,6 +257,28 @@ textarea {
   min-height: 40px;
 }
 
+.login-options-row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.remember-login {
+  align-items: center;
+  color: var(--navy);
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 850;
+  gap: 9px;
+  line-height: 1.35;
+}
+
+.remember-login input {
+  accent-color: var(--pink);
+  height: 17px;
+  width: 17px;
+}
+
 .topic-card,
 .lesson-card {
   background: var(--white);
@@ -1014,6 +1036,55 @@ textarea {
 
 .account-notice {
   margin-top: 16px;
+}
+
+.account-action-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  margin-bottom: 16px;
+}
+
+.account-service-card {
+  display: grid;
+  gap: 12px;
+}
+
+.account-service-card h2 {
+  color: var(--navy);
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.account-service-card form {
+  margin: 0;
+}
+
+.benefit-list {
+  display: grid;
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.benefit-list li {
+  background: #f8f6ff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+}
+
+.benefit-list strong {
+  color: var(--navy);
+}
+
+.benefit-list span {
+  color: var(--muted);
+  line-height: 1.45;
 }
 
 .contact-layout {
@@ -1779,6 +1850,7 @@ textarea {
   .topic-grid,
   .lesson-grid,
   .account-grid,
+  .account-action-grid,
   .lesson-layout,
   .material-content-layout,
   .admin-panels,
@@ -2229,7 +2301,8 @@ textarea {
 }
 
 .material-hero .favorite-heart-button.hero-heart,
-.material-hero .hero-progress-btn {
+.material-hero .hero-progress-btn,
+.material-back-btn {
   margin-top: 0;
   min-height: 38px;
   padding: 8px 13px;

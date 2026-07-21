@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { AppHeader } from "@/components/AppHeader";
 import { accessLabel } from "@/lib/labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -35,7 +36,24 @@ function formatDate(value?: string | null) {
   }).format(new Date(value));
 }
 
-export default async function AccountPage() {
+function includedServices(accessLevel: AccessLevel | null) {
+  const isPremium = accessLevel === "premium";
+
+  return {
+    consultationCredit: isPremium ? 90 : 45,
+    response: isPremium ? "Acces prioritar la suport și materiale avansate." : "Răspuns în maximum 24h pentru solicitările trimise.",
+    extra: isPremium
+      ? "Acces la materiale Premium, resurse exclusive și contact WhatsApp pentru membri Premium."
+      : "Acces la materialele Essential, resurse utile și discount-uri preferențiale pentru servicii juridice Forest & Co."
+  };
+}
+
+export default async function AccountPage({
+  searchParams
+}: {
+  searchParams?: Promise<{ billing?: string }>;
+}) {
+  const params = searchParams ? await searchParams : {};
   const supabase = await createSupabaseServerClient();
   const {
     data: { user }
@@ -46,8 +64,10 @@ export default async function AccountPage() {
   async function signOut() {
     "use server";
 
+    const cookieStore = await cookies();
     const supabase = await createSupabaseServerClient();
     await supabase.auth.signOut();
+    cookieStore.set("hilex_remember", "", { path: "/", maxAge: 0 });
     redirect("/login");
   }
 
@@ -59,7 +79,7 @@ export default async function AccountPage() {
 
   const { data: subscription } = await supabase
     .from("subscriptions")
-    .select("access_level,status,current_period_end,cancel_at_period_end")
+    .select("access_level,status,current_period_end,cancel_at_period_end,stripe_customer_id")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
     .limit(1)
@@ -94,6 +114,7 @@ export default async function AccountPage() {
   const progressPercent = totalCount ? Math.round((completedCount / totalCount) * 100) : 0;
   const progressBlocks = Math.round(progressPercent / 10);
   const progressBar = `${"█".repeat(progressBlocks)}${"░".repeat(10 - progressBlocks)}`;
+  const services = includedServices(userAccess);
 
   return (
     <main className="page">
@@ -134,6 +155,40 @@ export default async function AccountPage() {
                 {completedCount} din {totalCount} materiale disponibile pentru pachetul tău.
               </p>
             </div>
+          </div>
+          <div className="account-action-grid">
+            <article className="card account-service-card">
+              <span className="eyebrow">Servicii incluse</span>
+              <h2>Membership HILEX</h2>
+              <ul className="benefit-list">
+                <li>
+                  <strong>{services.consultationCredit} minute credit anual</strong>
+                  <span>pentru consultanță sau asistență juridică inclusă în planul tău.</span>
+                </li>
+                <li>
+                  <strong>{services.response}</strong>
+                  <span>{services.extra}</span>
+                </li>
+              </ul>
+            </article>
+            <article className="card account-service-card">
+              <span className="eyebrow">Facturi membership</span>
+              <h2>Facturile tale</h2>
+              <p className="muted">
+                Deschide pagina securizată Stripe pentru a vedea și descărca facturile sau chitanțele abonamentului.
+              </p>
+              {params.billing === "missing" ? (
+                <p className="notice-text account-notice">Nu am găsit încă un client Stripe activ pentru acest cont.</p>
+              ) : null}
+              {params.billing === "error" ? (
+                <p className="notice-text account-notice">Nu am putut deschide facturile acum. Reîncearcă în câteva momente.</p>
+              ) : null}
+              <form action="/api/stripe/billing-portal" method="POST">
+                <button className="btn primary" type="submit">
+                  Vezi și descarcă facturile
+                </button>
+              </form>
+            </article>
           </div>
           <div className="account-grid">
             <article className="card stat-card">
