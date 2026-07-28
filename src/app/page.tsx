@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
+import { HomeInstallAppModal } from "@/components/HomeInstallAppModal";
 import { accessLabel as formatAccessLabel, categoryIcon } from "@/lib/labels";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -110,6 +111,7 @@ export default async function HomePage() {
   return (
     <main className="page member-shell">
       <AppHeader />
+      <HomeInstallAppModal />
       <section className="hero member-landing-hero">
         <div className="inner member-landing-grid">
           <div>
