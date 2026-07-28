@@ -43,6 +43,7 @@ Response for inactive/non-member:
 ```
 
 This endpoint only reads membership data. It does not create users and does not send any email.
+It does not require the `X-HILEX-Booking-Key` header.
 
 ## Consume consultation credit
 
@@ -94,3 +95,4 @@ BOOKING_VERIFY_SECRET=choose-a-long-random-secret
 ```
 
 Use the same `BOOKING_VERIFY_SECRET` in the booking system when calling the consume endpoint.
+The secret is only required for consuming consultation credit, not for checking membership status.

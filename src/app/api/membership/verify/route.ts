@@ -37,12 +37,6 @@ export async function POST(request: Request) {
 }
 
 async function verifyMembership(request: Request, rawEmail: string) {
-  const requiredSecret = process.env.BOOKING_VERIFY_SECRET;
-
-  if (requiredSecret && request.headers.get("x-hilex-booking-key") !== requiredSecret) {
-    return jsonResponse(request, { member: false, error: "Unauthorized" }, 401);
-  }
-
   const email = rawEmail.trim().toLowerCase();
 
   if (!email || !email.includes("@")) {

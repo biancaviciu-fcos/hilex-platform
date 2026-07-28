@@ -1041,8 +1041,57 @@ textarea {
 .account-action-grid {
   display: grid;
   gap: 16px;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 16px;
+}
+
+.consultation-credit-card {
+  display: grid;
+  gap: 12px;
+}
+
+.consultation-credit-card h2 {
+  color: var(--navy);
+  font-size: clamp(28px, 3.5vw, 42px);
+  line-height: 1.04;
+  margin: 0;
+}
+
+.credit-meter {
+  background: #f2f4ff;
+  border-radius: 999px;
+  height: 14px;
+  overflow: hidden;
+}
+
+.credit-meter span {
+  background: linear-gradient(90deg, var(--pink), #ff65b0);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+}
+
+.credit-stats {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.credit-stats span {
+  background: #f8f6ff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  display: grid;
+  font-size: 13px;
+  gap: 2px;
+  padding: 10px;
+}
+
+.credit-stats strong {
+  color: var(--navy);
+  font-size: 20px;
+  line-height: 1;
 }
 
 .account-service-card {

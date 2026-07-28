@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { AppHeader } from "@/components/AppHeader";
 import { accessLabel } from "@/lib/labels";
+import { getMembershipCreditSummary } from "@/lib/membership";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AccessLevel } from "@/lib/types";
 
@@ -115,6 +116,10 @@ export default async function AccountPage({
   const progressBlocks = Math.round(progressPercent / 10);
   const progressBar = `${"█".repeat(progressBlocks)}${"░".repeat(10 - progressBlocks)}`;
   const services = includedServices(userAccess);
+  const creditSummary = await getMembershipCreditSummary(profile?.email || user.email || "");
+  const creditPercent = creditSummary.includedMinutes
+    ? Math.round((creditSummary.remainingMinutes / creditSummary.includedMinutes) * 100)
+    : 0;
 
   return (
     <main className="page">
@@ -157,6 +162,30 @@ export default async function AccountPage({
             </div>
           </div>
           <div className="account-action-grid">
+            <article className="card consultation-credit-card">
+              <span className="eyebrow">Credit consultanță</span>
+              <h2>{creditSummary.remainingMinutes} minute rămase</h2>
+              <p className="muted">
+                Ai folosit {creditSummary.usedMinutes} din {creditSummary.includedMinutes} minute incluse în planul tău anual.
+              </p>
+              <div className="credit-meter" aria-label={`${creditPercent}% credit rămas`}>
+                <span style={{ width: `${creditPercent}%` }} />
+              </div>
+              <div className="credit-stats">
+                <span>
+                  <strong>{creditSummary.includedMinutes}</strong>
+                  incluse
+                </span>
+                <span>
+                  <strong>{creditSummary.usedMinutes}</strong>
+                  folosite
+                </span>
+                <span>
+                  <strong>{creditSummary.remainingMinutes}</strong>
+                  rămase
+                </span>
+              </div>
+            </article>
             <article className="card account-service-card">
               <span className="eyebrow">Servicii incluse</span>
               <h2>Membership HILEX</h2>
