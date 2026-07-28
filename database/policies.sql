@@ -8,6 +8,7 @@ alter table public.video_uploads enable row level security;
 alter table public.favorite_lessons enable row level security;
 alter table public.lesson_progress enable row level security;
 alter table public.lesson_views enable row level security;
+alter table public.consultation_credit_usage enable row level security;
 
 create or replace function public.current_user_role()
 returns public.user_role
@@ -85,6 +86,15 @@ create policy "Users can manage own lesson views"
 on public.lesson_views for all
 using (user_id = auth.uid())
 with check (user_id = auth.uid());
+
+create policy "Users can read own consultation credit usage"
+on public.consultation_credit_usage for select
+using (user_id = auth.uid() or public.current_user_role() in ('admin', 'owner'));
+
+create policy "Admins can manage consultation credit usage"
+on public.consultation_credit_usage for all
+using (public.current_user_role() in ('admin', 'owner'))
+with check (public.current_user_role() in ('admin', 'owner'));
 
 create policy "Admins can manage resources"
 on public.lesson_resources for all

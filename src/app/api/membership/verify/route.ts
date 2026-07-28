@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { getMembershipCreditSummary } from "@/lib/membership";
 
 export const runtime = "nodejs";
 
@@ -46,38 +46,29 @@ async function verifyMembership(request: Request, rawEmail: string) {
   const email = rawEmail.trim().toLowerCase();
 
   if (!email || !email.includes("@")) {
-    return jsonResponse(request, { member: false, error: "Invalid email" }, 400);
+    return jsonResponse(
+      request,
+      {
+        member: false,
+        plan: null,
+        status: "inactive",
+        includedMinutes: 0,
+        usedMinutes: 0,
+        remainingMinutes: 0,
+        error: "Invalid email"
+      },
+      400
+    );
   }
 
-  const supabase = createSupabaseAdminClient();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id,email")
-    .ilike("email", email)
-    .maybeSingle();
-
-  if (!profile?.id) {
-    return jsonResponse(request, { member: false });
-  }
-
-  const { data: subscription } = await supabase
-    .from("subscriptions")
-    .select("access_level,status,current_period_end")
-    .eq("user_id", profile.id)
-    .in("status", ["active", "trialing"])
-    .or(`current_period_end.is.null,current_period_end.gt.${new Date().toISOString()}`)
-    .order("access_level", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (!subscription) {
-    return jsonResponse(request, { member: false });
-  }
+  const summary = await getMembershipCreditSummary(email);
 
   return jsonResponse(request, {
-    member: true,
-    plan: subscription.access_level === "premium" ? "premium" : "essential",
-    status: subscription.status,
-    validUntil: subscription.current_period_end
+    member: summary.member,
+    plan: summary.plan,
+    status: summary.status,
+    includedMinutes: summary.includedMinutes,
+    usedMinutes: summary.usedMinutes,
+    remainingMinutes: summary.remainingMinutes
   });
 }

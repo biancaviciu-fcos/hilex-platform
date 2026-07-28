@@ -121,6 +121,16 @@ create table public.lesson_views (
   primary key (user_id, lesson_id)
 );
 
+create table public.consultation_credit_usage (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  booking_id text not null,
+  source text not null default 'forest-booking',
+  minutes integer not null check (minutes > 0),
+  created_at timestamptz not null default now(),
+  unique(user_id, booking_id)
+);
+
 create index lessons_category_idx on public.lessons(category_id);
 create index lessons_subcategory_idx on public.lessons(subcategory_id);
 create index lessons_access_status_idx on public.lessons(access_level, status);
@@ -129,6 +139,7 @@ create index favorite_lessons_lesson_idx on public.favorite_lessons(lesson_id);
 create index lesson_progress_lesson_idx on public.lesson_progress(lesson_id);
 create index lesson_views_viewed_idx on public.lesson_views(user_id, viewed_at desc);
 create index lesson_views_lesson_idx on public.lesson_views(lesson_id);
+create index consultation_credit_usage_user_created_idx on public.consultation_credit_usage(user_id, created_at desc);
 
 insert into public.categories (name, slug, description, sort_order) values
 ('Dreptul Familiei', 'dreptul-familiei', 'Divort, copii, acord parental si aranjamente familiale.', 1),
