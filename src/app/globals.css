@@ -1041,8 +1041,37 @@ textarea {
 .account-action-grid {
   display: grid;
   gap: 16px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-bottom: 16px;
+}
+
+.install-app-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.install-app-box,
+.install-app-status {
+  display: grid;
+  gap: 10px;
+}
+
+.install-app-btn {
+  width: 100%;
+}
+
+.install-app-help,
+.install-app-status span {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.install-app-status strong {
+  color: var(--navy);
+  font-size: 1.05rem;
 }
 
 .consultation-credit-card {

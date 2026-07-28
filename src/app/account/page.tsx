@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { AppHeader } from "@/components/AppHeader";
+import { InstallAppButton } from "@/components/InstallAppButton";
 import { accessLabel } from "@/lib/labels";
 import { getMembershipCreditSummary } from "@/lib/membership";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -165,6 +166,14 @@ export default async function AccountPage({
             </div>
           </div>
           <div className="account-action-grid">
+            <article className="card account-service-card install-app-card">
+              <span className="eyebrow">Aplicația HiLex</span>
+              <h2>Salvează HiLex pe telefon</h2>
+              <p className="muted">
+                Instalează platforma ca aplicație pentru acces mai rapid la resursele tale.
+              </p>
+              <InstallAppButton />
+            </article>
             <article className="card consultation-credit-card">
               <span className="eyebrow">Credit consultanță</span>
               <h2>{creditSummary.remainingMinutes} minute rămase</h2>
