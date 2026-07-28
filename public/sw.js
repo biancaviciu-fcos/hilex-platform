@@ -1,4 +1,4 @@
-const CACHE_NAME = "hilex-pwa-v1";
+const CACHE_NAME = "hilex-pwa-v2";
 const STATIC_ASSETS = [
   "/",
   "/login",

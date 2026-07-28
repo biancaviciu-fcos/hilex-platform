@@ -4,7 +4,7 @@ import { WhatsAppWidget } from "@/components/WhatsAppWidget";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "HILEX",
+  title: "HiLex",
   description: "Resurse digitale HILEX",
   manifest: "/manifest.webmanifest",
   applicationName: "HiLex",
