@@ -82,6 +82,9 @@ export default async function AccountPage({
     .from("subscriptions")
     .select("access_level,status,current_period_end,cancel_at_period_end,stripe_customer_id")
     .eq("user_id", user.id)
+    .in("status", ["active", "trialing"])
+    .or(`current_period_end.is.null,current_period_end.gt.${new Date().toISOString()}`)
+    .order("access_level", { ascending: false })
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
