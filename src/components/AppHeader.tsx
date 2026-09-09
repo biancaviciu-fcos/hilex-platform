@@ -8,6 +8,7 @@ export async function AppHeader() {
       </Link>
       <nav className="nav">
         <Link href="/">Acasă</Link>
+        <Link href="/essential">Essential</Link>
         <Link href="/library">Resurse</Link>
         <Link href="/library?favorites=1">Favorite</Link>
         <Link href="/contact">Contact</Link>

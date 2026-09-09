@@ -9,6 +9,7 @@ async function signIn(formData: FormData) {
   const email = String(formData.get("email") || "");
   const password = String(formData.get("password") || "");
   const remember = formData.get("remember") === "1";
+  const selectedPlan = String(formData.get("selected_plan") || "");
   const cookieStore = await cookies();
 
   cookieStore.set("hilex_remember", remember ? "1" : "0", {
@@ -19,18 +20,33 @@ async function signIn(formData: FormData) {
   });
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) redirect("/login?error=1");
-  redirect("/library");
+
+  const { data: subscription } = await supabase
+    .from("subscriptions")
+    .select("access_level,status,current_period_end")
+    .eq("user_id", data.user?.id)
+    .in("status", ["active", "trialing"])
+    .or(`current_period_end.is.null,current_period_end.gt.${new Date().toISOString()}`)
+    .order("access_level", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (subscription?.access_level === "premium") redirect("/");
+  if (selectedPlan === "premium") redirect("/essential?upgrade=1");
+  redirect("/essential");
 }
 
 export default async function LoginPage({
   searchParams
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; plan?: string }>;
 }) {
   const params = await searchParams;
+  const selectedPlan = params.plan === "premium" ? "premium" : params.plan === "essential" ? "essential" : "";
+  const planLabel = selectedPlan === "premium" ? "Premium" : selectedPlan === "essential" ? "Essential" : "HiLex";
 
   return (
     <main className="page login-page">
@@ -38,14 +54,15 @@ export default async function LoginPage({
         <div className="login-panel">
           <img className="login-logo" alt="HiLex" src="/hilex-logo-transparent.png" />
           <div className="login-heading">
-            <h1>Autentificare HiLex</h1>
-            <p>Intră în contul tău pentru a accesa resursele.</p>
+            <h1>Autentificare {planLabel}</h1>
+            <p>Intră în contul tău pentru a accesa zona inclusă în membership-ul tău.</p>
           </div>
 
           <form className="card form login-card" action={signIn}>
             {params.error ? (
               <p className="notice-text">Datele de login nu sunt corecte sau parola nu a fost setată încă.</p>
             ) : null}
+            <input name="selected_plan" type="hidden" value={selectedPlan} />
             <div className="field">
               <label>Email</label>
               <input name="email" type="email" required />

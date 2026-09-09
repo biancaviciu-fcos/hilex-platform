@@ -45,7 +45,7 @@ export default async function HomePage() {
     data: { user }
   } = await supabase.auth.getUser();
 
-  if (!user) redirect("/login");
+  if (!user) redirect("/choose");
 
   const { data: subscription } = await supabase
     .from("subscriptions")
@@ -56,6 +56,8 @@ export default async function HomePage() {
     .order("access_level", { ascending: false })
     .limit(1)
     .maybeSingle();
+
+  if (subscription?.access_level !== "premium") redirect("/essential");
 
   const { data: categories } = await supabase
     .from("categories")
