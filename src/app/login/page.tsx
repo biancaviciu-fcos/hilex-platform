@@ -20,23 +20,11 @@ async function signIn(formData: FormData) {
   });
 
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) redirect("/login?error=1");
 
-  const { data: subscription } = await supabase
-    .from("subscriptions")
-    .select("access_level,status,current_period_end")
-    .eq("user_id", data.user?.id)
-    .in("status", ["active", "trialing"])
-    .or(`current_period_end.is.null,current_period_end.gt.${new Date().toISOString()}`)
-    .order("access_level", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (subscription?.access_level === "premium") redirect("/");
-  if (selectedPlan === "premium") redirect("/essential?upgrade=1");
-  redirect("/essential");
+  redirect(selectedPlan === "essential" ? "/essential" : "/");
 }
 
 export default async function LoginPage({

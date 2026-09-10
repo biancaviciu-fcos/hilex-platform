@@ -6,7 +6,6 @@ import { LockedPremiumCard } from "@/components/LockedPremiumCard";
 import { UpgradePremiumModal } from "@/components/UpgradePremiumModal";
 import { canAccessLesson } from "@/lib/access";
 import { accessLabel } from "@/lib/labels";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AccessLevel } from "@/lib/types";
 
@@ -239,40 +238,25 @@ export default async function LibraryPage({
 
   if (userAccess !== "premium") redirect("/essential");
 
-  const adminSupabase = createSupabaseAdminClient();
+  const [categoriesResult, categoryLessonRowsResult, favoritesResult, progressRowsResult] = await Promise.all([
+    supabase.from("categories").select("id,name,slug,description,sort_order").order("sort_order"),
+    supabase.from("lessons").select("category_id").eq("status", "published"),
+    supabase.from("favorite_lessons").select("lesson_id").eq("user_id", user.id),
+    supabase.from("lesson_progress").select("lesson_id").eq("user_id", user.id)
+  ]);
 
-  const { data: categories } = await supabase
-    .from("categories")
-    .select("id,name,slug,description,sort_order")
-    .order("sort_order");
-
+  const categories = categoriesResult.data;
   const selectedCategory = onlyFavorites ? null : categories?.find((item) => item.slug === category);
 
-  const { data: categoryLessonRows } = await supabase
-    .from("lessons")
-    .select("category_id")
-    .eq("status", "published");
-
   const categoryCounts = new Map<string, number>();
-  (categoryLessonRows || []).forEach((lesson) => {
+  (categoryLessonRowsResult.data || []).forEach((lesson) => {
     if (lesson.category_id) {
       categoryCounts.set(lesson.category_id, (categoryCounts.get(lesson.category_id) || 0) + 1);
     }
   });
 
-  const { data: favorites } = await adminSupabase
-    .from("favorite_lessons")
-    .select("lesson_id")
-    .eq("user_id", user.id);
-
-  const savedIds = favoriteIds(favorites);
-
-  const { data: progressRows } = await supabase
-    .from("lesson_progress")
-    .select("lesson_id")
-    .eq("user_id", user.id);
-
-  const completedIds = favoriteIds(progressRows);
+  const savedIds = favoriteIds(favoritesResult.data);
+  const completedIds = favoriteIds(progressRowsResult.data);
 
   let lessonsQuery = supabase
     .from("lessons")

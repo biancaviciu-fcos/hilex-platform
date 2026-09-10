@@ -2,7 +2,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { EssentialHeader } from "@/components/EssentialHeader";
 import { categoryIcon } from "@/lib/labels";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -62,33 +61,27 @@ export default async function EssentialPage({
 }) {
   const params = searchParams ? await searchParams : {};
   const supabase = await createSupabaseServerClient();
-  const adminSupabase = createSupabaseAdminClient();
   const {
     data: { user }
   } = await supabase.auth.getUser();
 
   if (!user) redirect("/login?plan=essential");
 
-  const { data: categories } = await supabase
-    .from("categories")
-    .select("id,name,slug,description,sort_order")
-    .order("sort_order");
+  const [categoriesResult, lessonsResult, favoritesResult] = await Promise.all([
+    supabase.from("categories").select("id,name,slug,description,sort_order").order("sort_order"),
+    supabase
+      .from("lessons")
+      .select("id,title,slug,excerpt,access_level,duration_minutes,thumbnail_url,category_id,categories(name,slug)")
+      .eq("status", "published")
+      .eq("platform", "essential")
+      .order("published_at", { ascending: false }),
+    supabase.from("favorite_lessons").select("lesson_id").eq("user_id", user.id)
+  ]);
 
-  const { data: lessons } = await supabase
-    .from("lessons")
-    .select("id,title,slug,excerpt,access_level,duration_minutes,thumbnail_url,category_id,categories(name,slug)")
-    .eq("status", "published")
-    .eq("platform", "essential")
-    .order("published_at", { ascending: false });
-
-  const essentialLessons = (lessons || []) as EssentialMaterial[];
+  const categories = categoriesResult.data;
+  const essentialLessons = (lessonsResult.data || []) as EssentialMaterial[];
   const selectedCategory = (categories || []).find((category) => category.slug === params.category);
-  const { data: favorites } = await adminSupabase
-    .from("favorite_lessons")
-    .select("lesson_id")
-    .eq("user_id", user.id);
-
-  const favoriteIds = new Set((favorites || []).map((item) => item.lesson_id));
+  const favoriteIds = new Set((favoritesResult.data || []).map((item) => item.lesson_id));
   const query = normalizeEssentialSearch(params.q);
   const visibleLessons = essentialLessons.filter((lesson) => {
     if (selectedCategory && lesson.category_id !== selectedCategory.id) return false;

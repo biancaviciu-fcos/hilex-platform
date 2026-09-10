@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { HomeInstallAppModal } from "@/components/HomeInstallAppModal";
 import { accessLabel as formatAccessLabel, categoryIcon } from "@/lib/labels";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -40,7 +39,6 @@ function MaterialMiniCard({ material }: { material: HomeMaterial }) {
 
 export default async function HomePage() {
   const supabase = await createSupabaseServerClient();
-  const adminSupabase = createSupabaseAdminClient();
   const {
     data: { user }
   } = await supabase.auth.getUser();
@@ -59,17 +57,27 @@ export default async function HomePage() {
 
   if (subscription?.access_level !== "premium") redirect("/essential");
 
-  const { data: categories } = await supabase
-    .from("categories")
-    .select("id,name,slug,description,sort_order")
-    .order("sort_order");
+  const [categoriesResult, lessonsResult, favoritesResult, viewedRowsResult] = await Promise.all([
+    supabase.from("categories").select("id,name,slug,description,sort_order").order("sort_order"),
+    supabase
+      .from("lessons")
+      .select("id,title,slug,excerpt,access_level,duration_minutes,thumbnail_url,category_id,published_at")
+      .eq("status", "published")
+      .order("published_at", { ascending: false }),
+    supabase
+      .from("favorite_lessons")
+      .select("lesson_id,created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("lesson_views")
+      .select("lesson_id,viewed_at")
+      .eq("user_id", user.id)
+      .order("viewed_at", { ascending: false })
+  ]);
 
-  const { data: lessons } = await supabase
-    .from("lessons")
-    .select("id,title,slug,excerpt,access_level,duration_minutes,thumbnail_url,category_id,published_at")
-    .eq("status", "published");
-
-  const allLessons = ((lessons || []) as (HomeMaterial & { published_at?: string | null })[]).sort((first, second) => {
+  const categories = categoriesResult.data;
+  const allLessons = ((lessonsResult.data || []) as (HomeMaterial & { published_at?: string | null })[]).sort((first, second) => {
     const firstDate = first.published_at ? new Date(first.published_at).getTime() : 0;
     const secondDate = second.published_at ? new Date(second.published_at).getTime() : 0;
     return secondDate - firstDate;
@@ -82,22 +90,10 @@ export default async function HomePage() {
     }
   });
 
-  const { data: favorites } = await adminSupabase
-    .from("favorite_lessons")
-    .select("lesson_id,created_at")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
-
-  const favoriteIds = new Set((favorites || []).map((item) => item.lesson_id));
+  const favoriteIds = new Set((favoritesResult.data || []).map((item) => item.lesson_id));
   const savedMaterials = allLessons.filter((lesson) => favoriteIds.has(lesson.id));
 
-  const { data: viewedRows } = await supabase
-    .from("lesson_views")
-    .select("lesson_id,viewed_at")
-    .eq("user_id", user.id)
-    .order("viewed_at", { ascending: false });
-
-  const recentlyViewed = (viewedRows || [])
+  const recentlyViewed = (viewedRowsResult.data || [])
     .map((row) => allLessons.find((lesson) => lesson.id === row.lesson_id))
     .filter(Boolean)
     .slice(0, 3) as HomeMaterial[];

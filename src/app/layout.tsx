@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { PwaRegister } from "@/components/PwaRegister";
-import { WhatsAppWidget } from "@/components/WhatsAppWidget";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -32,7 +31,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <PwaRegister />
         {children}
-        <WhatsAppWidget />
       </body>
     </html>
   );
