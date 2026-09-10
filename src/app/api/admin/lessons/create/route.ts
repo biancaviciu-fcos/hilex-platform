@@ -110,7 +110,8 @@ export async function POST(request: Request) {
   }
 
   const subcategoryId = String(formData.get("subcategory_id") || "");
-  const accessLevel = String(formData.get("access_level") || "basic");
+  const platform = String(formData.get("platform") || "premium") === "essential" ? "essential" : "premium";
+  const accessLevel = platform === "essential" ? "basic" : String(formData.get("access_level") || "basic");
   const status = String(formData.get("status") || "draft");
   const excerpt = String(formData.get("excerpt") || "");
   const durationMinutes = Number(formData.get("duration_minutes") || 0) || null;
@@ -134,6 +135,7 @@ export async function POST(request: Request) {
       slug,
       category_id: categoryId,
       subcategory_id: subcategoryId || null,
+      platform,
       access_level: accessLevel,
       status,
       excerpt,

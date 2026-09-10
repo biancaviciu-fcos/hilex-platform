@@ -78,7 +78,7 @@ export default async function EssentialPage({
     .from("lessons")
     .select("id,title,slug,excerpt,access_level,duration_minutes,thumbnail_url,category_id,categories(name,slug)")
     .eq("status", "published")
-    .eq("access_level", "basic")
+    .eq("platform", "essential")
     .order("published_at", { ascending: false });
 
   const essentialLessons = (lessons || []) as EssentialMaterial[];

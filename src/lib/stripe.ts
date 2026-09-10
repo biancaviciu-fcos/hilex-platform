@@ -1,8 +1,16 @@
 import Stripe from "stripe";
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
 export type CheckoutPlan = "basic" | "premium" | "premium_upgrade";
+
+export function getStripe() {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+
+  if (!secretKey) {
+    throw new Error("Missing STRIPE_SECRET_KEY");
+  }
+
+  return new Stripe(secretKey);
+}
 
 export function priceIdForPlan(plan: CheckoutPlan) {
   if (plan === "premium_upgrade") return process.env.STRIPE_PREMIUM_UPGRADE_PRICE_ID!;

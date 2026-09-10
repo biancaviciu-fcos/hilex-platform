@@ -63,7 +63,8 @@ async function updateLesson(formData: FormData) {
   const slug = String(formData.get("slug") || "");
   const categoryId = String(formData.get("category_id") || "");
   const subcategoryId = String(formData.get("subcategory_id") || "");
-  const accessLevel = String(formData.get("access_level") || "basic");
+  const platform = String(formData.get("platform") || "premium") === "essential" ? "essential" : "premium";
+  const accessLevel = platform === "essential" ? "basic" : String(formData.get("access_level") || "basic");
   const status = String(formData.get("status") || "draft");
   const excerpt = String(formData.get("excerpt") || "");
   const thumbnail = formData.get("thumbnail");
@@ -92,6 +93,7 @@ async function updateLesson(formData: FormData) {
     slug,
     category_id: categoryId,
     subcategory_id: subcategoryId || null,
+    platform,
     access_level: accessLevel,
     status,
     excerpt,
@@ -232,7 +234,17 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
               <p className="field-hint">Momentan nu afișăm subcategoriile ca filtru public în resurse.</p>
             </div>
             <div className="field">
-              <label>Pachet material</label>
+              <label>Apare în platforma</label>
+              <select name="platform" defaultValue={lesson.platform || "premium"}>
+                <option value="premium">HiLex Premium</option>
+                <option value="essential">HiLex Essential</option>
+              </select>
+              <p className="field-hint">
+                Alege Essential doar pentru materialele video care trebuie să existe în platforma Essential.
+              </p>
+            </div>
+            <div className="field">
+              <label>Pachet de acces</label>
               <select name="access_level" defaultValue={lesson.access_level}>
                 <option value="basic">Essential - inclus pentru toți membrii</option>
                 <option value="premium">Premium - blocat pentru membrii Essential</option>

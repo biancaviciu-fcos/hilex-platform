@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -35,6 +35,7 @@ export async function POST(request: Request) {
       return NextResponse.redirect(`${siteUrl}${returnTo}?billing=missing`, { status: 303 });
     }
 
+    const stripe = getStripe();
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: subscription.stripe_customer_id,
       return_url: `${siteUrl}${returnTo}`

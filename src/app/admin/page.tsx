@@ -78,7 +78,7 @@ export default async function AdminPage({
 
   const { data: lessons } = await adminSupabase
     .from("lessons")
-    .select("id,title,slug,status,access_level,excerpt,thumbnail_url")
+    .select("id,title,slug,status,access_level,platform,excerpt,thumbnail_url")
     .order("created_at", { ascending: false });
 
   const allLessons = lessons || [];
@@ -105,6 +105,9 @@ export default async function AdminPage({
             <div className="lesson-content">
               <div className="tag-row">
                 <span className="tag">{statusLabel(lesson.status)}</span>
+                <span className={`tag ${lesson.platform === "premium" ? "premium" : ""}`}>
+                  {lesson.platform === "essential" ? "Essential platform" : "Premium platform"}
+                </span>
                 <span className={`tag ${lesson.access_level === "premium" ? "premium" : ""}`}>
                   {lesson.access_level === "premium" ? "Premium" : "Essential"}
                 </span>

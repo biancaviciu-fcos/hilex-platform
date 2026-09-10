@@ -1,5 +1,6 @@
 export type AccessLevel = "basic" | "premium";
 export type ContentStatus = "draft" | "published" | "archived";
+export type LessonPlatform = "essential" | "premium";
 
 export type Category = {
   id: string;
@@ -17,6 +18,7 @@ export type Lesson = {
   body: string[];
   key_points: string[];
   access_level: AccessLevel;
+  platform: LessonPlatform;
   status: ContentStatus;
   duration_minutes: number | null;
   thumbnail_url: string | null;

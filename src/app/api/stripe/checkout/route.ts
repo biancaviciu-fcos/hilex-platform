@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { type CheckoutPlan, priceIdForPlan, stripe } from "@/lib/stripe";
+import { type CheckoutPlan, getStripe, priceIdForPlan } from "@/lib/stripe";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -26,6 +26,7 @@ export async function POST(request: Request) {
       );
     }
 
+    const stripe = getStripe();
     const session = await stripe.checkout.sessions.create({
       mode: checkoutPlan === "premium_upgrade" ? "payment" : "subscription",
       line_items: [{ price: priceId, quantity: 1 }],

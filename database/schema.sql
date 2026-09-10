@@ -5,6 +5,7 @@ create type public.access_level as enum ('basic', 'premium');
 create type public.subscription_status as enum ('trialing', 'active', 'past_due', 'canceled', 'expired', 'incomplete', 'incomplete_expired', 'unpaid', 'paused');
 create type public.content_status as enum ('draft', 'published', 'archived');
 create type public.video_provider as enum ('cloudflare_stream', 'mux', 'external');
+create type public.lesson_platform as enum ('essential', 'premium');
 
 create table public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -70,6 +71,7 @@ create table public.lessons (
   video_provider public.video_provider,
   video_asset_id text,
   video_playback_id text,
+  platform public.lesson_platform not null default 'premium',
   published_at timestamptz,
   created_by uuid references public.profiles(id) on delete set null,
   created_at timestamptz not null default now(),
@@ -134,6 +136,7 @@ create table public.consultation_credit_usage (
 create index lessons_category_idx on public.lessons(category_id);
 create index lessons_subcategory_idx on public.lessons(subcategory_id);
 create index lessons_access_status_idx on public.lessons(access_level, status);
+create index lessons_platform_status_idx on public.lessons(platform, status);
 create index subscriptions_user_status_idx on public.subscriptions(user_id, status);
 create index favorite_lessons_lesson_idx on public.favorite_lessons(lesson_id);
 create index lesson_progress_lesson_idx on public.lesson_progress(lesson_id);

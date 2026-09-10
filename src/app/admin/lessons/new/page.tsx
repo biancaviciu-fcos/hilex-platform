@@ -91,7 +91,18 @@ export default async function NewLessonPage({
               <p className="field-hint">Momentan nu afișăm subcategoriile ca filtru public în resurse.</p>
             </div>
             <div className="field">
-              <label>Pachet material</label>
+              <label>Apare în platforma</label>
+              <select name="platform" defaultValue="premium">
+                <option value="premium">HiLex Premium</option>
+                <option value="essential">HiLex Essential</option>
+              </select>
+              <p className="field-hint">
+                Materialele existente rămân Premium. Alege Essential doar pentru clipurile publice/social media care
+                trebuie să apară în platforma Essential.
+              </p>
+            </div>
+            <div className="field">
+              <label>Pachet de acces</label>
               <select name="access_level">
                 <option value="basic">Essential - inclus pentru toți membrii</option>
                 <option value="premium">Premium - blocat pentru membrii Essential</option>

@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { sendEmail } from "@/lib/email";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(request: Request) {
@@ -16,6 +16,7 @@ export async function POST(request: Request) {
   let event: Stripe.Event;
 
   try {
+    const stripe = getStripe();
     event = stripe.webhooks.constructEvent(
       body,
       signature,
@@ -172,6 +173,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   if (!subscriptionId) return;
 
+  const stripe = getStripe();
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
   await supabase.from("subscriptions").upsert({

@@ -40,7 +40,7 @@ export default async function EssentialMaterialPage({ params }: { params: Promis
     .select("id,title,slug,excerpt,body,key_points,video_provider,video_playback_id,thumbnail_url,duration_minutes,categories(name,slug)")
     .eq("slug", slug)
     .eq("status", "published")
-    .eq("access_level", "basic")
+    .eq("platform", "essential")
     .single();
 
   if (!lesson) notFound();
