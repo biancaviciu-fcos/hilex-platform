@@ -62,6 +62,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
     .select("*, categories(name,slug), subcategories(name,slug), lesson_resources(title,resource_type,url,access_level,sort_order)")
     .eq("slug", slug)
     .eq("status", "published")
+    .eq("platform", "premium")
     .single();
 
   if (!lesson) notFound();
@@ -87,7 +88,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
 
   if (locked) {
     return (
-      <main className="page">
+      <main className="page member-shell">
         <AppHeader />
         <section className="hero compact material-hero">
           <div className="inner material-hero-inner">
@@ -154,7 +155,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   );
 
   return (
-    <main className="page">
+    <main className="page member-shell">
       <AppHeader />
       <section className="hero compact material-hero">
         <div className="inner material-hero-inner">

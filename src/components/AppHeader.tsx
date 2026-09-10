@@ -4,11 +4,10 @@ export async function AppHeader() {
   return (
     <aside className="topbar">
       <Link className="brand" href="/">
-        Hi<span>Lex</span>
+        <img alt="HiLex" src="/hilex-logo-transparent.png" />
       </Link>
       <nav className="nav">
         <Link href="/">Acasă</Link>
-        <Link href="/essential">Essential</Link>
         <Link href="/library">Resurse</Link>
         <Link href="/library?favorites=1">Favorite</Link>
         <Link href="/contact">Contact</Link>

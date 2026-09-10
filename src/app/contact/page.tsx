@@ -17,7 +17,7 @@ export default async function ContactPage({
   if (!user) redirect("/login");
 
   return (
-    <main className="page">
+    <main className="page member-shell">
       <AppHeader />
       <section className="hero compact">
         <div className="inner">
