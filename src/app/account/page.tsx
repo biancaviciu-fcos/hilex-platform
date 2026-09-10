@@ -127,7 +127,7 @@ export default async function AccountPage({
 
   return (
     <main className="page member-shell">
-      <AppHeader />
+      <AppHeader showWhatsApp={userAccess === "premium"} />
       <section className="hero compact">
         <div className="inner">
           <h1>Contul meu</h1>

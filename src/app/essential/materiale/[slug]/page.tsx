@@ -2,8 +2,8 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { EssentialHeader } from "@/components/EssentialHeader";
 import { FavoriteHeartButton } from "@/components/FavoriteHeartButton";
+import { LessonViewTracker } from "@/components/LessonViewTracker";
 import { VideoCoverPlayer } from "@/components/VideoCoverPlayer";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type EssentialLesson = {
@@ -28,7 +28,6 @@ function relationName(value: EssentialLesson["categories"]) {
 export default async function EssentialMaterialPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const supabase = await createSupabaseServerClient();
-  const adminSupabase = createSupabaseAdminClient();
   const {
     data: { user }
   } = await supabase.auth.getUser();
@@ -45,18 +44,7 @@ export default async function EssentialMaterialPage({ params }: { params: Promis
 
   if (!lesson) notFound();
 
-  await supabase
-    .from("lesson_views")
-    .upsert(
-      {
-        user_id: user.id,
-        lesson_id: lesson.id,
-        viewed_at: new Date().toISOString()
-      },
-      { onConflict: "user_id,lesson_id" }
-    );
-
-  const { data: favorite } = await adminSupabase
+  const { data: favorite } = await supabase
     .from("favorite_lessons")
     .select("lesson_id")
     .eq("user_id", user.id)
@@ -70,6 +58,7 @@ export default async function EssentialMaterialPage({ params }: { params: Promis
   return (
     <main className="page essential-page">
       <EssentialHeader />
+      <LessonViewTracker lessonId={lesson.id} />
       <section className="essential-material-hero">
         <div className="inner essential-material-hero-inner">
           <Link className="essential-back-link" href="/essential#materiale">

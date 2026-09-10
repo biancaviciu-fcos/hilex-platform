@@ -1,30 +1,9 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-
 const whatsappNumber = "447908790689";
 const whatsappMessage = encodeURIComponent(
   "Bună! Am nevoie de ajutor cu contul sau resursele HiLex."
 );
 
-export async function WhatsAppWidget() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (!user) return null;
-
-  const { data: subscription } = await supabase
-    .from("subscriptions")
-    .select("access_level,status")
-    .eq("user_id", user.id)
-    .eq("access_level", "premium")
-    .in("status", ["active", "trialing"])
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (!subscription) return null;
-
+export function WhatsAppWidget() {
   return (
     <a
       aria-label="Contactează HILEX pe WhatsApp"

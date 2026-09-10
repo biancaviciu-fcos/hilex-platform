@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { WhatsAppWidget } from "@/components/WhatsAppWidget";
 
-export async function AppHeader() {
+export function AppHeader({ showWhatsApp = false }: { showWhatsApp?: boolean }) {
   return (
     <>
       <aside className="topbar">
@@ -19,7 +19,7 @@ export async function AppHeader() {
           <Link className="btn" href="/account">Cont</Link>
         </nav>
       </aside>
-      <WhatsAppWidget />
+      {showWhatsApp ? <WhatsAppWidget /> : null}
     </>
   );
 }

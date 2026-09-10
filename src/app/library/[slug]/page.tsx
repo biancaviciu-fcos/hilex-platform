@@ -4,9 +4,9 @@ import { AppHeader } from "@/components/AppHeader";
 import { FavoriteHeartButton } from "@/components/FavoriteHeartButton";
 import { UpgradePremiumModal } from "@/components/UpgradePremiumModal";
 import { VideoCoverPlayer } from "@/components/VideoCoverPlayer";
+import { LessonViewTracker } from "@/components/LessonViewTracker";
 import { canAccessLesson } from "@/lib/access";
 import { accessLabel } from "@/lib/labels";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { AccessLevel } from "@/lib/types";
 
@@ -77,8 +77,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   const lessonAccess = lesson.access_level as AccessLevel;
   const locked = !canAccessLesson(userAccess, lessonAccess);
   const canViewPremiumExtraInfo = userAccess === "premium";
-  const adminSupabase = createSupabaseAdminClient();
-  const { data: favorite } = await adminSupabase
+  const { data: favorite } = await supabase
     .from("favorite_lessons")
     .select("lesson_id")
     .eq("user_id", user.id)
@@ -88,7 +87,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   if (locked) {
     return (
       <main className="page member-shell">
-        <AppHeader />
+        <AppHeader showWhatsApp />
         <section className="hero compact material-hero">
           <div className="inner material-hero-inner">
             <p className="breadcrumbs">
@@ -129,17 +128,6 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
     );
   }
 
-  await supabase
-    .from("lesson_views")
-    .upsert(
-      {
-        user_id: user.id,
-        lesson_id: lesson.id,
-        viewed_at: new Date().toISOString()
-      },
-      { onConflict: "user_id,lesson_id" }
-    );
-
   const resourcesWithUrls = await Promise.all(
     pdfResources.map(async (resource: { title: string; url: string; resource_type: string; access_level: string }) => {
       const { data } = await supabase.storage
@@ -155,7 +143,8 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
 
   return (
     <main className="page member-shell">
-      <AppHeader />
+      <AppHeader showWhatsApp />
+      <LessonViewTracker lessonId={lesson.id} />
       <section className="hero compact material-hero">
         <div className="inner material-hero-inner">
           <p className="breadcrumbs">

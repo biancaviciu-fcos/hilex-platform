@@ -286,7 +286,7 @@ export default async function LibraryPage({
 
   return (
     <main className="page member-shell">
-      <AppHeader />
+      <AppHeader showWhatsApp />
       <section className="hero library-hero">
         <div className="inner">
           <h1>{onlyFavorites ? "Favoritele tale" : "Resurse HILEX"}</h1>

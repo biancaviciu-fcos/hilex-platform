@@ -108,7 +108,7 @@ export default async function HomePage() {
 
   return (
     <main className="page member-shell">
-      <AppHeader />
+      <AppHeader showWhatsApp />
       <HomeInstallAppModal />
       <section className="hero member-landing-hero">
         <div className="inner member-landing-grid">
