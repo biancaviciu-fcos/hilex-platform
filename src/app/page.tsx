@@ -67,8 +67,7 @@ export default async function HomePage() {
   const { data: lessons } = await supabase
     .from("lessons")
     .select("id,title,slug,excerpt,access_level,duration_minutes,thumbnail_url,category_id,published_at")
-    .eq("status", "published")
-    .eq("platform", "premium");
+    .eq("status", "published");
 
   const allLessons = ((lessons || []) as (HomeMaterial & { published_at?: string | null })[]).sort((first, second) => {
     const firstDate = first.published_at ? new Date(first.published_at).getTime() : 0;

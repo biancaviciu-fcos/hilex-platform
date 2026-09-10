@@ -251,8 +251,7 @@ export default async function LibraryPage({
   const { data: categoryLessonRows } = await supabase
     .from("lessons")
     .select("category_id")
-    .eq("status", "published")
-    .eq("platform", "premium");
+    .eq("status", "published");
 
   const categoryCounts = new Map<string, number>();
   (categoryLessonRows || []).forEach((lesson) => {
@@ -278,8 +277,7 @@ export default async function LibraryPage({
   let lessonsQuery = supabase
     .from("lessons")
     .select("id,title,slug,excerpt,body,key_points,extra_info,access_level,duration_minutes,status,thumbnail_url,categories(name,slug,description)")
-    .eq("status", "published")
-    .eq("platform", "premium");
+    .eq("status", "published");
 
   if (!onlyFavorites && category && selectedCategory) {
     lessonsQuery = lessonsQuery.eq("category_id", selectedCategory.id);
