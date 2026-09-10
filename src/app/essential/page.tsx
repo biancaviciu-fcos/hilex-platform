@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AppHeader } from "@/components/AppHeader";
-import { UpgradePremiumModal } from "@/components/UpgradePremiumModal";
-import { accessLabel, categoryIcon } from "@/lib/labels";
-import { getMembershipCreditSummary } from "@/lib/membership";
+import { categoryIcon } from "@/lib/labels";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -26,6 +24,16 @@ function relationName(value: EssentialMaterial["categories"]) {
   return value?.name || "";
 }
 
+function normalizeEssentialSearch(value: unknown) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function EssentialMaterialCard({ material }: { material: EssentialMaterial }) {
   const category = relationName(material.categories);
 
@@ -36,7 +44,6 @@ function EssentialMaterialCard({ material }: { material: EssentialMaterial }) {
       </div>
       <div className="essential-material-copy">
         <div className="tag-row">
-          <span className="tag">{accessLabel(material.access_level)}</span>
           {material.duration_minutes ? <span className="tag">{material.duration_minutes} min</span> : null}
           {category ? <span className="tag">{category}</span> : null}
         </div>
@@ -47,34 +54,38 @@ function EssentialMaterialCard({ material }: { material: EssentialMaterial }) {
   );
 }
 
+function EssentialHeader() {
+  return (
+    <header className="essential-header">
+      <Link className="essential-brand" href="/essential">
+        Hi<span>Lex</span> <small>Essential</small>
+      </Link>
+      <nav className="essential-nav">
+        <Link href="/essential">Acasă</Link>
+        <Link href="/essential#materiale">Materiale video</Link>
+        <Link href="/essential?favorites=1#materiale">Favorite</Link>
+        <Link href="/contact">Contact</Link>
+        <Link className="btn essential-account-btn" href="/account">
+          Cont
+        </Link>
+      </nav>
+    </header>
+  );
+}
+
 export default async function EssentialPage({
   searchParams
 }: {
-  searchParams?: Promise<{ upgrade?: string }>;
+  searchParams?: Promise<{ category?: string; favorites?: string; q?: string; upgrade?: string }>;
 }) {
   const params = searchParams ? await searchParams : {};
   const supabase = await createSupabaseServerClient();
+  const adminSupabase = createSupabaseAdminClient();
   const {
     data: { user }
   } = await supabase.auth.getUser();
 
   if (!user) redirect("/login?plan=essential");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("email")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  const { data: subscription } = await supabase
-    .from("subscriptions")
-    .select("access_level,status,current_period_end")
-    .eq("user_id", user.id)
-    .in("status", ["active", "trialing"])
-    .or(`current_period_end.is.null,current_period_end.gt.${new Date().toISOString()}`)
-    .order("access_level", { ascending: false })
-    .limit(1)
-    .maybeSingle();
 
   const { data: categories } = await supabase
     .from("categories")
@@ -89,49 +100,46 @@ export default async function EssentialPage({
     .order("published_at", { ascending: false });
 
   const essentialLessons = (lessons || []) as EssentialMaterial[];
+  const selectedCategory = (categories || []).find((category) => category.slug === params.category);
+  const { data: favorites } = await adminSupabase
+    .from("favorite_lessons")
+    .select("lesson_id")
+    .eq("user_id", user.id);
+
+  const favoriteIds = new Set((favorites || []).map((item) => item.lesson_id));
+  const query = normalizeEssentialSearch(params.q);
+  const visibleLessons = essentialLessons.filter((lesson) => {
+    if (selectedCategory && lesson.category_id !== selectedCategory.id) return false;
+    if (params.favorites && !favoriteIds.has(lesson.id)) return false;
+    if (!query) return true;
+
+    const searchable = normalizeEssentialSearch([lesson.title, lesson.excerpt, relationName(lesson.categories)].join(" "));
+    return searchable.includes(query);
+  });
   const categoryCounts = new Map<string, number>();
 
   essentialLessons.forEach((lesson) => {
     if (lesson.category_id) categoryCounts.set(lesson.category_id, (categoryCounts.get(lesson.category_id) || 0) + 1);
   });
 
-  const creditSummary = await getMembershipCreditSummary(profile?.email || user.email || "");
-  const isPremium = subscription?.access_level === "premium";
-
   return (
     <main className="page essential-page">
-      <AppHeader />
+      <EssentialHeader />
       <section className="essential-hero">
-        <div className="inner essential-hero-grid">
+        <div className="inner essential-hero-inner">
           <div>
-            <span className="eyebrow">HiLex Essential</span>
-            <h1>Materiale simple, clare și ușor de parcurs.</h1>
+            <span className="eyebrow">HILEX ESSENTIAL</span>
+            <h1>Informația juridică de care ai nevoie, la îndemână.</h1>
             <p>
-              Aici găsești materiale publicate și ghiduri scurte, organizate pe arii de drept, ca să ajungi rapid la
-              informația de care ai nevoie.
+              Materiale video juridice utile, atent selectate și organizate pentru acces rapid și ușor.
             </p>
-            <form className="essential-search-row" action="/library">
-              <input name="q" placeholder="Caută după temă sau cuvânt cheie" />
-              <input name="access" type="hidden" value="basic" />
+            <form className="essential-search-row" action="/essential#materiale">
+              <input name="q" placeholder="Caută materiale video" defaultValue={params.q || ""} />
               <button className="btn primary" type="submit">
                 Caută
               </button>
             </form>
           </div>
-          <aside className="essential-status-card">
-            <span className="eyebrow">Planul tău</span>
-            <strong>{isPremium ? "Premium" : "Essential"}</strong>
-            <p>
-              {creditSummary.remainingMinutes} din {creditSummary.includedMinutes} minute de consultanță disponibile.
-            </p>
-            {isPremium ? (
-              <Link className="btn" href="/">
-                Mergi la Premium
-              </Link>
-            ) : (
-              <UpgradePremiumModal compact triggerContent="Upgrade la Premium" />
-            )}
-          </aside>
         </div>
       </section>
 
@@ -139,20 +147,24 @@ export default async function EssentialPage({
         <div className="inner">
           {params.upgrade ? (
             <div className="notice-text essential-upgrade-notice">
-              Ai ales zona Premium, dar contul tău este Essential. Poți face upgrade oricând pentru acces complet.
+              Ai intrat în zona Essential. Aici găsești materialele video incluse în membership-ul tău.
             </div>
           ) : null}
 
-          <div className="section-title">
+          <div className="essential-section-heading">
             <div>
-              <span className="eyebrow">Arii Essential</span>
-              <h2>Alege domeniul care te interesează</h2>
+              <span className="eyebrow">Arii de drept</span>
+              <h2>Explorează materialele pe domenii</h2>
             </div>
           </div>
 
           <div className="essential-topic-grid">
             {(categories || []).map((category) => (
-              <Link className="essential-topic-card" href={`/library?category=${category.slug}&access=basic`} key={category.id}>
+              <Link
+                className={`essential-topic-card ${params.category === category.slug ? "active" : ""}`}
+                href={`/essential?category=${category.slug}#materiale`}
+                key={category.id}
+              >
                 <span aria-hidden="true">{categoryIcon(category.slug, category.name)}</span>
                 <div>
                   <h3>
@@ -164,20 +176,39 @@ export default async function EssentialPage({
             ))}
           </div>
 
-          <div className="section-title">
+          <div className="essential-section-heading with-action">
             <div>
-              <span className="eyebrow">Materiale Essential</span>
-              <h2>Materiale disponibile</h2>
+              <span className="eyebrow">Materiale video</span>
+              <h2>
+                {params.favorites
+                  ? "Favoritele tale"
+                  : selectedCategory
+                    ? selectedCategory.name
+                    : query
+                      ? "Rezultatele căutării"
+                      : "Disponibile acum"}
+              </h2>
             </div>
-            <Link className="btn" href="/library?access=basic">
-              Vezi toate
-            </Link>
+            {selectedCategory || params.favorites || query ? (
+              <Link className="btn" href="/essential#materiale">
+                Vezi toate materialele
+              </Link>
+            ) : null}
           </div>
 
-          <div className="essential-material-grid">
-            {essentialLessons.map((material) => (
+          <div className="essential-material-grid" id="materiale">
+            {visibleLessons.map((material) => (
               <EssentialMaterialCard key={material.id} material={material} />
             ))}
+            {!visibleLessons.length ? (
+              <div className="essential-empty-state">
+                <h3>Nu am găsit materiale aici încă.</h3>
+                <p className="muted">Încearcă o altă arie de drept sau revino la toate materialele video.</p>
+                <Link className="btn" href="/essential#materiale">
+                  Vezi toate materialele
+                </Link>
+              </div>
+            ) : null}
           </div>
         </div>
       </section>
