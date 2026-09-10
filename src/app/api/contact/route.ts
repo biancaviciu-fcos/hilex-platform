@@ -5,6 +5,10 @@ function clean(value: FormDataEntryValue | null) {
   return String(value || "").trim();
 }
 
+function safeRedirectPath(value: string) {
+  return value.startsWith("/") && !value.startsWith("//") ? value : "/contact";
+}
+
 export async function POST(request: Request) {
   const supabase = await createSupabaseServerClient();
   const {
@@ -16,13 +20,14 @@ export async function POST(request: Request) {
   }
 
   const formData = await request.formData();
+  const redirectTo = safeRedirectPath(clean(formData.get("redirectTo")) || "/contact");
   const name = clean(formData.get("name"));
   const email = clean(formData.get("email"));
   const topic = clean(formData.get("topic"));
   const message = clean(formData.get("message"));
 
   if (!name || !email || !message) {
-    return NextResponse.redirect(new URL("/contact?error=missing", request.url), { status: 303 });
+    return NextResponse.redirect(new URL(`${redirectTo}?error=missing`, request.url), { status: 303 });
   }
 
   const resendApiKey = process.env.RESEND_API_KEY;
@@ -31,7 +36,7 @@ export async function POST(request: Request) {
 
   if (!resendApiKey) {
     console.error("Missing RESEND_API_KEY for contact form");
-    return NextResponse.redirect(new URL("/contact?error=email", request.url), { status: 303 });
+    return NextResponse.redirect(new URL(`${redirectTo}?error=email`, request.url), { status: 303 });
   }
 
   const { data: profile } = await supabase
@@ -71,8 +76,8 @@ export async function POST(request: Request) {
   if (!response.ok) {
     const errorText = await response.text();
     console.error("Contact email failed", errorText);
-    return NextResponse.redirect(new URL("/contact?error=email", request.url), { status: 303 });
+    return NextResponse.redirect(new URL(`${redirectTo}?error=email`, request.url), { status: 303 });
   }
 
-  return NextResponse.redirect(new URL("/contact?sent=1", request.url), { status: 303 });
+  return NextResponse.redirect(new URL(`${redirectTo}?sent=1`, request.url), { status: 303 });
 }

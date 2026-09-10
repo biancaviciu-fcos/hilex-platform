@@ -236,6 +236,9 @@ export default async function LibraryPage({
     .maybeSingle();
 
   const userAccess = (subscription?.access_level || null) as AccessLevel | null;
+
+  if (userAccess !== "premium") redirect("/essential");
+
   const adminSupabase = createSupabaseAdminClient();
 
   const { data: categories } = await supabase

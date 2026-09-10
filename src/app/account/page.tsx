@@ -225,6 +225,7 @@ export default async function AccountPage({
                 <p className="notice-text account-notice">Nu am putut deschide facturile acum. Reîncearcă în câteva momente.</p>
               ) : null}
               <form action="/api/stripe/billing-portal" method="POST">
+                <input name="returnTo" type="hidden" value="/account" />
                 <button className="btn primary" type="submit">
                   Vezi și descarcă facturile
                 </button>

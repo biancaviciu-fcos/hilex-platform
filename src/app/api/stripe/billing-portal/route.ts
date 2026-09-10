@@ -4,8 +4,15 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
-export async function POST() {
+function safeRedirectPath(value: FormDataEntryValue | null) {
+  const path = String(value || "/account").trim();
+  return path.startsWith("/") && !path.startsWith("//") ? path : "/account";
+}
+
+export async function POST(request: Request) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://membersaccess.hilex.co.uk";
+  const formData = await request.formData();
+  const returnTo = safeRedirectPath(formData.get("returnTo"));
 
   try {
     const supabase = await createSupabaseServerClient();
@@ -25,17 +32,17 @@ export async function POST() {
       .maybeSingle();
 
     if (!subscription?.stripe_customer_id) {
-      return NextResponse.redirect(`${siteUrl}/account?billing=missing`, { status: 303 });
+      return NextResponse.redirect(`${siteUrl}${returnTo}?billing=missing`, { status: 303 });
     }
 
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: subscription.stripe_customer_id,
-      return_url: `${siteUrl}/account`
+      return_url: `${siteUrl}${returnTo}`
     });
 
     return NextResponse.redirect(portalSession.url, { status: 303 });
   } catch (error) {
     console.error("HILEX billing portal failed", error);
-    return NextResponse.redirect(`${siteUrl}/account?billing=error`, { status: 303 });
+    return NextResponse.redirect(`${siteUrl}${returnTo}?billing=error`, { status: 303 });
   }
 }

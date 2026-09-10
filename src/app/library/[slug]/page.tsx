@@ -55,6 +55,8 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
 
   const userAccess = (subscription?.access_level || null) as AccessLevel | null;
 
+  if (userAccess !== "premium") redirect(`/essential/materiale/${slug}`);
+
   const { data: lesson } = await supabase
     .from("lessons")
     .select("*, categories(name,slug), subcategories(name,slug), lesson_resources(title,resource_type,url,access_level,sort_order)")

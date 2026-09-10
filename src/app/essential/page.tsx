@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { EssentialHeader } from "@/components/EssentialHeader";
 import { categoryIcon } from "@/lib/labels";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -38,7 +39,7 @@ function EssentialMaterialCard({ material }: { material: EssentialMaterial }) {
   const category = relationName(material.categories);
 
   return (
-    <Link className="essential-material-card" href={`/library/${material.slug}`}>
+    <Link className="essential-material-card" href={`/essential/materiale/${material.slug}`}>
       <div className="essential-material-thumb">
         {material.thumbnail_url ? <img alt="" src={material.thumbnail_url} /> : <span>▶</span>}
       </div>
@@ -51,25 +52,6 @@ function EssentialMaterialCard({ material }: { material: EssentialMaterial }) {
         {material.excerpt ? <p className="muted">{material.excerpt}</p> : null}
       </div>
     </Link>
-  );
-}
-
-function EssentialHeader() {
-  return (
-    <header className="essential-header">
-      <Link className="essential-brand" href="/essential">
-        Hi<span>Lex</span> <small>Essential</small>
-      </Link>
-      <nav className="essential-nav">
-        <Link href="/essential">Acasă</Link>
-        <Link href="/essential#materiale">Materiale video</Link>
-        <Link href="/essential?favorites=1#materiale">Favorite</Link>
-        <Link href="/contact">Contact</Link>
-        <Link className="btn essential-account-btn" href="/account">
-          Cont
-        </Link>
-      </nav>
-    </header>
   );
 }
 
