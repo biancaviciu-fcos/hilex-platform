@@ -32,18 +32,21 @@ export default async function ChoosePlatformPage() {
         <div className="choose-platform-grid">
           <Link className="choose-plan-card essential" href="/login?plan=essential">
             <span className="choose-plan-icon">E</span>
-            <small>HiLex Essential</small>
-            <h2>Materiale clare, rapide și ușor de parcurs.</h2>
-            <p>Zona simplă pentru materiale publicate, ghiduri scurte și orientare juridică de bază.</p>
-            <strong>Intră în Essential</strong>
+            <small>HILEX ESSENTIAL</small>
+            <h2>Informația juridică de care ai nevoie, la îndemână.</h2>
+            <p>Materiale video juridice utile, atent selectate și organizate pentru acces rapid și ușor.</p>
+            <strong>Accesează Essential</strong>
           </Link>
 
           <Link className="choose-plan-card premium" href="/login?plan=premium">
             <span className="choose-plan-icon">P</span>
-            <small>HiLex Premium</small>
-            <h2>Acces complet la resursele exclusive HiLex.</h2>
-            <p>Zona completă pentru materiale premium, extra content, resurse, WhatsApp și suport prioritar.</p>
-            <strong>Intră în Premium</strong>
+            <small>HILEX PREMIUM</small>
+            <h2>Resurse juridice exclusive pentru membrii HiLex Premium.</h2>
+            <p>
+              Acces la materiale create special pentru membrii Premium, inclusiv conținut video, întrebări frecvente și
+              ghiduri PDF.
+            </p>
+            <strong>Accesează Premium</strong>
           </Link>
         </div>
       </section>
