@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "import:essential-videos": "node scripts/import-essential-videos.mjs",
     "lint": "next lint"
   },
   "dependencies": {
