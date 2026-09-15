@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { FavoriteHeartButton } from "@/components/FavoriteHeartButton";
-import { VideoCoverPlayer } from "@/components/VideoCoverPlayer";
 
 export type EssentialVideoMaterial = {
   id: string;
@@ -73,9 +72,11 @@ export function EssentialVideoGrid({ materials }: { materials: EssentialVideoMat
             </div>
             <div className="essential-video-modal-player">
               {activeMaterial.video_provider === "cloudflare_stream" && activeMaterial.video_playback_id ? (
-                <VideoCoverPlayer
-                  playbackId={activeMaterial.video_playback_id}
-                  thumbnailUrl={activeMaterial.thumbnail_url}
+                <iframe
+                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                  allowFullScreen
+                  className="video-embed"
+                  src={`https://iframe.videodelivery.net/${activeMaterial.video_playback_id}?autoplay=true`}
                   title={activeMaterial.title}
                 />
               ) : (
