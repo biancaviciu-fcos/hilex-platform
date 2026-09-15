@@ -22,7 +22,12 @@ export async function createSupabaseServerClient() {
         },
         setAll(cookiesToSet: CookieToSet[]) {
           cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, rememberSession && value ? { ...options, maxAge: 60 * 60 * 24 * 365 } : options);
+            try {
+              cookieStore.set(name, value, rememberSession && value ? { ...options, maxAge: 60 * 60 * 24 * 365 } : options);
+            } catch {
+              // Server Components can read cookies, but cannot always write refreshed auth cookies.
+              // Route Handlers and Server Actions still persist them through the same helper.
+            }
           });
         }
       }
