@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { EssentialHeader } from "@/components/EssentialHeader";
 import { EssentialVideoGrid, type EssentialVideoMaterial } from "@/components/EssentialVideoGrid";
+import { HomeInstallAppModal } from "@/components/HomeInstallAppModal";
 import { categoryIcon } from "@/lib/labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -94,6 +95,7 @@ export default async function EssentialPage({
   return (
     <main className="page essential-page">
       <EssentialHeader />
+      <HomeInstallAppModal />
       <section className="essential-hero">
         <div className="inner essential-hero-inner">
           <div>

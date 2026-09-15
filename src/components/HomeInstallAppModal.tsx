@@ -7,7 +7,7 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 };
 
-const DISMISSED_KEY = "hilex_install_modal_dismissed";
+const DISMISSED_KEY = "hilex_install_modal_dismissed_v2";
 
 function isIosDevice() {
   if (typeof window === "undefined") return false;
