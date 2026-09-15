@@ -49,6 +49,10 @@ export async function POST(
     })
     .eq("id", id);
 
+  if (request.headers.get("accept")?.includes("application/json")) {
+    return NextResponse.json({ ok: true });
+  }
+
   return NextResponse.redirect(new URL(`/admin/lessons/${id}`, request.url), {
     status: 303
   });

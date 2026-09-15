@@ -76,7 +76,7 @@ export function EssentialVideoGrid({ materials }: { materials: EssentialVideoMat
                   allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
                   allowFullScreen
                   className="video-embed"
-                  src={`https://iframe.videodelivery.net/${activeMaterial.video_playback_id}?autoplay=true`}
+                  src={`https://iframe.videodelivery.net/${activeMaterial.video_playback_id}`}
                   title={activeMaterial.title}
                 />
               ) : (

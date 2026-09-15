@@ -2,8 +2,10 @@
 
 import type { ChangeEvent } from "react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function VideoUploadPanel({ lessonId }: { lessonId: string }) {
+  const router = useRouter();
   const [uploadUrl, setUploadUrl] = useState("");
   const [videoId, setVideoId] = useState("");
   const [message, setMessage] = useState("");
@@ -31,10 +33,28 @@ export function VideoUploadPanel({ lessonId }: { lessonId: string }) {
     setMessage("Linkul de upload a fost creat. Alege fișierul video și încarcă-l.");
   }
 
+  async function saveVideoToLesson(assetId: string) {
+    const saveData = new FormData();
+    saveData.append("video_asset_id", assetId);
+
+    const response = await fetch(`/api/admin/lessons/${lessonId}/video`, {
+      method: "POST",
+      body: saveData,
+      headers: {
+        Accept: "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      throw new Error(payload?.error || "Nu am putut salva video-ul pe material.");
+    }
+  }
+
   async function uploadVideo(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
 
-    if (!file || !uploadUrl) {
+    if (!file || !uploadUrl || !videoId) {
       return;
     }
 
@@ -56,7 +76,13 @@ export function VideoUploadPanel({ lessonId }: { lessonId: string }) {
       return;
     }
 
-    setMessage("Video-ul a fost încărcat. Apasă pe Salvează video pe material.");
+    try {
+      await saveVideoToLesson(videoId);
+      setMessage("Video-ul a fost încărcat și salvat pe material.");
+      router.refresh();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Video-ul a fost încărcat, dar nu a putut fi salvat pe material.");
+    }
   }
 
   return (
@@ -64,7 +90,7 @@ export function VideoUploadPanel({ lessonId }: { lessonId: string }) {
       <h2>Video Cloudflare Stream</h2>
       <p className="muted">
         Creează un link privat de upload, încarcă video-ul în Cloudflare, apoi
-        salvează ID-ul video pe material.
+        salvează automat ID-ul video pe material.
       </p>
       <button className="btn primary" disabled={isLoading} onClick={createUploadUrl} type="button">
         {isLoading ? "Se creează..." : "Creează link upload video"}
@@ -82,7 +108,7 @@ export function VideoUploadPanel({ lessonId }: { lessonId: string }) {
               <input name="video_asset_id" readOnly value={videoId} />
             </div>
             <button className="btn primary" type="submit">
-              {isUploading ? "Se încarcă..." : "Salvează video pe material"}
+              {isUploading ? "Se încarcă..." : "Salvează din nou video pe material"}
             </button>
           </form>
         </div>
