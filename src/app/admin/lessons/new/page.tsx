@@ -97,8 +97,8 @@ export default async function NewLessonPage({
                 <option value="essential">HiLex Essential</option>
               </select>
               <p className="field-hint">
-                Materialele existente rămân Premium. Alege Essential doar pentru clipurile publice/social media care
-                trebuie să apară în platforma Essential.
+                Essential este strict video-only: titlu, categorie, descriere scurtă, thumbnail și video. Articolele,
+                PDF-urile, link-urile și întrebările extra sunt folosite doar pentru Premium.
               </p>
             </div>
             <div className="field">
@@ -153,10 +153,12 @@ export default async function NewLessonPage({
             <div className="field">
               <label>Text articol, câte un paragraf pe rând</label>
               <textarea name="body" rows={8} />
+              <p className="field-hint">Se folosește doar pentru HiLex Premium. Pentru Essential, acest câmp este ignorat.</p>
             </div>
             <div className="field">
               <label>Idei cheie, câte una pe rând</label>
               <textarea name="key_points" rows={5} />
+              <p className="field-hint">Se folosește doar pentru HiLex Premium. Pentru Essential, acest câmp este ignorat.</p>
             </div>
             <div className="field">
               <label>Ce mai trebuie să știi (Premium)</label>
@@ -166,13 +168,12 @@ export default async function NewLessonPage({
                 rows={8}
               />
               <p className="field-hint">
-                Această secțiune apare doar pentru membrii Premium. Pentru mai multe întrebări, lasă o linie goală
-                între fiecare întrebare și răspuns.
+                Această secțiune apare doar pentru membrii Premium. Pentru Essential, acest câmp este ignorat.
               </p>
             </div>
             <section className="nested-form-panel">
               <h2>PDF inițial</h2>
-              <p className="field-hint">Opțional: poți atașa primul PDF direct când creezi materialul.</p>
+              <p className="field-hint">Opțional pentru Premium. Materialele Essential nu afișează PDF-uri.</p>
               <div className="field">
                 <label>Titlu resursă PDF</label>
                 <input name="resource_title" placeholder="Ex: Checklist documente" />
@@ -191,7 +192,7 @@ export default async function NewLessonPage({
             </section>
             <section className="nested-form-panel">
               <h2>Link util inițial</h2>
-              <p className="field-hint">Opțional: poți adăuga primul link util direct la creare.</p>
+              <p className="field-hint">Opțional pentru Premium. Materialele Essential nu afișează link-uri utile.</p>
               <div className="field">
                 <label>Titlu link</label>
                 <input name="link_title" placeholder="Ex: GOV.UK guidance" />

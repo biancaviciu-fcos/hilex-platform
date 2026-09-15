@@ -2176,12 +2176,25 @@ textarea {
   box-shadow: none;
   display: grid;
   overflow: hidden;
+  position: relative;
   transition: border-color 0.18s ease, transform 0.18s ease;
 }
 
 .essential-material-card:hover {
   border-color: #f3c8df;
   transform: translateY(-2px);
+}
+
+.essential-material-open {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+  width: 100%;
 }
 
 .essential-material-thumb {
@@ -2229,6 +2242,69 @@ textarea {
   font-size: 14px;
   line-height: 1.45;
   margin: 0;
+}
+
+.essential-video-modal-backdrop {
+  align-items: center;
+  background: rgba(2, 8, 63, 0.64);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 22px;
+  position: fixed;
+  z-index: 80;
+}
+
+.essential-video-modal {
+  background: var(--white);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 14px;
+  box-shadow: 0 28px 80px rgba(2, 8, 63, 0.24);
+  display: grid;
+  gap: 18px;
+  max-height: calc(100vh - 44px);
+  max-width: 980px;
+  overflow: auto;
+  padding: clamp(18px, 3vw, 28px);
+  position: relative;
+  width: min(980px, 100%);
+}
+
+.essential-video-modal-close {
+  align-items: center;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--navy);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 28px;
+  height: 42px;
+  justify-content: center;
+  line-height: 1;
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  width: 42px;
+}
+
+.essential-video-modal-heading {
+  display: grid;
+  gap: 10px;
+  padding-right: 54px;
+}
+
+.essential-video-modal-heading h2 {
+  color: var(--navy);
+  font-size: clamp(25px, 3vw, 38px);
+  line-height: 1.08;
+  margin: 0;
+}
+
+.essential-video-modal-player {
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .essential-empty-state {
@@ -2311,12 +2387,25 @@ textarea {
   gap: 28px;
 }
 
+.essential-material-layout.video-only {
+  max-width: 1040px;
+}
+
 .essential-video-panel {
   background: var(--white);
   border: 1px solid var(--line);
   border-radius: 10px;
   box-shadow: 0 16px 36px rgba(2, 8, 63, 0.08);
   overflow: hidden;
+}
+
+.essential-material-section.video-only {
+  padding-top: 10px;
+}
+
+.essential-material-layout.video-only .essential-video-panel {
+  margin: 0 auto;
+  width: 100%;
 }
 
 .essential-article {

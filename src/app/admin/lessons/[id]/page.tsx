@@ -72,15 +72,19 @@ async function updateLesson(formData: FormData) {
   const videoAssetId = String(formData.get("video_asset_id") || "") || null;
   const videoPlaybackId = String(formData.get("video_playback_id") || "") || null;
   const durationMinutes = Number(formData.get("duration_minutes") || 0) || null;
-  const body = String(formData.get("body") || "")
-    .split("\n")
-    .map((item) => item.trim())
-    .filter(Boolean);
-  const keyPoints = String(formData.get("key_points") || "")
-    .split("\n")
-    .map((item) => item.trim())
-    .filter(Boolean);
-  const extraInfo = parseExtraInfo(String(formData.get("extra_info") || ""));
+  const body = platform === "essential"
+    ? []
+    : String(formData.get("body") || "")
+        .split("\n")
+        .map((item) => item.trim())
+        .filter(Boolean);
+  const keyPoints = platform === "essential"
+    ? []
+    : String(formData.get("key_points") || "")
+        .split("\n")
+        .map((item) => item.trim())
+        .filter(Boolean);
+  const extraInfo = platform === "essential" ? [] : parseExtraInfo(String(formData.get("extra_info") || ""));
 
   let thumbnailUrl: string | null = null;
 
@@ -128,6 +132,10 @@ async function updateLesson(formData: FormData) {
     .from("lessons")
     .update(updatePayload)
     .eq("id", id);
+
+  if (platform === "essential") {
+    await adminSupabase.from("lesson_resources").delete().eq("lesson_id", id);
+  }
 
   redirect("/admin");
 }
@@ -240,7 +248,8 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
                 <option value="essential">HiLex Essential</option>
               </select>
               <p className="field-hint">
-                Alege Essential doar pentru materialele video care trebuie să existe în platforma Essential.
+                Essential este strict video-only: titlu, categorie, descriere scurtă, thumbnail și video. Dacă salvezi
+                un material ca Essential, textul, FAQ-urile și resursele atașate nu vor fi folosite.
               </p>
             </div>
             <div className="field">
@@ -299,10 +308,12 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
             <div className="field">
               <label>Text articol, câte un paragraf pe rând</label>
               <textarea name="body" rows={10} defaultValue={body} />
+              <p className="field-hint">Se folosește doar pentru HiLex Premium. Pentru Essential, acest câmp este ignorat.</p>
             </div>
             <div className="field">
               <label>Idei cheie, câte una pe rând</label>
               <textarea name="key_points" rows={6} defaultValue={keyPoints} />
+              <p className="field-hint">Se folosește doar pentru HiLex Premium. Pentru Essential, acest câmp este ignorat.</p>
             </div>
             <div className="field">
               <label>Ce mai trebuie să știi (Premium)</label>
@@ -313,7 +324,7 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
                 placeholder={"Scrie întrebarea pe primul rând, apoi răspunsul dedesubt.\n\nPentru mai multe întrebări, lasă o linie goală între fiecare bloc."}
               />
               <p className="field-hint">
-                Această secțiune apare doar pentru membrii Premium, sub text și idei cheie.
+                Această secțiune apare doar pentru membrii Premium. Pentru Essential, acest câmp este ignorat.
               </p>
             </div>
             <button className="btn primary" type="submit">
@@ -325,7 +336,8 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
 
           <div className="admin-panels">
             <section className="card form">
-              <h2>Adaugă PDF</h2>
+              <h2>Adaugă PDF Premium</h2>
+              <p className="field-hint">PDF-urile sunt folosite doar pe materialele Premium.</p>
               <form action="/api/admin/resources/upload" encType="multipart/form-data" method="POST" className="form">
                 <input type="hidden" name="lesson_id" value={lesson.id} />
                 <div className="field">
@@ -350,7 +362,8 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
             </section>
 
             <section className="card form">
-              <h2>Adaugă link</h2>
+              <h2>Adaugă link Premium</h2>
+              <p className="field-hint">Link-urile utile sunt folosite doar pe materialele Premium.</p>
               <form action="/api/admin/resources/link" method="POST" className="form">
                 <input type="hidden" name="lesson_id" value={lesson.id} />
                 <div className="field">

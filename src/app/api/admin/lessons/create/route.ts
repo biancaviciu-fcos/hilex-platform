@@ -118,15 +118,19 @@ export async function POST(request: Request) {
   const videoProvider = String(formData.get("video_provider") || "") || null;
   const videoAssetId = String(formData.get("video_asset_id") || "") || null;
   const videoPlaybackId = String(formData.get("video_playback_id") || "") || null;
-  const body = String(formData.get("body") || "")
-    .split("\n")
-    .map((item) => item.trim())
-    .filter(Boolean);
-  const keyPoints = String(formData.get("key_points") || "")
-    .split("\n")
-    .map((item) => item.trim())
-    .filter(Boolean);
-  const extraInfo = parseExtraInfo(String(formData.get("extra_info") || ""));
+  const body = platform === "essential"
+    ? []
+    : String(formData.get("body") || "")
+        .split("\n")
+        .map((item) => item.trim())
+        .filter(Boolean);
+  const keyPoints = platform === "essential"
+    ? []
+    : String(formData.get("key_points") || "")
+        .split("\n")
+        .map((item) => item.trim())
+        .filter(Boolean);
+  const extraInfo = platform === "essential" ? [] : parseExtraInfo(String(formData.get("extra_info") || ""));
 
   const { data: material, error } = await supabase
     .from("lessons")
@@ -173,7 +177,7 @@ export async function POST(request: Request) {
   }
 
   const resourceFile = formData.get("resource_file");
-  if (resourceFile instanceof File && resourceFile.size > 0) {
+  if (platform !== "essential" && resourceFile instanceof File && resourceFile.size > 0) {
     const path = `${material.id}/${Date.now()}-${safeResourceFileName(resourceFile.name)}`;
     const { error: uploadError } = await supabase.storage
       .from("lesson-resources")
@@ -195,7 +199,7 @@ export async function POST(request: Request) {
 
   const linkTitle = String(formData.get("link_title") || "").trim();
   const linkUrl = String(formData.get("link_url") || "").trim();
-  if (linkTitle && linkUrl) {
+  if (platform !== "essential" && linkTitle && linkUrl) {
     await supabase.from("lesson_resources").insert({
       lesson_id: material.id,
       title: linkTitle,

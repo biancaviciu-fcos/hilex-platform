@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { EssentialHeader } from "@/components/EssentialHeader";
+import { EssentialVideoGrid, type EssentialVideoMaterial } from "@/components/EssentialVideoGrid";
 import { categoryIcon } from "@/lib/labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -15,6 +16,8 @@ type EssentialMaterial = {
   access_level: string;
   duration_minutes: number | null;
   thumbnail_url: string | null;
+  video_provider: string | null;
+  video_playback_id: string | null;
   category_id: string | null;
   categories?: { name?: string | null; slug?: string | null } | { name?: string | null; slug?: string | null }[] | null;
 };
@@ -34,26 +37,6 @@ function normalizeEssentialSearch(value: unknown) {
     .trim();
 }
 
-function EssentialMaterialCard({ material }: { material: EssentialMaterial }) {
-  const category = relationName(material.categories);
-
-  return (
-    <Link className="essential-material-card" href={`/essential/materiale/${material.slug}`}>
-      <div className="essential-material-thumb">
-        {material.thumbnail_url ? <img alt="" src={material.thumbnail_url} /> : <span>▶</span>}
-      </div>
-      <div className="essential-material-copy">
-        <div className="tag-row">
-          {material.duration_minutes ? <span className="tag">{material.duration_minutes} min</span> : null}
-          {category ? <span className="tag">{category}</span> : null}
-        </div>
-        <h3>{material.title}</h3>
-        {material.excerpt ? <p className="muted">{material.excerpt}</p> : null}
-      </div>
-    </Link>
-  );
-}
-
 export default async function EssentialPage({
   searchParams
 }: {
@@ -71,7 +54,7 @@ export default async function EssentialPage({
     supabase.from("categories").select("id,name,slug,description,sort_order").order("sort_order"),
     supabase
       .from("lessons")
-      .select("id,title,slug,excerpt,access_level,duration_minutes,thumbnail_url,category_id,categories(name,slug)")
+      .select("id,title,slug,excerpt,access_level,duration_minutes,thumbnail_url,video_provider,video_playback_id,category_id,categories(name,slug)")
       .eq("status", "published")
       .eq("platform", "essential")
       .order("published_at", { ascending: false }),
@@ -96,6 +79,17 @@ export default async function EssentialPage({
   essentialLessons.forEach((lesson) => {
     if (lesson.category_id) categoryCounts.set(lesson.category_id, (categoryCounts.get(lesson.category_id) || 0) + 1);
   });
+  const videoMaterials: EssentialVideoMaterial[] = visibleLessons.map((lesson) => ({
+    id: lesson.id,
+    title: lesson.title,
+    excerpt: lesson.excerpt,
+    duration_minutes: lesson.duration_minutes,
+    thumbnail_url: lesson.thumbnail_url,
+    video_provider: lesson.video_provider,
+    video_playback_id: lesson.video_playback_id,
+    categoryName: relationName(lesson.categories),
+    isFavorite: favoriteIds.has(lesson.id)
+  }));
 
   return (
     <main className="page essential-page">
@@ -171,10 +165,8 @@ export default async function EssentialPage({
             ) : null}
           </div>
 
-          <div className="essential-material-grid" id="materiale">
-            {visibleLessons.map((material) => (
-              <EssentialMaterialCard key={material.id} material={material} />
-            ))}
+          <div>
+            <EssentialVideoGrid materials={videoMaterials} />
             {!visibleLessons.length ? (
               <div className="essential-empty-state">
                 <h3>Nu am găsit materiale aici încă.</h3>
