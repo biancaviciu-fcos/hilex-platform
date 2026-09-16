@@ -18,6 +18,7 @@ type EssentialMaterial = {
   duration_minutes: number | null;
   thumbnail_url: string | null;
   video_provider: string | null;
+  video_asset_id: string | null;
   video_playback_id: string | null;
   category_id: string | null;
   categories?: { name?: string | null; slug?: string | null } | { name?: string | null; slug?: string | null }[] | null;
@@ -55,7 +56,7 @@ export default async function EssentialPage({
     supabase.from("categories").select("id,name,slug,description,sort_order").order("sort_order"),
     supabase
       .from("lessons")
-      .select("id,title,slug,excerpt,access_level,duration_minutes,thumbnail_url,video_provider,video_playback_id,category_id,categories(name,slug)")
+      .select("id,title,slug,excerpt,access_level,duration_minutes,thumbnail_url,video_provider,video_asset_id,video_playback_id,category_id,categories(name,slug)")
       .eq("status", "published")
       .eq("platform", "essential")
       .order("published_at", { ascending: false }),
@@ -87,6 +88,7 @@ export default async function EssentialPage({
     duration_minutes: lesson.duration_minutes,
     thumbnail_url: lesson.thumbnail_url,
     video_provider: lesson.video_provider,
+    video_asset_id: lesson.video_asset_id,
     video_playback_id: lesson.video_playback_id,
     categoryName: relationName(lesson.categories),
     isFavorite: favoriteIds.has(lesson.id)

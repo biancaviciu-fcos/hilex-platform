@@ -68,9 +68,14 @@ async function updateLesson(formData: FormData) {
   const status = String(formData.get("status") || "draft");
   const excerpt = String(formData.get("excerpt") || "");
   const thumbnail = formData.get("thumbnail");
-  const videoProvider = String(formData.get("video_provider") || "") || null;
-  const videoAssetId = String(formData.get("video_asset_id") || "") || null;
-  const videoPlaybackId = String(formData.get("video_playback_id") || "") || null;
+  const rawVideoProvider = String(formData.get("video_provider") || "") || null;
+  const rawVideoAssetId = String(formData.get("video_asset_id") || "") || null;
+  const rawVideoPlaybackId = String(formData.get("video_playback_id") || "") || null;
+  const cloudflareVideoId =
+    !rawVideoProvider || rawVideoProvider === "cloudflare_stream" ? rawVideoPlaybackId || rawVideoAssetId : null;
+  const videoProvider = cloudflareVideoId ? "cloudflare_stream" : rawVideoProvider;
+  const videoAssetId = cloudflareVideoId || rawVideoAssetId;
+  const videoPlaybackId = cloudflareVideoId || rawVideoPlaybackId;
   const durationMinutes = Number(formData.get("duration_minutes") || 0) || null;
   const body = platform === "essential"
     ? []
