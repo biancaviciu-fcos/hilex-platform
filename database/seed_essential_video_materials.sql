@@ -1,3 +1,17 @@
+update public.lessons
+set
+  thumbnail_url = '/essential-covers/vocea-si-imaginea-dupa-plecarea-din-companie.png',
+  platform = 'essential',
+  access_level = 'basic',
+  status = 'published',
+  updated_at = now()
+where lower(title) like lower('%Vocea%imaginea%plecarea%companie%');
+
+delete from public.lessons
+where slug = 'vocea-si-imaginea-ta-dupa-plecarea-din-companie'
+  and video_asset_id is null
+  and video_playback_id is null;
+
 with family as (
   select id from public.categories where slug = 'dreptul-familiei' limit 1
 ), immigration as (
@@ -8,13 +22,6 @@ with family as (
   select id from public.categories where slug = 'drept-penal' limit 1
 ), materials(category_id, title, slug, thumbnail_url, sort_order) as (
   values
-    (
-      (select id from civil),
-      'Vocea și imaginea ta după plecarea din companie: ce poate folosi angajatorul?',
-      'vocea-si-imaginea-ta-dupa-plecarea-din-companie',
-      '/essential-covers/vocea-si-imaginea-dupa-plecarea-din-companie.png',
-      1
-    ),
     (
       (select id from penal),
       'Extrădarea din UK: cum funcționează și când poate fi contestată',
