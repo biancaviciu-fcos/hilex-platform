@@ -62,6 +62,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
     .select("*, categories(name,slug), subcategories(name,slug), lesson_resources(title,resource_type,url,access_level,sort_order)")
     .eq("slug", slug)
     .eq("status", "published")
+    .eq("platform", "premium")
     .single();
 
   if (!lesson) notFound();

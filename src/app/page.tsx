@@ -63,6 +63,7 @@ export default async function HomePage() {
       .from("lessons")
       .select("id,title,slug,excerpt,access_level,duration_minutes,thumbnail_url,category_id,published_at")
       .eq("status", "published")
+      .eq("platform", "premium")
       .order("published_at", { ascending: false }),
     supabase
       .from("favorite_lessons")

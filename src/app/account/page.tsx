@@ -98,7 +98,8 @@ export default async function AccountPage({
     let lessonsQuery = supabase
       .from("lessons")
       .select("id,access_level,status")
-      .eq("status", "published");
+      .eq("status", "published")
+      .eq("platform", "premium");
 
     if (userAccess === "basic") {
       lessonsQuery = lessonsQuery.eq("access_level", "basic");

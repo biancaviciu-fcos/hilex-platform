@@ -240,7 +240,7 @@ export default async function LibraryPage({
 
   const [categoriesResult, categoryLessonRowsResult, favoritesResult, progressRowsResult] = await Promise.all([
     supabase.from("categories").select("id,name,slug,description,sort_order").order("sort_order"),
-    supabase.from("lessons").select("category_id").eq("status", "published"),
+    supabase.from("lessons").select("category_id").eq("status", "published").eq("platform", "premium"),
     supabase.from("favorite_lessons").select("lesson_id").eq("user_id", user.id),
     supabase.from("lesson_progress").select("lesson_id").eq("user_id", user.id)
   ]);
@@ -261,7 +261,8 @@ export default async function LibraryPage({
   let lessonsQuery = supabase
     .from("lessons")
     .select("id,title,slug,excerpt,body,key_points,extra_info,access_level,duration_minutes,status,thumbnail_url,categories(name,slug,description)")
-    .eq("status", "published");
+    .eq("status", "published")
+    .eq("platform", "premium");
 
   if (!onlyFavorites && category && selectedCategory) {
     lessonsQuery = lessonsQuery.eq("category_id", selectedCategory.id);
