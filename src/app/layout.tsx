@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { PwaRegister } from "@/components/PwaRegister";
 import "./globals.css";
+import "./essential/essential.css";
+import "./premium.css";
 
 export const metadata: Metadata = {
   title: "HiLex",

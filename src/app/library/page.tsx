@@ -286,8 +286,8 @@ export default async function LibraryPage({
   const lessons = sortForAccess(filteredLessons as LessonCardData[], userAccess);
 
   return (
-    <main className="page member-shell">
-      <AppHeader showWhatsApp />
+    <main className="page member-shell premium-shell">
+      <AppHeader premiumDesign showWhatsApp categories={(categories || []).map(category => ({ ...category, count: categoryCounts.get(category.id) || 0 }))} />
       <section className="hero library-hero">
         <div className="inner">
           <h1>{onlyFavorites ? "Favoritele tale" : "Resurse HILEX"}</h1>
@@ -315,21 +315,23 @@ export default async function LibraryPage({
         <div className="inner">
           {!onlyFavorites ? (
             <>
-              <div className="topic-grid library-topic-grid">
+              <nav className="premium-category-tabs" aria-label="Arii de drept">
+                <Link href="/library" className={!category ? "active" : ""} aria-current={!category ? "page" : undefined}>Toate resursele</Link>
                 {(categories || []).map((item) => (
                   <Link
-                    className={`topic-card library-topic-card ${category === item.slug ? "active" : ""}`}
+                    className={category === item.slug ? "active" : ""}
                     href={`/library?category=${item.slug}`}
                     key={item.id}
+                    title={item.description || undefined}
+                    aria-current={category === item.slug ? "page" : undefined}
                   >
-                    <h3>
-                      {item.name} ({categoryCounts.get(item.id) || 0})
-                    </h3>
-                    <p>{item.description}</p>
+                    {item.name} <span>({categoryCounts.get(item.id) || 0})</span>
                   </Link>
                 ))}
-              </div>
+              </nav>
 
+              <details className="premium-library-filters" open={Boolean(access)}>
+                <summary>Filtrează resursele</summary>
               <div className="subcategory-filter">
                 <span className="eyebrow">Filtre rapide</span>
                 <div className="tag-row">
@@ -373,6 +375,7 @@ export default async function LibraryPage({
                   Resetează
                 </Link>
               </form>
+              </details>
 
               <div className="section-title">
                 <div>

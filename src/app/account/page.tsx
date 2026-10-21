@@ -118,8 +118,6 @@ export default async function AccountPage({
   const completedCount = (progressRows || []).filter((row) => accessibleLessonIds.has(row.lesson_id)).length;
   const totalCount = accessibleLessons?.length || 0;
   const progressPercent = totalCount ? Math.round((completedCount / totalCount) * 100) : 0;
-  const progressBlocks = Math.round(progressPercent / 10);
-  const progressBar = `${"█".repeat(progressBlocks)}${"░".repeat(10 - progressBlocks)}`;
   const services = includedServices(userAccess);
   const creditSummary = await getMembershipCreditSummary(profile?.email || user.email || "");
   const creditPercent = creditSummary.includedMinutes
@@ -127,8 +125,8 @@ export default async function AccountPage({
     : 0;
 
   return (
-    <main className="page member-shell">
-      <AppHeader showWhatsApp={userAccess === "premium"} />
+    <main className="page member-shell premium-shell">
+      <AppHeader premiumDesign showWhatsApp={userAccess === "premium"} />
       <section className="hero compact">
         <div className="inner">
           <h1>Contul meu</h1>
@@ -157,9 +155,9 @@ export default async function AccountPage({
             <div>
               <span className="eyebrow">Progresul tău</span>
               <h2>Ai parcurs</h2>
-              <p className="progress-bar" aria-label={`${progressPercent}% parcurs`}>
-                {progressBar}
-              </p>
+              <div className="premium-progress-meter" role="progressbar" aria-label="Materiale parcurse" aria-valuenow={progressPercent} aria-valuemin={0} aria-valuemax={100}>
+                <span style={{ width: `${progressPercent}%` }} />
+              </div>
               <strong>{progressPercent}%</strong>
               <p className="muted">
                 {completedCount} din {totalCount} materiale disponibile pentru pachetul tău.

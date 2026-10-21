@@ -96,3 +96,57 @@ playback were not end-to-end verified. No production deployment or SQL migration
 
 Optional refinement: exact font matching to the raster references. No remaining P0/P1/P2
 UI findings were observed in the tested desktop and mobile views.
+
+## Premium Design Extension - 2026-10-21
+
+Source direction: the approved Essential design, captured at
+`/tmp/hilex-premium-qa/reference-essential.png`. This is a design-language adaptation,
+not an exact content clone: Premium retains descriptions, access labels, advanced
+filters, article bodies, key points, FAQs, useful links and PDFs.
+
+Implementation: `/tmp/hilex-premium-qa/library-desktop.png`.
+Full-view comparison: `/tmp/hilex-premium-qa/comparison.png`, Essential left,
+Premium right. Both original captures are 1440x1000 CSS/pixel dimensions at 1x,
+signed in with isolated fixture data, menu closed, all categories, no search.
+Comparison sheet scales each capture equally to 720x500; no cropping.
+Focused comparison was unnecessary because the full-view comparison exposes header,
+search, category navigation and content cards together.
+
+Implemented across home, library, favorites, individual materials, account and contact.
+Premium uses the same initially hidden click-to-open navigation, white surfaces,
+navy buttons, magenta active accents, restrained dividers and unframed content.
+Admin retains its existing navigation. Essential routes and content remain separate.
+
+Comparison history:
+- Initial inspection found inherited pill outlines around category icons. Replaced
+  home icons with Lucide and removed the inherited border/radius.
+- Initial article inspection found inherited white metadata text and a redundant
+  navy pseudo-element rule. Fixed contrast and removed the duplicate separator.
+- Account inspection found a glyph-based progress bar. Replaced it with an accessible
+  proportional meter using the existing progress calculation.
+- Library comparison found the old filter area too dominant. Category tabs and a
+  native expandable advanced-filter section retain controls while reducing density.
+- Post-fix captures and comparison show these issues resolved; no remaining P0/P1/P2
+  visual issues observed. Mobile article evidence: `material-mobile.png` in the same folder.
+
+Interaction checks:
+- Premium menu opens on desktop/mobile and closes on navigation; current links and
+  booking destination are correct. It reuses Essential's existing Escape/focus handling.
+- Search in favorites retains the favorites query and returns the matching fixture.
+- Advanced filters expand; Penal + Premium returns one matching fixture and retains
+  selected controls after navigation.
+- A legacy basic-labelled Premium-platform fixture remains visible and opens normally.
+- Article paragraphs, key points, FAQs, useful links and PDF attachment row render;
+  FAQ expansion displays the answer. Signed PDF URL generation remains unchanged.
+- Account shows 90 included/remaining minutes for the Premium fixture and keeps billing
+  and sign-out actions. Contact retains its form action, required fields and booking link;
+  redundant Premium upgrade messaging was removed from this Premium contact page.
+- At 390x844, account, contact, favorites and article have no horizontal overflow.
+  Images load correctly. Desktop and mobile screenshots were visually inspected.
+- Browser error logs: empty. Production build and type validation passed.
+
+Limits: production authentication, persistence, Stripe, actual PDF download and complete
+Cloudflare playback were not exercised. No production SQL, material mutation or deployment
+was performed. Preview fixtures exist only in `/tmp/hilex-design-preview`, not the repo.
+
+Premium final result: passed

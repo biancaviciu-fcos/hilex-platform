@@ -87,8 +87,8 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
 
   if (locked) {
     return (
-      <main className="page member-shell">
-        <AppHeader showWhatsApp />
+      <main className="page member-shell premium-shell">
+        <AppHeader premiumDesign showWhatsApp />
         <section className="hero compact material-hero">
           <div className="inner material-hero-inner">
             <p className="breadcrumbs">
@@ -143,8 +143,8 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   );
 
   return (
-    <main className="page member-shell">
-      <AppHeader showWhatsApp />
+    <main className="page member-shell premium-shell">
+      <AppHeader premiumDesign showWhatsApp />
       <LessonViewTracker lessonId={lesson.id} />
       <section className="hero compact material-hero">
         <div className="inner material-hero-inner">

@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { WhatsAppWidget } from "@/components/WhatsAppWidget";
+import { EssentialHeader, type EssentialCategory } from "@/components/EssentialHeader";
 
-export function AppHeader({ showWhatsApp = false }: { showWhatsApp?: boolean }) {
+export function AppHeader({ showWhatsApp = false, premiumDesign = false, categories }: { showWhatsApp?: boolean; premiumDesign?: boolean; categories?: EssentialCategory[] }) {
   return (
     <>
-      <aside className="topbar">
+      {premiumDesign ? <EssentialHeader platform="premium" categories={categories} /> : <aside className="topbar">
         <Link className="brand" href="/">
           <img alt="HiLex" src="/hilex-logo-transparent.png" />
         </Link>
@@ -18,7 +19,7 @@ export function AppHeader({ showWhatsApp = false }: { showWhatsApp?: boolean }) 
           </a>
           <Link className="btn" href="/account">Cont</Link>
         </nav>
-      </aside>
+      </aside>}
       {showWhatsApp ? <WhatsAppWidget /> : null}
     </>
   );

@@ -17,8 +17,8 @@ export default async function ContactPage({
   if (!user) redirect("/login");
 
   return (
-    <main className="page member-shell">
-      <AppHeader />
+    <main className="page member-shell premium-shell">
+      <AppHeader premiumDesign />
       <section className="hero compact">
         <div className="inner">
           <h1>Contact HILEX</h1>
@@ -32,7 +32,7 @@ export default async function ContactPage({
             <span className="eyebrow">Suport membri</span>
             <h2>Trimite-ne un mesaj</h2>
             <p className="muted">
-              Pentru întrebări despre cont, acces la materiale, upgrade la Premium sau o situație juridică în care ai
+              Pentru întrebări despre cont, acces la materiale sau o situație juridică în care ai
               nevoie de asistență, contactează echipa HILEX și revenim cât mai curând.
             </p>
             {params.sent ? (
@@ -59,7 +59,6 @@ export default async function ContactPage({
                   <option>Situație juridică - Drept Penal</option>
                   <option>Am nevoie de asistență juridică</option>
                   <option>Vreau să programez o consultanță</option>
-                  <option>Upgrade la Premium</option>
                   <option>Problemă cu platforma</option>
                   <option>Nu văd materialele corecte</option>
                   <option>Întrebare despre cont</option>
@@ -91,20 +90,6 @@ export default async function ContactPage({
           </article>
 
           <aside className="contact-side">
-            <article className="card contact-card">
-              <span className="eyebrow">Upgrade</span>
-              <h3>Vrei acces Premium?</h3>
-              <p className="muted">
-                Poți face upgrade automat la Premium și vei primi acces după finalizarea plății.
-              </p>
-              <form action="/api/stripe/checkout" method="POST">
-                <input name="plan" type="hidden" value="premium_upgrade" />
-                <button className="btn primary" type="submit">
-                  Fă upgrade acum
-                </button>
-              </form>
-            </article>
-
             <article className="card contact-card">
               <span className="eyebrow">Consultanță</span>
               <h3>Vrei să vorbești cu cineva?</h3>

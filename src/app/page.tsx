@@ -2,7 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { HomeInstallAppModal } from "@/components/HomeInstallAppModal";
-import { accessLabel as formatAccessLabel, categoryIcon } from "@/lib/labels";
+import { accessLabel as formatAccessLabel } from "@/lib/labels";
+import { UsersRound, Scale, Globe2, Shield } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +19,11 @@ type HomeMaterial = {
   thumbnail_url: string | null;
   category_id: string | null;
 };
+
+function CategoryMark({ slug }: { slug: string }) {
+  const Icon = slug.includes("famili") ? UsersRound : slug.includes("imigra") ? Globe2 : slug.includes("penal") ? Shield : Scale;
+  return <Icon size={26} strokeWidth={1.6} />;
+}
 
 function MaterialMiniCard({ material }: { material: HomeMaterial }) {
   return (
@@ -108,13 +114,13 @@ export default async function HomePage() {
   const accessLabel = formatAccessLabel(subscription?.access_level);
 
   return (
-    <main className="page member-shell">
-      <AppHeader showWhatsApp />
+    <main className="page member-shell premium-shell">
+      <AppHeader premiumDesign showWhatsApp categories={(categories || []).map(category => ({ ...category, count: categoryCounts.get(category.id) || 0 }))} />
       <HomeInstallAppModal />
       <section className="hero member-landing-hero">
         <div className="inner member-landing-grid">
           <div>
-            <span className="eyebrow hero-eyebrow">HILEX pentru membri</span>
+            <span className="eyebrow hero-eyebrow">HILEX PREMIUM</span>
             <h1>Bine ai venit în platforma HILEX</h1>
             <p>
               Găsești soluții practice, materiale video și resurse juridice create pentru situații reale din viața de zi
@@ -156,7 +162,7 @@ export default async function HomePage() {
             {(categories || []).map((category) => (
               <Link className="topic-card home-topic-card" href={`/library?category=${category.slug}`} key={category.id}>
                 <span className="topic-icon" aria-hidden="true">
-                  {categoryIcon(category.slug, category.name)}
+                  <CategoryMark slug={category.slug} />
                 </span>
                 <h3>
                   {category.name} ({categoryCounts.get(category.id) || 0})
