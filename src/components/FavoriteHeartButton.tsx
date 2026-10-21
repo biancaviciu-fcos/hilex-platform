@@ -3,11 +3,12 @@
 import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Heart } from "lucide-react";
 
 type FavoriteHeartButtonProps = {
   initialIsFavorite: boolean;
   lessonId: string;
-  variant?: "card" | "hero";
+  variant?: "card" | "hero" | "essential";
 };
 
 export function FavoriteHeartButton({
@@ -68,7 +69,7 @@ export function FavoriteHeartButton({
   return (
     <button
       aria-label={isFavorite ? "Scoate de la favorite" : "Adaugă la favorite"}
-      className={`favorite-heart-button ${variant === "hero" ? "hero-heart" : ""} ${
+      className={`favorite-heart-button ${variant === "hero" ? "hero-heart" : ""} ${variant === "essential" ? "essential-heart" : ""} ${
         isFavorite ? "active" : ""
       } ${isSaving ? "saving" : ""}`}
       aria-pressed={isFavorite}
@@ -77,7 +78,7 @@ export function FavoriteHeartButton({
       title={saveError ? "Nu s-a putut salva. Reîncearcă." : isFavorite ? "Salvat la favorite" : "Adaugă la favorite"}
       type="button"
     >
-      <span aria-hidden="true">♥</span>
+      {variant === "essential" ? <Heart size={23} strokeWidth={1.6} fill={isFavorite ? "currentColor" : "none"} aria-hidden="true" /> : <span aria-hidden="true">♥</span>}
     </button>
   );
 }

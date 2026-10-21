@@ -123,15 +123,11 @@ export async function POST(request: Request) {
   const videoProvider = cloudflareVideoId ? "cloudflare_stream" : rawVideoProvider;
   const videoAssetId = cloudflareVideoId || rawVideoAssetId;
   const videoPlaybackId = cloudflareVideoId || rawVideoPlaybackId;
-  const body = platform === "essential"
-    ? []
-    : String(formData.get("body") || "")
+  const body = String(formData.get("body") || "")
         .split("\n")
         .map((item) => item.trim())
         .filter(Boolean);
-  const keyPoints = platform === "essential"
-    ? []
-    : String(formData.get("key_points") || "")
+  const keyPoints = String(formData.get("key_points") || "")
         .split("\n")
         .map((item) => item.trim())
         .filter(Boolean);

@@ -77,15 +77,11 @@ async function updateLesson(formData: FormData) {
   const videoAssetId = cloudflareVideoId || rawVideoAssetId;
   const videoPlaybackId = cloudflareVideoId || rawVideoPlaybackId;
   const durationMinutes = Number(formData.get("duration_minutes") || 0) || null;
-  const body = platform === "essential"
-    ? []
-    : String(formData.get("body") || "")
+  const body = String(formData.get("body") || "")
         .split("\n")
         .map((item) => item.trim())
         .filter(Boolean);
-  const keyPoints = platform === "essential"
-    ? []
-    : String(formData.get("key_points") || "")
+  const keyPoints = String(formData.get("key_points") || "")
         .split("\n")
         .map((item) => item.trim())
         .filter(Boolean);
@@ -253,8 +249,7 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
                 <option value="essential">HiLex Essential</option>
               </select>
               <p className="field-hint">
-                Essential este strict video-only: titlu, categorie, descriere scurtă, thumbnail și video. Dacă salvezi
-                un material ca Essential, textul, FAQ-urile și resursele atașate nu vor fi folosite.
+                Essential include video, descriere completă și idei cheie. FAQ-urile și resursele atașate rămân doar pentru Premium.
               </p>
             </div>
             <div className="field">
@@ -313,12 +308,12 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
             <div className="field">
               <label>Text articol, câte un paragraf pe rând</label>
               <textarea name="body" rows={10} defaultValue={body} />
-              <p className="field-hint">Se folosește doar pentru HiLex Premium. Pentru Essential, acest câmp este ignorat.</p>
+              <p className="field-hint">Textul apare sub video, atât în Essential, cât și în Premium.</p>
             </div>
             <div className="field">
               <label>Idei cheie, câte una pe rând</label>
               <textarea name="key_points" rows={6} defaultValue={keyPoints} />
-              <p className="field-hint">Se folosește doar pentru HiLex Premium. Pentru Essential, acest câmp este ignorat.</p>
+              <p className="field-hint">Ideile cheie apar după textul materialului, în ambele platforme.</p>
             </div>
             <div className="field">
               <label>Ce mai trebuie să știi (Premium)</label>

@@ -97,8 +97,7 @@ export default async function NewLessonPage({
                 <option value="essential">HiLex Essential</option>
               </select>
               <p className="field-hint">
-                Essential este strict video-only: titlu, categorie, descriere scurtă, thumbnail și video. Articolele,
-                PDF-urile, link-urile și întrebările extra sunt folosite doar pentru Premium.
+                Essential include video, descriere completă și idei cheie. PDF-urile, link-urile și întrebările extra sunt folosite doar pentru Premium.
               </p>
             </div>
             <div className="field">
@@ -153,12 +152,12 @@ export default async function NewLessonPage({
             <div className="field">
               <label>Text articol, câte un paragraf pe rând</label>
               <textarea name="body" rows={8} />
-              <p className="field-hint">Se folosește doar pentru HiLex Premium. Pentru Essential, acest câmp este ignorat.</p>
+              <p className="field-hint">Textul apare sub video, atât în Essential, cât și în Premium.</p>
             </div>
             <div className="field">
               <label>Idei cheie, câte una pe rând</label>
               <textarea name="key_points" rows={5} />
-              <p className="field-hint">Se folosește doar pentru HiLex Premium. Pentru Essential, acest câmp este ignorat.</p>
+              <p className="field-hint">Ideile cheie apar după textul materialului, în ambele platforme.</p>
             </div>
             <div className="field">
               <label>Ce mai trebuie să știi (Premium)</label>

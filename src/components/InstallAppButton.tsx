@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ArrowRight } from "lucide-react";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -19,7 +20,7 @@ function isStandalone() {
   return window.matchMedia("(display-mode: standalone)").matches || (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
 }
 
-export function InstallAppButton() {
+export function InstallAppButton({ compact = false }: { compact?: boolean }) {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
@@ -76,6 +77,7 @@ export function InstallAppButton() {
     <div className="install-app-box">
       <button className="btn primary install-app-btn" onClick={installApp} type="button">
         Instalează aplicația HiLex
+        {compact && <ArrowRight size={20} />}
       </button>
       {showInstructions ? (
         <p className="install-app-help">
@@ -83,9 +85,9 @@ export function InstallAppButton() {
             ? "Pe iPhone, apasă Share în browser, apoi Add to Home Screen / Adaugă pe ecranul principal."
             : "Dacă nu apare fereastra de instalare, deschide meniul browserului și alege Install app / Add to Home screen."}
         </p>
-      ) : (
+      ) : !compact ? (
         <p className="install-app-help">Adaugă HiLex pe telefon sau desktop și accesează platforma mai rapid.</p>
-      )}
+      ) : null}
     </div>
   );
 }

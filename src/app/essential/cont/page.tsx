@@ -1,9 +1,10 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { EssentialHeader } from "@/components/EssentialHeader";
+import { ArrowRight, FileText, LogOut, Smartphone } from "lucide-react";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { getMembershipCreditSummary } from "@/lib/membership";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getEssentialContent } from "@/lib/essential";
 
 function formatDate(value?: string | null) {
   if (!value) return "În verificare";
@@ -22,11 +23,7 @@ export default async function EssentialAccountPage({
 }) {
   const params = searchParams ? await searchParams : {};
   const supabase = await createSupabaseServerClient();
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login?plan=essential");
+  const { user } = await getEssentialContent();
 
   async function signOut() {
     "use server";
@@ -61,24 +58,18 @@ export default async function EssentialAccountPage({
     : 0;
 
   return (
-    <main className="page essential-page">
-      <EssentialHeader />
-      <section className="essential-simple-hero">
-        <div className="inner">
-          <span className="eyebrow">Cont Essential</span>
-          <h1>Membership-ul tău HiLex</h1>
-          <p>Detalii despre accesul tău, creditul de consultanță și facturile membership-ului.</p>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="inner essential-account-grid">
-          <article className="essential-account-panel main">
-            <span className="eyebrow">Planul tău</span>
+    <main className="essential-content">
+      <header className="essential-page-heading essential-underlined-heading">
+          <p className="essential-breadcrumbs">HiLex Essential <span>/</span> Cont</p>
+          <h1>Contul tău</h1>
+          <p>Membership, credit de consultanță și facturi, într-un singur loc.</p>
+      </header>
+      <section className="essential-account-columns">
+          <article className="essential-account-identity">
+            <span className="essential-label">Membership</span>
             <h2>HiLex Essential</h2>
-            <p className="muted">
-              Ai acces la materialele video Essential, organizate pe arii de drept pentru navigare rapidă.
-            </p>
+            <p>Acces la materialele video, organizate pe arii de drept.</p>
+            <h3>Datele tale</h3>
             <dl className="essential-account-details">
               <div>
                 <dt>Nume</dt>
@@ -98,27 +89,25 @@ export default async function EssentialAccountPage({
               </div>
             </dl>
             <form action={signOut}>
-              <button className="btn" type="submit">
-                Ieși din cont
+              <button className="essential-sign-out" type="submit">
+                <LogOut size={22} /> Ieși din cont
               </button>
             </form>
           </article>
 
-          <article className="essential-account-panel">
-            <span className="eyebrow">Credit consultanță</span>
-            <h2>{creditSummary.remainingMinutes} minute rămase</h2>
-            <p className="muted">
-              Ai folosit {creditSummary.usedMinutes} din {creditSummary.includedMinutes} minute incluse anual.
-            </p>
-            <div className="credit-meter" aria-label={`${creditPercent}% credit rămas`}>
+          <div className="essential-account-benefits">
+          <article className="essential-credit-section">
+            <span className="essential-label">Credit de consultanță</span>
+            <h2><strong>{creditSummary.remainingMinutes}</strong>minute disponibile</h2>
+            <p>Din cele {creditSummary.includedMinutes} de minute incluse anual.</p>
+            <div className="credit-meter" role="progressbar" aria-valuemin={0} aria-valuemax={creditSummary.includedMinutes || 1} aria-valuenow={creditSummary.remainingMinutes} aria-label="Credit de consultanță rămas">
               <span style={{ width: `${creditPercent}%` }} />
             </div>
+            <div className="essential-credit-caption"><span>{creditSummary.usedMinutes} minute folosite</span><span>{creditSummary.remainingMinutes} minute rămase</span></div>
           </article>
-
-          <article className="essential-account-panel">
-            <span className="eyebrow">Facturi</span>
-            <h2>Facturile tale</h2>
-            <p className="muted">Deschide pagina securizată Stripe pentru facturi și chitanțe.</p>
+          <article className="essential-invoices-section">
+            <div className="essential-invoices-title"><FileText size={34} strokeWidth={1.5} /><div><h2>Facturi și chitanțe</h2>
+            <p>Accesează facturile în portalul securizat Stripe.</p></div></div>
             {params.billing === "missing" ? (
               <p className="notice-text account-notice">Nu am găsit încă un client Stripe activ pentru acest cont.</p>
             ) : null}
@@ -128,18 +117,16 @@ export default async function EssentialAccountPage({
             <form action="/api/stripe/billing-portal" method="POST">
               <input name="returnTo" type="hidden" value="/essential/cont" />
               <button className="btn primary" type="submit">
-                Vezi facturile
+                Vezi facturile <ArrowRight size={22} />
               </button>
             </form>
           </article>
-
-          <article className="essential-account-panel">
-            <span className="eyebrow">Aplicația HiLex</span>
-            <h2>Salvează platforma pe telefon</h2>
-            <p className="muted">Accesează mai rapid materialele tale video, ca într-o aplicație.</p>
-            <InstallAppButton />
-          </article>
-        </div>
+          </div>
+      </section>
+      <section className="essential-install-section">
+        <Smartphone size={38} strokeWidth={1.5} />
+        <div><h2>HiLex, la îndemână</h2><p>Adaugă platforma pe telefon sau desktop pentru acces rapid.</p></div>
+        <InstallAppButton compact />
       </section>
     </main>
   );
