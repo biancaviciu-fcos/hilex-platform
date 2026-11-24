@@ -10,9 +10,10 @@ type SendEmailInput = {
   html?: string;
   replyTo?: string;
   attachments?: EmailAttachment[];
+  idempotencyKey?: string;
 };
 
-export async function sendEmail({ to, subject, text, html, replyTo, attachments }: SendEmailInput) {
+export async function sendEmail({ to, subject, text, html, replyTo, attachments, idempotencyKey }: SendEmailInput) {
   const resendApiKey = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM || "HILEX <membership@hilex.co.uk>";
 
@@ -24,7 +25,8 @@ export async function sendEmail({ to, subject, text, html, replyTo, attachments 
     method: "POST",
     headers: {
       Authorization: `Bearer ${resendApiKey}`,
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {})
     },
     body: JSON.stringify({
       from,

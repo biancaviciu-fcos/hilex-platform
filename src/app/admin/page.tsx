@@ -17,8 +17,9 @@ function statusLabel(status: string) {
 function emailTestMessage(value?: string | string[]) {
   const status = Array.isArray(value) ? value[0] : value;
 
+  if (status === "portal-ready") return "Portalul HiLex este pregătit: oprirea reînnoirii păstrează accesul până la finalul perioadei. Niciun abonament nu a fost modificat.";
   if (status === "sent") {
-    return "Emailul test cu ghidul atașat a fost acceptat pentru trimitere. Verifică inboxul și spamul.";
+    return "Emailul de test a fost acceptat pentru trimitere. Verifică inboxul și spamul.";
   }
 
   if (status === "failed") {
@@ -47,7 +48,7 @@ export default async function AdminPage({
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const emailMessage = emailTestMessage(resolvedSearchParams.emailTest);
-  const emailMessageIsSuccess = resolvedSearchParams.emailTest === "sent";
+  const emailMessageIsSuccess = ["sent", "portal-ready"].includes(String(resolvedSearchParams.emailTest));
   const supabase = await createSupabaseServerClient();
   const {
     data: { user }
@@ -154,6 +155,17 @@ export default async function AdminPage({
                 </button>
               </form>
             </div>
+            <form action="/api/admin/test-email" method="POST" style={{ marginTop: 24 }}>
+              <input type="hidden" name="kind" value="cancellation" />
+              <label htmlFor="cancellation-test-email">Test: confirmarea opririi reînnoirii</label>
+              <p className="muted">Folosește o dată demonstrativă. Nu modifică niciun abonament.</p>
+              <input id="cancellation-test-email" name="to" type="email" placeholder="Adresa pentru emailul de test" required />
+              <button className="btn primary" type="submit">Trimite test de oprire a reînnoirii</button>
+            </form>
+            <form action="/api/admin/test-email" method="POST" style={{ marginTop: 24 }}>
+              <input type="hidden" name="kind" value="portal-setup" />
+              <button className="btn secondary" type="submit">Verifică portalul de abonamente</button>
+            </form>
             {emailMessage ? (
               <p className={emailMessageIsSuccess ? "success-box" : "error-box"}>{emailMessage}</p>
             ) : null}

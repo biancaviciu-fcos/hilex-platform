@@ -212,21 +212,21 @@ export default async function AccountPage({
               </ul>
             </article>
             <article className="card account-service-card">
-              <span className="eyebrow">Facturi membership</span>
-              <h2>Facturile tale</h2>
+              <span className="eyebrow">Abonament și facturi</span>
+              <h2>Gestionează abonamentul</h2>
               <p className="muted">
-                Deschide pagina securizată Stripe pentru a vedea și descărca facturile sau chitanțele abonamentului.
+                Vezi facturile, actualizează metoda de plată sau oprește reînnoirea automată. Dacă oprești reînnoirea, accesul rămâne activ până la finalul perioadei curente.
               </p>
               {params.billing === "missing" ? (
                 <p className="notice-text account-notice">Nu am găsit încă un client Stripe activ pentru acest cont.</p>
               ) : null}
               {params.billing === "error" ? (
-                <p className="notice-text account-notice">Nu am putut deschide facturile acum. Reîncearcă în câteva momente.</p>
+                <p className="notice-text account-notice">Nu am putut deschide pagina de gestionare acum. Reîncearcă în câteva momente.</p>
               ) : null}
               <form action="/api/stripe/billing-portal" method="POST">
                 <input name="returnTo" type="hidden" value="/account" />
                 <button className="btn primary" type="submit">
-                  Vezi și descarcă facturile
+                  Gestionează abonamentul
                 </button>
               </form>
             </article>

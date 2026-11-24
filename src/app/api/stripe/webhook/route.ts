@@ -1,3 +1,4 @@
+import { sendCancellationEmail } from "@/lib/cancellationEmail";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
@@ -39,7 +40,7 @@ export async function POST(request: Request) {
     event.type === "customer.subscription.updated" ||
     event.type === "customer.subscription.deleted"
   ) {
-    await handleSubscriptionUpdated(event.data.object as Stripe.Subscription);
+    await handleSubscriptionUpdated(event.data.object as Stripe.Subscription, event);
   }
 
   return NextResponse.json({ received: true });
@@ -191,10 +192,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   await sendMembershipWelcomeEmail(email, plan, name || undefined, session.id);
 }
 
-async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
+async function handleSubscriptionUpdated(snapshot: Stripe.Subscription, event: Stripe.Event) {
+  const stripe = getStripe();
+  // Read current Stripe state so delayed events cannot restore expired access.
+  const subscription = await stripe.subscriptions.retrieve(snapshot.id);
   const supabase = createSupabaseAdminClient();
 
-  await supabase
+  const { error: syncError } = await supabase
     .from("subscriptions")
     .update({
       status: subscription.status,
@@ -204,6 +208,22 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
       updated_at: new Date().toISOString()
     })
     .eq("stripe_subscription_id", subscription.id);
+  if (syncError) throw syncError;
+
+  const previous = event.data.previous_attributes as Partial<Stripe.Subscription> | undefined;
+  const newlyStopped = event.type === "customer.subscription.updated" && previous?.cancel_at_period_end === false && snapshot.cancel_at_period_end;
+  if (!newlyStopped || !subscription.cancel_at_period_end || !["active", "trialing", "past_due"].includes(subscription.status)) return;
+  if (subscription.metadata.hilex_cancellation_email_event === event.id) return;
+  // Ignore an obsolete cancellation event after a later reactivation/cancellation.
+  if (snapshot.canceled_at !== subscription.canceled_at) return;
+  const { data: membership, error: lookupError } = await supabase.from("subscriptions").select("user_id").eq("stripe_subscription_id", subscription.id).maybeSingle();
+  if (lookupError) throw lookupError;
+  if (!membership) throw new Error("Cancellation membership not yet synchronized");
+  const { data: profile, error: profileError } = await supabase.from("profiles").select("email,full_name").eq("id", membership.user_id).single();
+  if (profileError || !profile?.email) throw profileError || new Error("Cancellation email recipient missing");
+  await sendCancellationEmail({ to: profile.email, name: profile.full_name || undefined, accessUntil: subscription.cancel_at || subscription.current_period_end, idempotencyKey: `hilex-cancellation/${event.id}` });
+  // Durable replay marker; Resend also deduplicates concurrent retries.
+  await stripe.subscriptions.update(subscription.id, { metadata: { hilex_cancellation_email_event: event.id } });
 }
 
 function toIso(value: number | null | undefined) {

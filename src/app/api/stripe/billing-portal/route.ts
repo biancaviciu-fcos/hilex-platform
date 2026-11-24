@@ -1,3 +1,4 @@
+import { ensureHiLexPortal } from "@/lib/billingPortal";
 import { NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -36,8 +37,10 @@ export async function POST(request: Request) {
     }
 
     const stripe = getStripe();
+    const configuration = await ensureHiLexPortal(stripe, siteUrl);
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: subscription.stripe_customer_id,
+      configuration: configuration.id,
       return_url: `${siteUrl}${returnTo}`
     });
 
