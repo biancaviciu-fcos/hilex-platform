@@ -18,7 +18,7 @@ function emailTestMessage(value?: string | string[]) {
   const status = Array.isArray(value) ? value[0] : value;
 
   if (status === "sent") {
-    return "Emailul test a fost trimis. Verifică inboxul și spamul.";
+    return "Emailul test cu ghidul atașat a fost acceptat pentru trimitere. Verifică inboxul și spamul.";
   }
 
   if (status === "failed") {
@@ -140,10 +140,15 @@ export default async function AdminPage({
               <div>
                 <h2>Verificare emailuri</h2>
                 <p className="muted">
-                  Trimite un email test către contul tău de admin pentru a verifica dacă Resend este configurat corect.
+                  Trimite către contul tău de admin emailul de bun venit cu ghidul HiLex atașat. Testul nu modifică abonamentul sau parola.
                 </p>
               </div>
               <form action="/api/admin/test-email" method="POST">
+                <label htmlFor="email-test-plan">Email de bun venit</label>
+                <select id="email-test-plan" name="plan" defaultValue="basic">
+                  <option value="basic">Essential</option>
+                  <option value="premium">Premium</option>
+                </select>
                 <button className="btn primary" type="submit">
                   Trimite email test
                 </button>

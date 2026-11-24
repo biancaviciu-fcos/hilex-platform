@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { sendEmail } from "@/lib/email";
+import { sendMembershipWelcomeEmail as deliverMembershipWelcomeEmail } from "@/lib/membershipEmail";
 import { getStripe } from "@/lib/stripe";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -167,7 +167,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       });
     }
 
-    await sendMembershipWelcomeEmail(email, "premium", name || undefined, session.id);
+    await sendMembershipWelcomeEmail(email, "premium", name || undefined, session.id, true);
     return;
   }
 
@@ -215,37 +215,7 @@ function getCheckoutCustomField(session: Stripe.Checkout.Session, key: string) {
   return field?.text?.value || field?.numeric?.value || field?.dropdown?.value || "";
 }
 
-async function sendMembershipWelcomeEmail(email: string, plan: "basic" | "premium", name?: string, sessionId?: string) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://membersaccess.hilex.co.uk";
-  const firstName = escapeHtml(name?.split(" ")[0] || "Bună");
-  const planLabel = plan === "premium" ? "Premium" : "Essential";
-  const headline =
-    plan === "premium"
-      ? "Felicitări, planul tău HILEX este acum Premium"
-      : "Bun venit în HILEX Essential";
-  const intro =
-    plan === "premium"
-      ? "upgrade-ul tău a fost activat cu succes."
-      : "abonamentul tău a fost activat cu succes.";
-  const details =
-    plan === "premium"
-      ? "Ai acum acces la materialele Premium, resursele exclusive și conținutul prioritar din platformă."
-      : "Ai acum acces la materialele Essential, resursele juridice practice și conținutul inclus în planul tău.";
-
-  const html = `
-    <div style="font-family: Arial, sans-serif; color: #05083f; line-height: 1.55; max-width: 620px; margin: 0 auto; padding: 28px;">
-      <h1 style="font-size: 30px; margin: 0 0 12px;">${headline}</h1>
-      <p>${firstName}, ${intro}</p>
-      <p>${details}</p>
-      <p>Plan activ: <strong>${planLabel}</strong></p>
-      <p>Dacă este prima dată când intri în HILEX, vei primi și emailul pentru setarea parolei contului tău.</p>
-      <p style="margin: 28px 0;">
-        <a href="${siteUrl}/library" style="background: #d9047c; color: #ffffff; padding: 14px 22px; text-decoration: none; border-radius: 8px; font-weight: 700;">Intră în resurse</a>
-      </p>
-      <p style="color: #5f6377;">Mulțumim,<br />Echipa HILEX</p>
-    </div>
-  `;
-
+async function sendMembershipWelcomeEmail(email: string, plan: "basic" | "premium", name?: string, sessionId?: string, upgrade = false) {
   try {
     console.log("HILEX sending membership email", {
       to: email,
@@ -255,20 +225,13 @@ async function sendMembershipWelcomeEmail(email: string, plan: "basic" | "premiu
       emailFrom: process.env.EMAIL_FROM || "HILEX <membership@hilex.co.uk>"
     });
 
-    await sendEmail({
-      to: email,
-      subject: plan === "premium" ? "Planul tău HILEX a fost upgradat la Premium" : "Bun venit în HILEX Essential",
-      html,
-      text:
-        plan === "premium"
-          ? `Felicitări, planul tău HILEX este acum Premium. Intră în resurse: ${siteUrl}/library`
-          : `Bun venit în HILEX Essential. Abonamentul tău a fost activat. Intră în resurse: ${siteUrl}/library`
-    });
+    const result = await deliverMembershipWelcomeEmail({ to: email, plan, name, upgrade });
 
     console.log("HILEX membership email sent", {
       to: email,
       plan,
-      sessionId
+      sessionId,
+      emailId: result.id
     });
   } catch (error) {
     console.error("Membership welcome email failed", {
@@ -278,13 +241,4 @@ async function sendMembershipWelcomeEmail(email: string, plan: "basic" | "premiu
       error
     });
   }
-}
-
-function escapeHtml(value: string) {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
 }

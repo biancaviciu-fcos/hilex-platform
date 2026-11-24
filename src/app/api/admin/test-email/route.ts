@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sendEmail } from "@/lib/email";
+import { sendMembershipWelcomeEmail } from "@/lib/membershipEmail";
 import { isAdminUser } from "@/lib/admin";
 import { hasAdminPanelAccess } from "@/lib/adminAccess";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -31,17 +31,14 @@ export async function POST(request: Request) {
   }
 
   try {
-    await sendEmail({
+    const form = await request.formData();
+    const plan = form.get("plan") === "premium" ? "premium" : "basic";
+    const result = await sendMembershipWelcomeEmail({
       to,
-      subject: "Test email HILEX",
-      text: "Dacă ai primit acest email, Resend este configurat corect pentru HILEX.",
-      html: `
-        <div style="font-family:Arial,sans-serif;color:#05083f;line-height:1.55;max-width:620px;margin:0 auto;padding:28px;">
-          <h1>Test email HILEX</h1>
-          <p>Dacă ai primit acest email, Resend este configurat corect pentru HILEX.</p>
-        </div>
-      `
+      plan,
+      test: true
     });
+    console.log("HILEX admin welcome email test accepted", { emailId: result.id, plan });
 
     return redirectToAdmin(request, "emailTest=sent");
   } catch (error) {
@@ -51,5 +48,5 @@ export async function POST(request: Request) {
 }
 
 function redirectToAdmin(request: Request, query: string) {
-  return NextResponse.redirect(new URL(`/admin?${query}`, request.url));
+  return NextResponse.redirect(new URL(`/admin?${query}`, request.url), 303);
 }
