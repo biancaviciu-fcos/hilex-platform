@@ -128,6 +128,7 @@ export default async function AdminPage({
       <section className="hero">
         <div className="inner">
           <h1>Admin HILEX</h1>
+          <Link className="btn" href="/admin/members">Membri și export emailuri</Link>
           <p>Gestionează conținutul resurselor, drafturile și publicarea.</p>
           <Link className="btn primary" href="/admin/lessons/new">
             Material nou
