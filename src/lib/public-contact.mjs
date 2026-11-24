@@ -5,7 +5,7 @@ const attempts = new Map();
 const windowMs = 15 * 60 * 1000;
 const topics = new Set(['Despre membership', 'Alegerea pachetului', 'Acces la cont', 'Programarea unei consultații', 'Altă întrebare']);
 const origins = new Set(['https://www.hilex.co.uk', 'https://hilex.co.uk']);
-const errorMessage = 'Nu am putut trimite mesajul. Încearcă din nou sau scrie-ne la enquiries@fcos.co.uk.';
+const errorMessage = 'Nu am putut trimite mesajul. Încearcă din nou sau scrie-ne la membership@hilex.co.uk.';
 function json(data, status = 200, headers = {}) {
   return Response.json(data, { status, headers: { 'Cache-Control': 'no-store', ...headers } });
 }
@@ -55,7 +55,7 @@ export default {
         headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', 'Idempotency-Key': `hilex-contact-${id}` },
         body: JSON.stringify({
           from: process.env.EMAIL_FROM || 'HiLex <membership@hilex.co.uk>',
-          to: ['enquiries@fcos.co.uk'],
+          to: ['membership@hilex.co.uk'],
           reply_to: email,
           subject: `HiLex Contact — ${topic}`,
           text: `Mesaj nou de pe www.hilex.co.uk/contact.html\n\nNume: ${name}\nE-mail: ${email}\nSubiect: ${topic}\n\n${message}`
